@@ -1,0 +1,12 @@
+# Ignore compiled binaries and object files
+bin/
+obj/
+
+# Ignore log files
+*.log
+
+# Ignore node modules
+node_modules/
+
+# Ignore sensitive environment variables
+.env
