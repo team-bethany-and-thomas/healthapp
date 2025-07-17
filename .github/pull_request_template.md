@@ -1,6 +1,6 @@
 ## Related Issue
 
-- Closes: [#20](https://github.com/orgs/team-bethany-and-thomas/projects/4?pane=issue&itemId=120413491&issue=team-bethany-and-thomas%7CHealthApp%7C20)
+- Closes: (put link to related GitHub ticket here)
 
 ## Description
 
