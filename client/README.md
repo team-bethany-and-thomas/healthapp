@@ -1,3 +1,8 @@
+Team Members:
+
+Ryan Hardin- [Github](https://github.com/Rhardin378)
+
+Richard Whittington https://github.com/kilted2000
 
 Shaina Bowser github: https://github.com/poisonivy91
 =======
