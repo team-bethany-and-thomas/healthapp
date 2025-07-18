@@ -12,7 +12,7 @@ Pulse Health is a patient-focused healthcare application that simplifies the pro
 - **Richard Whittington** - [GitHub](https://github.com/kilted2000)
 - **Shaina Bowser** - [GitHub](https://github.com/poisonivy91)
 - **Lynjai Jimenez** - [GitHub](https://github.com/IntermediaDesigns)
-- **Christopher** - [GitHub]()
+- **Christopher** - [GitHub]() 
 
 ## 🛠️ Tech Stack
 
