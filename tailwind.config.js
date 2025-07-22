@@ -1,11 +1,17 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./app/**/*.{js,ts,jsx,tsx}",
-    "./components/**/*.{js,ts,jsx,tsx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ["var(--font-geist-sans)", "Arial", "Helvetica", "sans-serif"],
+        mono: ["var(--font-geist-mono)", "monospace"],
+      },
+    },
   },
   plugins: [require("daisyui")],
   daisyui: {
@@ -35,5 +41,11 @@ module.exports = {
         }
       }
     ],
+    darkTheme: false,
+    base: true,
+    styled: true,
+    utils: true,
+    prefix: "",
+    logs: true,
   }
 }
