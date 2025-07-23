@@ -1,5 +1,5 @@
 import React from 'react';
-import LandingPage from '../../components/features/LandingPage'
+import LandingPage from '../../../components/features/LandingPage'
 
 const HomePage = () => {
   return (
@@ -9,4 +9,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default HomePage; 
