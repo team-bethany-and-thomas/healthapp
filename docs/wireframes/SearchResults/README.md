@@ -67,3 +67,4 @@ Each provider result includes:
 - Each provider card is self-contained with all essential information
 - Calendar integration allows for immediate booking workflow
 - Design maintains consistency with overall app design system
+- FigJam board: https://www.figma.com/board/LBXggp7T2UD5rUonHWUEsQ/Brainstorm-FigJam?node-id=0-1&p=f&t=2ASTzYarf1qh3bhT-0
