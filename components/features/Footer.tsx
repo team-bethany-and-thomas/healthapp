@@ -1,16 +1,20 @@
 import React from "react";
 import { Facebook, Instagram, Twitter } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export const Footer = () => {
   return (
     <footer className="footer sm:footer-horizontal text-base-content justify-evenly gap-12 p-10  ">
       <aside className="max-w-sm flex flex-col justify-end   ">
-        <Link
-          href="/"
-          className="text-3xl text-primary font-bold hover:text-primary/80 transition-colors"
-        >
-          Pulse Clinic
+       <Link href="/" className="hover:opacity-80 transition-opacity">
+          <Image
+            src="/pulseclinic.png"
+            alt="Pulse Clinic Logo"
+            width={300}
+            height={95}
+            className="h-auto"
+          />
         </Link>
         <p className="w-full  text-base text-base-content ">
           Pulse serves as the heartbeat of community health, committed to
