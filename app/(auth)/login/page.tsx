@@ -1,54 +1,43 @@
 "use client";
-import { useState, useEffect } from "react";
-import { account } from "../../lib/appwrite";
-import { Models } from "appwrite";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../../hooks/useAuth";
 
 const LoginPage: React.FC = () => {
-  const [loggedInUser, setLoggedInUser] = useState<Models.User<Models.Preferences> | null>(null);
+  const { user, isLoading, login, logout } = useAuth();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [loginError, setLoginError] = useState<string>("");
+  const router = useRouter();
 
-  // Check if user is already logged in when component mounts
-  useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const user = await account.get();
-        setLoggedInUser(user);
-      } catch (error) {
-        // User is not logged in
-        setLoggedInUser(null);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkUser();
-  }, []);
-
-  const login = async (email: string, password: string): Promise<void> => {
+  const handleLogin = async () => {
     try {
-      const session = await account.createEmailPasswordSession(email, password);
-      setLoggedInUser(await account.get());
+      setLoginError("");
+      await login(email, password);
+      router.push("/dashboard"); // Redirect to dashboard after successful login
     } catch (error) {
       console.error("Login failed:", error);
+      setLoginError("Login failed. Please check your credentials.");
     }
   };
 
-  const logout = async (): Promise<void> => {
-    await account.deleteSession("current");
-    setLoggedInUser(null);
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  if (loggedInUser) {
+  if (user) {
     return (
       <div>
-        <p>Logged in as {loggedInUser.name}</p>
-        <button type="button" onClick={logout}>
+        <p>Logged in as {user.name}</p>
+        <button type="button" onClick={handleLogout}>
           Logout
         </button>
       </div>
@@ -58,6 +47,7 @@ const LoginPage: React.FC = () => {
   return (
     <div>
       <p>Not logged in</p>
+      {loginError && <p className="text-red-500">{loginError}</p>}
       <form>
         <input
           type="email"
@@ -71,7 +61,7 @@ const LoginPage: React.FC = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button type="button" onClick={() => login(email, password)}>
+        <button type="button" onClick={handleLogin}>
           Login
         </button>
       </form>
