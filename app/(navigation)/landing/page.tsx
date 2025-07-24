@@ -1,12 +1,14 @@
-import React from 'react';
-import LandingPage from '../../../components/features/LandingPage'
+import React from "react";
+import LandingPage from "../../../components/features/LandingPage";
 
 const HomePage = () => {
   return (
-    <main>
-      <LandingPage/>
-    </main>
+    <>
+      <main>
+        <LandingPage />
+      </main>
+    </>
   );
 };
 
-export default HomePage; 
+export default HomePage;
