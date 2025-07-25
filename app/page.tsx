@@ -1,9 +1,7 @@
-import Searchbar from "@/components/Searchbar";
+
+import LandingPage from '../components/features/LandingPage'
 
 export default function Home() {
-  return (
-    <div>
-<Searchbar />
-    </div>
-  );
+  return <LandingPage />
+
 }
