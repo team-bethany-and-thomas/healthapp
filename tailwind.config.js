@@ -12,7 +12,7 @@ const config = {
   },
   plugins: [daisyui],
   daisyui: {
-    themes: ["light", "dark", "cupcake"],
+    themes: false, // Disable themes since we're using CSS custom properties
   },
 };
 

@@ -73,15 +73,15 @@ const NavBar = () => {
             <ul
               tabIndex={0}
               className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
-              <li><a>Item 1</a></li>
+              <li><a>Contact</a></li>
               <li>
-                <a>Parent</a>
+                <a>Services</a>
                 <ul className="p-2">
-                  <li><a>Submenu 1</a></li>
-                  <li><a>Submenu 2</a></li>
+                  <li><a>Conventional</a></li>
+                  <li><a>Traditional</a></li>
                 </ul>
               </li>
-              <li><a>Item 3</a></li>
+              <li><a>About Us</a></li>
               {/* Mobile auth buttons */}
               <div className="divider lg:hidden my-2"></div>
               <div className="px-4 pb-2 lg:hidden">
@@ -102,17 +102,17 @@ const NavBar = () => {
         
         <div className="navbar-center hidden lg:flex">
           <ul className="menu menu-horizontal px-1">
-            <li><a>Item 1</a></li>
+            <li><a>Contact</a></li>
             <li>
               <details>
-                <summary>Parent</summary>
+                <summary>Services</summary>
                 <ul className="p-2">
-                  <li><a>Submenu 1</a></li>
-                  <li><a>Submenu 2</a></li>
+                  <li><a>Conventional</a></li>
+                  <li><a>Tradtional</a></li>
                 </ul>
               </details>
             </li>
-            <li><a>Item 3</a></li>
+            <li><a>About Us</a></li>
           </ul>
         </div>
         
