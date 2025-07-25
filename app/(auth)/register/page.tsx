@@ -1,28 +1,23 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation"; // App Router
-import { account, ID } from "../../lib/appwrite";
-import { Models } from "appwrite";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../../hooks/useAuth";
 
 const RegistrationPage: React.FC = () => {
   const router = useRouter();
-  const [loggedInUser, setLoggedInUser] = useState<Models.User<Models.Preferences> | null>(null);
+  const { user, isLoading: authLoading, register, logout } = useAuth();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [name, setName] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isRegistering, setIsRegistering] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
 
-  const register = async (): Promise<void> => {
+  const handleRegister = async (): Promise<void> => {
     try {
-      setIsLoading(true);
+      setIsRegistering(true);
       setMessage("");
       
-      await account.create(ID.unique(), email, password, name);
-      
-      // Auto-login after successful registration
-      await account.createEmailPasswordSession(email, password);
-      setLoggedInUser(await account.get());
+      await register(email, password, name);
       
       setMessage("Registration successful! Redirecting to dashboard...");
       
@@ -33,21 +28,28 @@ const RegistrationPage: React.FC = () => {
       setMessage("Registration failed. Please try again.");
       console.error("Registration error:", error);
     } finally {
-      setIsLoading(false);
+      setIsRegistering(false);
     }
   };
 
-  const logout = async (): Promise<void> => {
-    await account.deleteSession("current");
-    setLoggedInUser(null);
-    setMessage("");
+  const handleLogout = async (): Promise<void> => {
+    try {
+      await logout();
+      setMessage("");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
-  if (loggedInUser) {
+  if (authLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (user) {
     return (
       <div>
-        <p>Logged in as {loggedInUser.name}</p>
-        <button type="button" onClick={logout}>
+        <p>Logged in as {user.name}</p>
+        <button type="button" onClick={handleLogout}>
           Logout
         </button>
       </div>
@@ -82,10 +84,10 @@ const RegistrationPage: React.FC = () => {
         />
         <button 
           type="button" 
-          onClick={register}
-          disabled={isLoading || !email || !password || !name}
+          onClick={handleRegister}
+          disabled={isRegistering || !email || !password || !name}
         >
-          {isLoading ? "Registering..." : "Register"}
+          {isRegistering ? "Registering..." : "Register"}
         </button>
       </form>
     </div>

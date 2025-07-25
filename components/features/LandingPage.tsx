@@ -1,10 +1,10 @@
 import React from 'react'
-import NavBar from './NavBar'
+
 
 const LandingPage = () => {
   return (
     <>
-   <NavBar />
+
       <div className="container mx-auto p-4 space-y-6">
         {/* Theme Color Examples */}
         <section className="space-y-4">
