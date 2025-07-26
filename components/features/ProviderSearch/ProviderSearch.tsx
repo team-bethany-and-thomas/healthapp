@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Search, Stethoscope, Hospital, Syringe, Activity, Star, MapPin, Clock, Calendar } from "lucide-react";
 import styles from './ProviderSearch.module.css';
 
@@ -22,107 +22,102 @@ interface Provider {
   }[];
 }
 
+// Dummy provider data from the search results component
+const allProviders: Provider[] = [
+  {
+    first_name: "Emily",
+    last_name: "Chen",
+    specialty: "Primary Care (Family or Internal Medicine)",
+    city: "Dallas",
+    state: "TX",
+    zip: "75201",
+    education: "MD - University of Texas Southwestern Medical School",
+    practice_name: "Pulse Clinic - Downtown Dallas",
+    languages_spoken: ["English", "Mandarin"],
+    rating: 4.8,
+    appointments: [
+      { date: "2025-07-26", start_time: "09:00", length_minutes: 30 },
+      { date: "2025-07-26", start_time: "10:30", length_minutes: 30 },
+      { date: "2025-07-27", start_time: "08:00", length_minutes: 30 },
+      { date: "2025-07-28", start_time: "14:00", length_minutes: 45 },
+    ],
+  },
+  {
+    first_name: "Marcus",
+    last_name: "Patel",
+    specialty: "Cardiology",
+    city: "Plano",
+    state: "TX",
+    zip: "75023",
+    education: "MD - Baylor College of Medicine",
+    practice_name: "Pulse Clinic - Plano",
+    languages_spoken: ["English", "Hindi", "Gujarati"],
+    rating: 4.9,
+    appointments: [
+      { date: "2025-07-26", start_time: "11:00", length_minutes: 60 },
+      { date: "2025-07-27", start_time: "09:30", length_minutes: 60 },
+      { date: "2025-07-29", start_time: "13:00", length_minutes: 45 },
+    ],
+  },
+  {
+    first_name: "Rachel",
+    last_name: "Nguyen",
+    specialty: "Pediatrics",
+    city: "Frisco",
+    state: "TX",
+    zip: "75034",
+    education: "MD - Texas A&M Health Science Center",
+    practice_name: "Pulse Clinic - Frisco",
+    languages_spoken: ["English", "Vietnamese"],
+    rating: 4.7,
+    appointments: [
+      { date: "2025-07-26", start_time: "10:00", length_minutes: 30 },
+      { date: "2025-07-26", start_time: "15:30", length_minutes: 30 },
+      { date: "2025-07-28", start_time: "09:00", length_minutes: 30 },
+      { date: "2025-07-29", start_time: "16:00", length_minutes: 30 },
+    ],
+  },
+  {
+    first_name: "Thomas",
+    last_name: "Brooks",
+    specialty: "Orthopedics",
+    city: "Arlington",
+    state: "TX",
+    zip: "76010",
+    education: "MD - University of Texas Medical Branch",
+    practice_name: "Pulse Clinic - Arlington",
+    languages_spoken: ["English"],
+    rating: 4.6,
+    appointments: [
+      { date: "2025-07-27", start_time: "08:30", length_minutes: 45 },
+      { date: "2025-07-28", start_time: "10:15", length_minutes: 60 },
+      { date: "2025-07-30", start_time: "14:30", length_minutes: 45 },
+    ],
+  },
+  {
+    first_name: "Aisha",
+    last_name: "Roberts",
+    specialty: "Obstetrics & Gynecology",
+    city: "Fort Worth",
+    state: "TX",
+    zip: "76102",
+    education: "MD - UT Health San Antonio",
+    practice_name: "Pulse Clinic - Fort Worth",
+    languages_spoken: ["English", "Spanish"],
+    rating: 4.8,
+    appointments: [
+      { date: "2025-07-26", start_time: "13:00", length_minutes: 30 },
+      { date: "2025-07-27", start_time: "11:30", length_minutes: 45 },
+      { date: "2025-07-29", start_time: "09:00", length_minutes: 30 },
+      { date: "2025-07-30", start_time: "15:00", length_minutes: 30 },
+    ],
+  },
+];
+
 export function ProviderSearch() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [, setProviders] = useState<Provider[]>([]);
   const [filteredProviders, setFilteredProviders] = useState<Provider[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-
-  // Dummy provider data from the search results component
-  const allProviders: Provider[] = [
-    {
-      first_name: "Emily",
-      last_name: "Chen",
-      specialty: "Primary Care (Family or Internal Medicine)",
-      city: "Dallas",
-      state: "TX",
-      zip: "75201",
-      education: "MD - University of Texas Southwestern Medical School",
-      practice_name: "Pulse Clinic - Downtown Dallas",
-      languages_spoken: ["English", "Mandarin"],
-      rating: 4.8,
-      appointments: [
-        { date: "2025-07-26", start_time: "09:00", length_minutes: 30 },
-        { date: "2025-07-26", start_time: "10:30", length_minutes: 30 },
-        { date: "2025-07-27", start_time: "08:00", length_minutes: 30 },
-        { date: "2025-07-28", start_time: "14:00", length_minutes: 45 },
-      ],
-    },
-    {
-      first_name: "Marcus",
-      last_name: "Patel",
-      specialty: "Cardiology",
-      city: "Plano",
-      state: "TX",
-      zip: "75023",
-      education: "MD - Baylor College of Medicine",
-      practice_name: "Pulse Clinic - Plano",
-      languages_spoken: ["English", "Hindi", "Gujarati"],
-      rating: 4.9,
-      appointments: [
-        { date: "2025-07-26", start_time: "11:00", length_minutes: 60 },
-        { date: "2025-07-27", start_time: "09:30", length_minutes: 60 },
-        { date: "2025-07-29", start_time: "13:00", length_minutes: 45 },
-      ],
-    },
-    {
-      first_name: "Rachel",
-      last_name: "Nguyen",
-      specialty: "Pediatrics",
-      city: "Frisco",
-      state: "TX",
-      zip: "75034",
-      education: "MD - Texas A&M Health Science Center",
-      practice_name: "Pulse Clinic - Frisco",
-      languages_spoken: ["English", "Vietnamese"],
-      rating: 4.7,
-      appointments: [
-        { date: "2025-07-26", start_time: "10:00", length_minutes: 30 },
-        { date: "2025-07-26", start_time: "15:30", length_minutes: 30 },
-        { date: "2025-07-28", start_time: "09:00", length_minutes: 30 },
-        { date: "2025-07-29", start_time: "16:00", length_minutes: 30 },
-      ],
-    },
-    {
-      first_name: "Thomas",
-      last_name: "Brooks",
-      specialty: "Orthopedics",
-      city: "Arlington",
-      state: "TX",
-      zip: "76010",
-      education: "MD - University of Texas Medical Branch",
-      practice_name: "Pulse Clinic - Arlington",
-      languages_spoken: ["English"],
-      rating: 4.6,
-      appointments: [
-        { date: "2025-07-27", start_time: "08:30", length_minutes: 45 },
-        { date: "2025-07-28", start_time: "10:15", length_minutes: 60 },
-        { date: "2025-07-30", start_time: "14:30", length_minutes: 45 },
-      ],
-    },
-    {
-      first_name: "Aisha",
-      last_name: "Roberts",
-      specialty: "Obstetrics & Gynecology",
-      city: "Fort Worth",
-      state: "TX",
-      zip: "76102",
-      education: "MD - UT Health San Antonio",
-      practice_name: "Pulse Clinic - Fort Worth",
-      languages_spoken: ["English", "Spanish"],
-      rating: 4.8,
-      appointments: [
-        { date: "2025-07-26", start_time: "13:00", length_minutes: 30 },
-        { date: "2025-07-27", start_time: "11:30", length_minutes: 45 },
-        { date: "2025-07-29", start_time: "09:00", length_minutes: 30 },
-        { date: "2025-07-30", start_time: "15:00", length_minutes: 30 },
-      ],
-    },
-  ];
-
-  useEffect(() => {
-    setProviders(allProviders);
-  }, [allProviders]);
 
   const handleSearch = () => {
     setIsSearching(true);
