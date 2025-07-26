@@ -10,7 +10,15 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     max-width: 800px;
     margin: 2rem auto;
-    backdrop-filter: blur(2px); 
+    backdrop-filter: blur(2px);
+    border: 1px solid #9ca3af;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    max-width: 800px;
+    margin: 2rem auto;
+    backdrop-filter: blur(2px);
+    color: black;
   }
   
   .search-header {
@@ -49,11 +57,6 @@
     outline: none;
     font-size: 1rem;
     background: transparent;
-    color: black;
-  }
-  
-  .search-bar input::placeholder {
-    color: #6b7280;
   }
   
   .search-button {

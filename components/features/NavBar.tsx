@@ -76,9 +76,9 @@ const NavBar = () => {
               <li><a className="text-black">Contact</a></li>
               <li>
                 <a className="text-black">Services</a>
-                <ul className="p-2 bg-white border border-gray-200 rounded-lg">
-                  <li><a className="text-black hover:bg-gray-100">Conventional</a></li>
-                  <li><a className="text-black hover:bg-gray-100">Traditional</a></li>
+                <ul className="p-2">
+                  <li><a className="text-black">Conventional</a></li>
+                  <li><a className="text-black">Traditional</a></li>
                 </ul>
               </li>
               <li><a className="text-black">About Us</a></li>
@@ -106,9 +106,9 @@ const NavBar = () => {
             <li>
               <details>
                 <summary className="text-black">Services</summary>
-                <ul className="p-2 bg-white border border-gray-200 rounded-lg shadow-lg">
-                  <li><a className="text-black hover:bg-gray-100">Conventional</a></li>
-                  <li><a className="text-black hover:bg-gray-100">Tradtional</a></li>
+                <ul className="p-2">
+                  <li><a className="text-black">Conventional</a></li>
+                  <li><a className="text-black">Tradtional</a></li>
                 </ul>
               </details>
             </li>
