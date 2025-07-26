@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import Image from 'next/image';
 
 interface DoctorCardProps {
   name?: string;
@@ -18,9 +19,11 @@ export function DoctorCard({
   return (
     <div className="card bg-base-100 shadow-sm" style={{ width: "180px" }}>
       <figure>
-        <img
+        <Image
           src={imageUrl}
           alt={name}
+          width={180}
+          height={120}
           className="w-full h-auto"
         />
       </figure>

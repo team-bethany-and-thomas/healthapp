@@ -24,7 +24,7 @@ interface Provider {
 
 export function ProviderSearch() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [providers, setProviders] = useState<Provider[]>([]);
+  const [, setProviders] = useState<Provider[]>([]);
   const [filteredProviders, setFilteredProviders] = useState<Provider[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
@@ -122,7 +122,7 @@ export function ProviderSearch() {
 
   useEffect(() => {
     setProviders(allProviders);
-  }, []);
+  }, [allProviders]);
 
   const handleSearch = () => {
     setIsSearching(true);
@@ -261,7 +261,7 @@ export function ProviderSearch() {
 
       {searchQuery && filteredProviders.length === 0 && !isSearching && (
         <div className={styles['no-results']}>
-          <p>No providers found matching "{searchQuery}"</p>
+          <p>No providers found matching &quot;{searchQuery}&quot;</p>
           <p>Try adjusting your search terms or browse all providers</p>
         </div>
       )}
