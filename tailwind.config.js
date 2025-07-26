@@ -11,9 +11,6 @@ const config = {
     extend: {},
   },
   plugins: [daisyui],
-  daisyui: {
-    themes: false, // Disable themes since we're using CSS custom properties
-  },
 };
 
 export default config;

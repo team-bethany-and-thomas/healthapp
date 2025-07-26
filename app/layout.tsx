@@ -27,20 +27,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="healthapp">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        suppressHydrationWarning={true}
       >
-        <>
         <AuthProvider>
-        <Navbar />
-        <div className="min-h-screen bg-gradient-to-b from-teal-100 to-white">
-          {children}
-        </div>
-        <Footer />
+          <div className="min-h-screen flex flex-col">
+            <Navbar />
+            <main className="flex-1 bg-teal-100">
+              {children}
+            </main>
+            <Footer />
+          </div>
         </AuthProvider>
-        </>
       </body>
     </html>
   );
