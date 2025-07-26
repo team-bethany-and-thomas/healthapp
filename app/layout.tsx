@@ -35,7 +35,9 @@ export default function RootLayout({
         <>
         <AuthProvider>
         <Navbar />
-        {children}
+        <div className="min-h-screen bg-gradient-to-b from-teal-100 to-white">
+          {children}
+        </div>
         <Footer />
         </AuthProvider>
         </>
