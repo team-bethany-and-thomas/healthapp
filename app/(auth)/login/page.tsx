@@ -30,41 +30,85 @@ const LoginPage: React.FC = () => {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="loading loading-spinner loading-lg text-primary"></div>
+      </div>
+    );
   }
 
   if (user) {
     return (
-      <div>
-        <p>Logged in as {user.name}</p>
-        <button type="button" onClick={handleLogout}>
-          Logout
-        </button>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="card bg-base-100 shadow-xl max-w-md w-full">
+          <div className="card-body">
+            <h2 className="card-title text-2xl mb-4">Welcome Back!</h2>
+            <p className="mb-4">Logged in as {user.name}</p>
+            <button 
+              type="button" 
+              onClick={handleLogout}
+              className="btn btn-primary"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div>
-      <p>Not logged in</p>
-      {loginError && <p className="text-red-500">{loginError}</p>}
-      <form>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button type="button" onClick={handleLogin}>
-          Login
-        </button>
-      </form>
+    <div className="min-h-screen flex items-center justify-center bg-base-200">
+      <div className="card bg-base-100 shadow-xl max-w-md w-full">
+        <div className="card-body">
+          <h2 className="card-title text-2xl mb-6 text-center">Login</h2>
+          
+          {loginError && (
+            <div className="alert alert-error mb-4">
+              <span>{loginError}</span>
+            </div>
+          )}
+          
+          <form className="space-y-4">
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Email</span>
+              </label>
+              <input
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="input input-bordered"
+                required
+              />
+            </div>
+            
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Password</span>
+              </label>
+              <input
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="input input-bordered"
+                required
+              />
+            </div>
+            
+            <button 
+              type="button" 
+              onClick={handleLogin}
+              className="btn btn-primary w-full"
+              disabled={!email || !password}
+            >
+              Login
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };

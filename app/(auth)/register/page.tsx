@@ -42,54 +42,106 @@ const RegistrationPage: React.FC = () => {
   };
 
   if (authLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="loading loading-spinner loading-lg text-primary"></div>
+      </div>
+    );
   }
 
   if (user) {
     return (
-      <div>
-        <p>Logged in as {user.name}</p>
-        <button type="button" onClick={handleLogout}>
-          Logout
-        </button>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="card bg-base-100 shadow-xl max-w-md w-full">
+          <div className="card-body">
+            <h2 className="card-title text-2xl mb-4">Welcome!</h2>
+            <p className="mb-4">Logged in as {user.name}</p>
+            <button 
+              type="button" 
+              onClick={handleLogout}
+              className="btn btn-primary"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div>
-      <h2>Register</h2>
-      {message && <p>{message}</p>}
-      <form>
-        <input
-          type="text"
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button 
-          type="button" 
-          onClick={handleRegister}
-          disabled={isRegistering || !email || !password || !name}
-        >
-          {isRegistering ? "Registering..." : "Register"}
-        </button>
-      </form>
+    <div className="min-h-screen flex items-center justify-center bg-base-200">
+      <div className="card bg-base-100 shadow-xl max-w-md w-full">
+        <div className="card-body">
+          <h2 className="card-title text-2xl mb-6 text-center">Register</h2>
+          
+          {message && (
+            <div className={`alert ${message.includes('successful') ? 'alert-success' : 'alert-error'} mb-4`}>
+              <span>{message}</span>
+            </div>
+          )}
+          
+          <form className="space-y-4">
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Name</span>
+              </label>
+              <input
+                type="text"
+                placeholder="Enter your full name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="input input-bordered"
+                required
+              />
+            </div>
+            
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Email</span>
+              </label>
+              <input
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="input input-bordered"
+                required
+              />
+            </div>
+            
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Password</span>
+              </label>
+              <input
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="input input-bordered"
+                required
+              />
+            </div>
+            
+            <button 
+              type="button" 
+              onClick={handleRegister}
+              className="btn btn-primary w-full"
+              disabled={isRegistering || !email || !password || !name}
+            >
+              {isRegistering ? (
+                <>
+                  <span className="loading loading-spinner loading-sm"></span>
+                  Registering...
+                </>
+              ) : (
+                "Register"
+              )}
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };
