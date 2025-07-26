@@ -30,6 +30,7 @@ export default function RootLayout({
     <html lang="en" data-theme="healthapp">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning={true}
       >
         <AuthProvider>
           <div className="min-h-screen flex flex-col">
