@@ -1,36 +1,15 @@
 import React from 'react'
 import { ProviderSearch } from './ProviderSearch'
-
+import { DoctorCard } from '@/components/ui/DoctorCard'
 const LandingPage = () => {
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Provider Search Section */}
       <div className="py-8">
         <ProviderSearch />
       </div>
-    
-      {/* Card Component */}
-      <div className="card bg-base-100 shadow-sm" style={{ width: "180px" }}>
-  <figure>
-    <img
-      src="https://shelleefisher.com/site/wp-content/uploads/2024/08/RobertWood02-scaled-1.jpg"
-      alt="Dr. Robert Wood"
-      className="w-full h-auto"
-    />
-  </figure>
-  <div className="card-body p-2">
-    <h2 className="card-title text-secondary text-sm">Dr. Robert Wood</h2>
-    <p className="text-base-content text-primary text-xs">Cardiac Surgeon</p>
-    <div className="card-actions justify-center w-[90%] mt-1">
-      <button className="btn btn-primary btn-xs w-full">Consult Now</button>
-    </div>
-  </div>
-</div>
-<>
-</>
-<>
-</>
-
+      <div className="py-8">
+        <DoctorCard />
+      </div>
       {/* Alert Examples */}
       <section className="space-y-4">
         <h2 className="text-2xl font-bold text-base-content">Alerts</h2>
