@@ -1,0 +1,297 @@
+[
+    {
+      "first_name": "Karen",
+      "last_name": "Smith",
+      "specialty": "Family Medicine",
+      "city": "Austin",
+      "state": "TX",
+      "zip": "78701",
+      "education": "University of Texas Medical Branch",
+      "practice_name": "Capital Family Clinic",
+      "languages_spoken": [
+        "English",
+        "Spanish"
+      ],
+      "rating": "9.2"
+    },
+    {
+      "first_name": "James",
+      "last_name": "Johnson",
+      "specialty": "Internal Medicine",
+      "city": "Dallas",
+      "state": "TX",
+      "zip": "75201",
+      "education": "Baylor College of Medicine",
+      "practice_name": "Downtown Internal Medicine",
+      "languages_spoken": [
+        "English"
+      ],
+      "rating": "8.7"
+    },
+    {
+      "first_name": "Emily",
+      "last_name": "Davis",
+      "specialty": "Dermatology",
+      "city": "Houston",
+      "state": "TX",
+      "zip": "77002",
+      "education": "UTHealth Houston",
+      "practice_name": "Bayou City Skin Clinic",
+      "languages_spoken": [
+        "English",
+        "Vietnamese"
+      ],
+      "rating": "9.5"
+    },
+    {
+      "first_name": "Michael",
+      "last_name": "Brown",
+      "specialty": "Cardiology",
+      "city": "San Antonio",
+      "state": "TX",
+      "zip": "78205",
+      "education": "Johns Hopkins School of Medicine",
+      "practice_name": "Alamo Heart Group",
+      "languages_spoken": [
+        "English",
+        "Spanish"
+      ],
+      "rating": "9.0"
+    },
+    {
+      "first_name": "Jessica",
+      "last_name": "Williams",
+      "specialty": "Pediatrics",
+      "city": "El Paso",
+      "state": "TX",
+      "zip": "79901",
+      "education": "University of New Mexico School of Medicine",
+      "practice_name": "Sun City Pediatrics",
+      "languages_spoken": [
+        "English",
+        "Spanish"
+      ],
+      "rating": "8.4"
+    },
+    {
+      "first_name": "Daniel",
+      "last_name": "Jones",
+      "specialty": "Emergency Medicine",
+      "city": "Fort Worth",
+      "state": "TX",
+      "zip": "76102",
+      "education": "UT Southwestern Medical Center",
+      "practice_name": "Trinity ER Associates",
+      "languages_spoken": [
+        "English"
+      ],
+      "rating": "8.9"
+    },
+    {
+      "first_name": "Sarah",
+      "last_name": "Garcia",
+      "specialty": "Psychiatry",
+      "city": "Arlington",
+      "state": "TX",
+      "zip": "76011",
+      "education": "University of California, San Diego",
+      "practice_name": "North Star Mental Health",
+      "languages_spoken": [
+        "English",
+        "Spanish"
+      ],
+      "rating": "9.3"
+    },
+    {
+      "first_name": "David",
+      "last_name": "Miller",
+      "specialty": "Neurology",
+      "city": "Corpus Christi",
+      "state": "TX",
+      "zip": "78401",
+      "education": "Mayo Clinic Alix School of Medicine",
+      "practice_name": "Gulf Coast Neuro Center",
+      "languages_spoken": [
+        "English",
+        "French"
+      ],
+      "rating": "9.1"
+    },
+    {
+      "first_name": "Laura",
+      "last_name": "Martinez",
+      "specialty": "OB/GYN",
+      "city": "Plano",
+      "state": "TX",
+      "zip": "75023",
+      "education": "Texas Tech University Health Sciences Center",
+      "practice_name": "Women's Health of Plano",
+      "languages_spoken": [
+        "English",
+        "Spanish"
+      ],
+      "rating": "8.8"
+    },
+    {
+      "first_name": "Christopher",
+      "last_name": "Rodriguez",
+      "specialty": "Orthopaedic Surgery",
+      "city": "Laredo",
+      "state": "TX",
+      "zip": "78040",
+      "education": "Columbia University Vagelos College of Physicians and Surgeons",
+      "practice_name": "South Texas Ortho Group",
+      "languages_spoken": [
+        "English",
+        "Spanish"
+      ],
+      "rating": "9.6"
+    },
+    {
+      "first_name": "Michelle",
+      "last_name": "Lopez",
+      "specialty": "Endocrinology",
+      "city": "McAllen",
+      "state": "TX",
+      "zip": "78501",
+      "education": "University of Florida College of Medicine",
+      "practice_name": "Rio Grande Endocrine Clinic",
+      "languages_spoken": [
+        "English",
+        "Spanish"
+      ],
+      "rating": "9.4"
+    },
+    {
+      "first_name": "Brian",
+      "last_name": "Hernandez",
+      "specialty": "Gastroenterology",
+      "city": "Waco",
+      "state": "TX",
+      "zip": "76701",
+      "education": "University of Michigan Medical School",
+      "practice_name": "Heart of Texas Gastro Clinic",
+      "languages_spoken": [
+        "English",
+        "Spanish"
+      ],
+      "rating": "9.0"
+    },
+    {
+      "first_name": "Olivia",
+      "last_name": "Clark",
+      "specialty": "Rheumatology",
+      "city": "Lubbock",
+      "state": "TX",
+      "zip": "79401",
+      "education": "Stanford University School of Medicine",
+      "practice_name": "West Texas Rheumatology Center",
+      "languages_spoken": [
+        "English",
+        "Spanish"
+      ],
+      "rating": "9.2"
+    },
+    {
+      "first_name": "Ethan",
+      "last_name": "Walker",
+      "specialty": "Urology",
+      "city": "Amarillo",
+      "state": "TX",
+      "zip": "79101",
+      "education": "University of California, Los Angeles (UCLA) David Geffen School of Medicine",
+      "practice_name": "Panhandle Urology Associates",
+      "languages_spoken": [
+        "English"
+      ],
+      "rating": "9.5"
+    },
+    {
+      "first_name": "Sophia",
+      "last_name": "Young",
+      "specialty": "Ophthalmology",
+      "city": "Brownsville",
+      "state": "TX",
+      "zip": "78520",
+      "education": "University of California, San Francisco (UCSF) School of Medicine",
+      "practice_name": "Rio Grande Eye Care",
+      "languages_spoken": [
+        "English",
+        "Spanish"
+      ],
+      "rating": "9.3"
+    },
+    {
+      "first_name": "Alexander",
+      "last_name": "King",
+      "specialty": "Oncology",
+      "city": "Killeen",
+      "state": "TX",
+      "zip": "76541",
+      "education": "Harvard Medical School",
+      "practice_name": "Central Texas Cancer Center",
+      "languages_spoken": [
+        "English",
+        "Spanish"
+      ],
+      "rating": "9.7"
+    },
+    {
+      "first_name": "Ava",
+      "last_name": "Scott",
+      "specialty": "Pulmonology",
+      "city": "Tyler",
+      "state": "TX",
+      "zip": "75701",
+      "education": "University of Virginia School of Medicine",
+      "practice_name": "East Texas Lung Specialists",
+      "languages_spoken": [
+        "English"
+      ],
+      "rating": "9.1"
+    },
+    {
+      "first_name": "Mia",
+      "last_name": "Adams",
+      "specialty": "Hematology",
+      "city": "Laredo",
+      "state": "TX",
+      "zip": "78040",
+      "education": "University of Pennsylvania Perelman School of Medicine",
+      "practice_name": "Borderland Hematology Clinic",
+      "languages_spoken": [
+        "English",
+        "Spanish"
+      ],
+      "rating": "9.4"
+    },
+    {
+      "first_name": "Noah",
+      "last_name": "Baker",
+      "specialty": "Nephrology",
+      "city": "Abilene",
+      "state": "TX",
+      "zip": "79601",
+      "education": "University of Chicago Pritzker School of Medicine",
+      "practice_name": "West Texas Kidney Specialists",
+      "languages_spoken": [
+        "English"
+      ],
+      "rating": "9.0"
+    },
+    {
+      "first_name": "Isabella",
+      "last_name": "Gonzalez",
+      "specialty": "Plastic Surgery",
+      "city": "College Station",
+      "state": "TX",
+      "zip": "77840",
+      "education": "Duke University School of Medicine",
+      "practice_name": "Aggieland Aesthetic Surgery",
+      "languages_spoken": [
+        "English",
+        "Spanish"
+      ],
+      "rating": "9.6"
+    }
+  ]
