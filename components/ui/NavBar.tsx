@@ -62,7 +62,7 @@ const NavBar = () => {
 
   return (
     <>
-      <div className="navbar bg-base-100 shadow-sm">
+      <div className="navbar bg-white shadow-sm">
         <div className="navbar-start">
           <div className="dropdown">
             <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -72,16 +72,16 @@ const NavBar = () => {
             </div>
             <ul
               tabIndex={0}
-              className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
-              <li><a>Item 1</a></li>
+              className="menu menu-sm dropdown-content bg-white rounded-box z-[1] mt-3 w-52 p-2 shadow">
+              <li><a className="text-black">Contact</a></li>
               <li>
-                <a>Parent</a>
+                <a className="text-black">Services</a>
                 <ul className="p-2">
-                  <li><a>Submenu 1</a></li>
-                  <li><a>Submenu 2</a></li>
+                  <li><a className="text-black">Conventional</a></li>
+                  <li><a className="text-black">Traditional</a></li>
                 </ul>
               </li>
-              <li><a>Item 3</a></li>
+              <li><a className="text-black">About Us</a></li>
               {/* Mobile auth buttons */}
               <div className="divider lg:hidden my-2"></div>
               <div className="px-4 pb-2 lg:hidden">
@@ -102,17 +102,17 @@ const NavBar = () => {
         
         <div className="navbar-center hidden lg:flex">
           <ul className="menu menu-horizontal px-1">
-            <li><a>Item 1</a></li>
+            <li><a className="text-black">Contact</a></li>
             <li>
               <details>
-                <summary>Parent</summary>
+                <summary className="text-black">Services</summary>
                 <ul className="p-2">
-                  <li><a>Submenu 1</a></li>
-                  <li><a>Submenu 2</a></li>
+                  <li><a className="text-black">Conventional</a></li>
+                  <li><a className="text-black">Tradtional</a></li>
                 </ul>
               </details>
             </li>
-            <li><a>Item 3</a></li>
+            <li><a className="text-black">About Us</a></li>
           </ul>
         </div>
         

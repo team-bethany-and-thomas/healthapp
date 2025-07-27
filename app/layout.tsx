@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "../components/features/NavBar";
+import { NavBar } from "@/components/ui";
 import { AuthProvider } from "./providers/AuthProvider";
-import { Footer } from "@/components/features/Footer";
+import { Footer } from "@/components/ui";
 
 
 const geistSans = Geist({
@@ -27,18 +27,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="healthapp">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning={true}
       >
-        <>
         <AuthProvider>
-        <Navbar />
-        {children}
-        <Footer />
+          <div className="min-h-screen flex flex-col">
+            <NavBar />
+            <main className="flex-1 bg-teal-100">
+              {children}
+            </main>
+            <Footer />
+          </div>
         </AuthProvider>
-        </>
       </body>
     </html>
   );
