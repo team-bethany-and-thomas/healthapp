@@ -1,2 +1,45 @@
 @import "tailwindcss";
-@plugin "daisyui";
+@plugin "daisyui" {
+  themes: healthapp --default;
+}
+
+@plugin "daisyui/theme" {
+  name: "healthapp";
+  default: true;
+  prefersdark: false;
+  color-scheme: "light";
+  
+  /* Base colors */
+  --color-base-100: oklch(100% 0 0);
+  --color-base-200: oklch(98% 0 0);
+  --color-base-300: oklch(95% 0 0);
+  --color-base-content: oklch(21% 0.006 285.885);
+  
+  /* Primary: Teal */
+  --color-primary: oklch(65% 0.18 180);
+  --color-primary-content: oklch(95% 0.02 180);
+  
+  /* Secondary: Purple */
+  --color-secondary: oklch(55% 0.25 280);
+  --color-secondary-content: oklch(95% 0.02 280);
+  
+  /* Accent: Orange */
+  --color-accent: oklch(75% 0.25 45);
+  --color-accent-content: oklch(95% 0.02 45);
+  
+  /* Neutral */
+  --color-neutral: oklch(14% 0.005 285.823);
+  --color-neutral-content: oklch(92% 0.004 286.32);
+  
+  /* Status colors */
+  --color-info: oklch(74% 0.16 232.661);
+  --color-info-content: oklch(98% 0.01 232.661);
+  --color-success: oklch(74% 0.16 142.495);
+  --color-success-content: oklch(98% 0.01 142.495);
+  --color-warning: oklch(74% 0.16 82.87);
+  --color-warning-content: oklch(98% 0.01 82.87);
+  --color-error: oklch(74% 0.16 27.136);
+  --color-error-content: oklch(98% 0.01 27.136);
+}
+
+
