@@ -1,0 +1,194 @@
+.heroContainer {
+  position: relative;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0f9f4 0%, #e6f7ed 100%);
+  overflow: hidden;
+}
+
+.backgroundOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('/MedicalBkrnd.png'); 
+  background-size: cover;
+  background-position: center;
+  opacity: 0.1;
+  z-index: 1;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Quick Consult Section */
+.quickConsultSection {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.sectionTitle {
+  color: #0d9488; /* teal-600 */
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.medicalCategories {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.categoryCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  min-width: 100px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.categoryCard:hover {
+  background: #e2e8f0;
+  transform: translateY(-2px);
+}
+
+.categoryIcon {
+  color: #0d9488; /* teal-600 */
+  margin-bottom: 0.5rem;
+}
+
+.categoryLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  text-align: center;
+}
+
+.viewAllButton {
+  display: block;
+  margin: 0 auto;
+  padding: 0.75rem 2rem;
+  background: #0d9488;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.viewAllButton:hover {
+  background: #0f766e;
+}
+
+/* Find an in-network doctor Section */
+.doctorSection {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.doctorTitle {
+  color: #a855f7; 
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.doctorSubtitle {
+  color: #0d9488; 
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.doctorNote {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-bottom: 2rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.5;
+}
+
+.insuranceProviders {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.insuranceCard {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.insuranceCard:hover {
+  border-color: #0d9488;
+  box-shadow: 0 2px 8px rgba(13, 148, 136, 0.1);
+}
+
+.insuranceLogo {
+  max-width: 100%;
+  max-height: 40px;
+  object-fit: contain;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .content {
+    padding: 1rem;
+  }
+  
+  .medicalCategories {
+    gap: 0.5rem;
+  }
+  
+  .categoryCard {
+    min-width: 80px;
+    padding: 0.75rem;
+  }
+  
+  .insuranceProviders {
+    gap: 0.5rem;
+  }
+  
+  .insuranceCard {
+    min-width: 100px;
+    padding: 0.75rem;
+  }
+  
+  .sectionTitle {
+    font-size: 1.5rem;
+  }
+  
+  .doctorTitle {
+    font-size: 1.5rem;
+  }
+} 
