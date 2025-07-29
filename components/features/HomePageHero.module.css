@@ -160,6 +160,12 @@
   object-fit: contain;
 }
 
+/* Make Anthem logo bigger to match others */
+.insuranceCard:nth-child(2) .insuranceLogo {
+  max-height: 50px;
+  transform: scale(1.2);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .content {
