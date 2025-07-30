@@ -21,7 +21,6 @@ interface Provider {
   }[];
 }
 
-// Provider data for the top rated doctors
 const allProviders: Provider[] = [
   {
     first_name: "Emily",
