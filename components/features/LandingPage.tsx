@@ -1,6 +1,6 @@
 import React from 'react'
 import { ProviderSearch } from './ProviderSearch'
-import { DoctorCard } from '@/components/ui/DoctorCard'
+import { TopRatedDoctors } from './TopRatedDoctors/TopRatedDoctors'
 import { HomePageHero } from './HomePageHero'
 const LandingPage = () => {
   return (
@@ -9,7 +9,7 @@ const LandingPage = () => {
         <ProviderSearch />
      </div>
       <div className="py-8">
-        <DoctorCard />
+        <TopRatedDoctors />
       </div>
       <div className="py-8">
         <HomePageHero />
