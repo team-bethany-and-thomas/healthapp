@@ -2,7 +2,6 @@ import React from 'react'
 import { ProviderSearch } from './ProviderSearch'
 import { TopRatedDoctors } from './TopRatedDoctors/TopRatedDoctors'
 import { HomePageHero } from './HomePageHero'
-import { DoctorCard } from '@/components/ui/DoctorCard'
 
 const LandingPage = () => {
   return (
@@ -15,9 +14,6 @@ const LandingPage = () => {
       </div>
       <div className="py-8">
         <HomePageHero />
-      </div>
-      <div className="py-8">
-        <DoctorCard />
       </div>
       {/* Alert Examples */}
       <section className="space-y-4">
