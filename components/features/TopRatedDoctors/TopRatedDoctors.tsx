@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 interface Provider {
   first_name: string;
@@ -205,6 +206,25 @@ const allProviders: Provider[] = [
       { date: "2025-07-30", start_time: "08:30", length_minutes: 45 },
     ],
   },
+  {
+    first_name: "Catherine",
+    last_name: "Scott",
+    specialty: "Pulmonology",
+    city: "McKinney",
+    state: "TX",
+    zip: "75070",
+    education: "MD - University of Texas Health Science Center at Houston",
+    practice_name: "Pulse Clinic - McKinney",
+    languages_spoken: ["English", "Spanish"],
+    rating: 4.9,
+    imageUrl: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=180&h=120&fit=crop&crop=face",
+    appointments: [
+      { date: "2025-07-26", start_time: "09:00", length_minutes: 60 },
+      { date: "2025-07-27", start_time: "14:00", length_minutes: 60 },
+      { date: "2025-07-28", start_time: "11:00", length_minutes: 60 },
+      { date: "2025-07-29", start_time: "16:30", length_minutes: 60 },
+    ],
+  },
 ];
 
 export function TopRatedDoctors() {
@@ -285,18 +305,15 @@ export function TopRatedDoctors() {
               </div>
 
               {/* Action Button */}
-              <button 
+              <Link 
+                href={`/search?specialty=${encodeURIComponent(doctor.specialty)}&search=${encodeURIComponent(`${doctor.first_name} ${doctor.last_name}`)}`}
                 className="btn btn-primary w-full group-hover:btn-secondary transition-all duration-300 mt-auto"
-                onClick={() => {
-                  console.log(`Consult with Dr. ${doctor.first_name} ${doctor.last_name}`);
-                  // Add your consultation logic here
-                }}
               >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>
                 Consult Now
-              </button>
+              </Link>
             </div>
           </div>
         ))}
@@ -304,12 +321,12 @@ export function TopRatedDoctors() {
 
       {/* View All Button */}
       <div className="text-center mt-8">
-        <button className="btn btn-outline btn-secondary hover:btn-secondary">
+        <Link href="/search" className="btn btn-outline btn-secondary hover:btn-secondary">
           View All Doctors
           <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
-        </button>
+        </Link>
       </div>
     </section>
   );

@@ -26,7 +26,6 @@
   margin: 0 auto;
 }
 
-/* Quick Consult Section */
 .quickConsultSection {
   background: white;
   border-radius: 16px;
@@ -36,7 +35,7 @@
 }
 
 .sectionTitle {
-  color: #0d9488; /* teal-600 */
+  color: #0d9488; 
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
@@ -61,6 +60,8 @@
   min-width: 100px;
   transition: all 0.2s ease;
   cursor: pointer;
+  text-decoration: none;
+  color: inherit;
 }
 
 .categoryCard:hover {
@@ -69,7 +70,7 @@
 }
 
 .categoryIcon {
-  color: #0d9488; /* teal-600 */
+  color: #0d9488; 
   margin-bottom: 0.5rem;
 }
 
@@ -91,6 +92,8 @@
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s ease;
+  text-decoration: none;
+  text-align: center;
 }
 
 .viewAllButton:hover {
@@ -160,13 +163,11 @@
   object-fit: contain;
 }
 
-/* Make Anthem logo bigger to match others */
 .insuranceCard:nth-child(2) .insuranceLogo {
   max-height: 50px;
   transform: scale(1.2);
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .content {
     padding: 1rem;

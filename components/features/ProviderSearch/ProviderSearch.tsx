@@ -215,6 +215,25 @@ const allProviders: Provider[] = [
       { date: "2025-07-30", start_time: "08:30", length_minutes: 45 },
     ],
   },
+  {
+    first_name: "Catherine",
+    last_name: "Scott",
+    specialty: "Pulmonology",
+    city: "McKinney",
+    state: "TX",
+    zip: "75070",
+    education: "MD - University of Texas Health Science Center at Houston",
+    practice_name: "Pulse Clinic - McKinney",
+    languages_spoken: ["English", "Spanish"],
+    rating: 4.9,
+    imageUrl: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=180&h=120&fit=crop&crop=face",
+    appointments: [
+      { date: "2025-07-26", start_time: "09:00", length_minutes: 60 },
+      { date: "2025-07-27", start_time: "14:00", length_minutes: 60 },
+      { date: "2025-07-28", start_time: "11:00", length_minutes: 60 },
+      { date: "2025-07-29", start_time: "16:30", length_minutes: 60 },
+    ],
+  },
 ];
 
 export function ProviderSearch() {
@@ -303,6 +322,7 @@ export function ProviderSearch() {
               <option value="Gastroenterology"></option>
               <option value="Neurology"></option>
               <option value="Endocrinology"></option>
+              <option value="Pulmonology"></option>
             </datalist>
           </div>
 
@@ -326,6 +346,7 @@ export function ProviderSearch() {
               <option value="Dr. Henry Kim"></option>
               <option value="Dr. Olivia Adams"></option>
               <option value="Dr. Noah Singh"></option>
+              <option value="Dr. Catherine Scott"></option>
             </datalist>
           </div>
 

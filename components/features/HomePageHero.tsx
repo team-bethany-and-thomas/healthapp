@@ -2,22 +2,23 @@
 
 import React from 'react';
 import { Heart, Activity, Syringe, Wind, Pill } from 'lucide-react';
+import Link from 'next/link';
 import styles from './HomePageHero.module.css';
 
 const medicalCategories = [
-  { icon: Heart, label: "Heart", color: "teal" },
-  { icon: Activity, label: "Lungs", color: "teal" },
-  { icon: Syringe, label: "Diabetics", color: "teal" },
-  { icon: Wind, label: "Oxygen", color: "teal" },
-  { icon: Pill, label: "Prescribe", color: "teal" },
+  { id: 'heart', icon: Heart, label: "Heart", color: "teal", specialty: "Cardiology" },
+  { id: 'lungs', icon: Activity, label: "Lungs", color: "teal", specialty: "Pulmonology" },
+  { id: 'diabetics', icon: Syringe, label: "Diabetics", color: "teal", specialty: "Endocrinology" },
+  { id: 'oxygen', icon: Wind, label: "Oxygen", color: "teal", specialty: "Pulmonology" },
+  { id: 'prescribe', icon: Pill, label: "Prescribe", color: "teal", specialty: "Primary Care (Family or Internal Medicine)" },
 ];
 
 const insuranceProviders = [
-  { name: "Aetna", logo: "/Aetna.png" },
-  { name: "Anthem BlueCross", logo: "/AnthemTile.png" },
-  { name: "Humana", logo: "/Humana.png" },
-  { name: "UnitedHealthcare", logo: "/UnitedTile.png" },
-  { name: "CareSource", logo: "/CareSource.png" },
+  { id: 'aetna', name: "Aetna", logo: "/Aetna.png" },
+  { id: 'anthem', name: "Anthem BlueCross", logo: "/AnthemTile.png" },
+  { id: 'humana', name: "Humana", logo: "/Humana.png" },
+  { id: 'united', name: "UnitedHealthcare", logo: "/UnitedTile.png" },
+  { id: 'caresource', name: "CareSource", logo: "/CareSource.png" },
 ];
 
 export function HomePageHero() {
@@ -31,17 +32,21 @@ export function HomePageHero() {
           <h2 className={styles.sectionTitle}>Quick Consult For</h2>
           
           <div className={styles.medicalCategories}>
-            {medicalCategories.map((category, index) => (
-              <div key={index} className={styles.categoryCard}>
+            {medicalCategories.map((category) => (
+              <Link 
+                key={category.id} 
+                href={`/search?specialty=${encodeURIComponent(category.specialty)}`}
+                className={styles.categoryCard}
+              >
                 <category.icon className={styles.categoryIcon} size={32} />
                 <span className={styles.categoryLabel}>{category.label}</span>
-              </div>
+              </Link>
             ))}
           </div>
           
-          <button className={styles.viewAllButton}>
+          <Link href="/search" className={styles.viewAllButton}>
             View All
-          </button>
+          </Link>
         </div>
 
         <div className={styles.doctorSection}>
@@ -52,8 +57,8 @@ export function HomePageHero() {
           </p>
           
           <div className={styles.insuranceProviders}>
-            {insuranceProviders.map((provider, index) => (
-              <div key={index} className={styles.insuranceCard}>
+            {insuranceProviders.map((provider) => (
+              <div key={provider.id} className={styles.insuranceCard}>
                 <img 
                   src={provider.logo} 
                   alt={provider.name}

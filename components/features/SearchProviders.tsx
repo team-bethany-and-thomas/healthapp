@@ -33,13 +33,20 @@ const COLLECTION_ID =
 const PROVIDERS_BUCKET_ID =
   process.env.NEXT_PUBLIC_APPWRITE_PROVIDERS_BUCKET_ID!;
 
-const SearchProviders: React.FC = () => {
+interface SearchProvidersProps {
+  initialSpecialty?: string;
+  initialSearch?: string;
+  initialLocation?: string;
+}
+
+const SearchProviders: React.FC<SearchProvidersProps> = ({ initialSpecialty, initialSearch, initialLocation }) => {
   const { user, isLoading: authLoading } = useAuth();
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [selectedSpecialty, setSelectedSpecialty] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState<string>(initialSearch || "");
+  const [selectedSpecialty, setSelectedSpecialty] = useState<string>(initialSpecialty || "");
+  const [selectedLocation, setSelectedLocation] = useState<string>(initialLocation || "");
   const [weekendFilter, setWeekendFilter] = useState<boolean | null>(null);
 
   const specialties = [
@@ -53,6 +60,7 @@ const SearchProviders: React.FC = () => {
     "Gastroenterology",
     "Neurology",
     "Endocrinology",
+    "Pulmonology",
   ];
 
   // Fetch doctors from Appwrite
@@ -75,10 +83,6 @@ const SearchProviders: React.FC = () => {
         // Build queries based on filters
         const queries: string[] = [];
 
-        if (searchTerm) {
-          queries.push(Query.search("name", searchTerm));
-        }
-
         if (selectedSpecialty) {
           queries.push(Query.equal("specialty", selectedSpecialty));
         }
@@ -93,7 +97,23 @@ const SearchProviders: React.FC = () => {
           queries
         );
 
-        setDoctors(response.documents as unknown as Doctor[]);
+        let filteredDoctors = response.documents as unknown as Doctor[];
+
+        // Filter by search term client-side if no fulltext index is available
+        if (searchTerm) {
+          filteredDoctors = filteredDoctors.filter(doctor =>
+            doctor.name.toLowerCase().includes(searchTerm.toLowerCase())
+          );
+        }
+
+        // Filter by location client-side
+        if (selectedLocation) {
+          filteredDoctors = filteredDoctors.filter(doctor =>
+            doctor.location.toLowerCase().includes(selectedLocation.toLowerCase())
+          );
+        }
+
+        setDoctors(filteredDoctors);
         setError(null);
       } catch (err) {
         console.error("Error fetching doctors:", err);
@@ -145,6 +165,7 @@ const SearchProviders: React.FC = () => {
   const clearFilters = () => {
     setSearchTerm("");
     setSelectedSpecialty("");
+    setSelectedLocation("");
     setWeekendFilter(null);
   };
 
@@ -189,7 +210,7 @@ const SearchProviders: React.FC = () => {
 
       {/* Search and Filter Section */}
       <div className="bg-base-200 p-6 rounded-lg mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           {/* Search by name */}
           <div className="form-control">
             <label className="label">
@@ -223,6 +244,20 @@ const SearchProviders: React.FC = () => {
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* Filter by location */}
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">Location</span>
+            </label>
+            <input
+              type="text"
+              placeholder="Enter location..."
+              className="input input-bordered w-full"
+              value={selectedLocation}
+              onChange={(e) => setSelectedLocation(e.target.value)}
+            />
           </div>
 
           {/* Filter by weekend availability */}
