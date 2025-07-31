@@ -134,6 +134,8 @@ const LoginPage: React.FC = () => {
                 Email Address
               </label>
               <input
+                id="email"
+                name="email"
                 type="email"
                 placeholder="Enter your email"
                 value={email}
@@ -160,6 +162,8 @@ const LoginPage: React.FC = () => {
                 Password
               </label>
               <input
+                id="password"
+                name="password"
                 type="password"
                 placeholder="Enter your password"
                 value={password}
@@ -184,6 +188,8 @@ const LoginPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input 
+                  id="remember-me"
+                  name="rememberMe"
                   type="checkbox" 
                   className="w-4 h-4 text-primary bg-base-100 border-base-300 rounded focus:ring-primary/20 focus:ring-2" 
                 />

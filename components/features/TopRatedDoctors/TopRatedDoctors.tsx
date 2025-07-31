@@ -287,6 +287,7 @@ export function TopRatedDoctors() {
                     {[...Array(5)].map((_, i) => (
                       <input
                         key={i}
+                        id={`rating-${index}-${i}`}
                         type="radio"
                         name={`rating-${index}`}
                         className="mask mask-star-2 bg-orange-400"

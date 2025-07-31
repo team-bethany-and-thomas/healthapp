@@ -164,6 +164,8 @@ const RegistrationPage: React.FC = () => {
                 Full Name
               </label>
               <input
+                id="name"
+                name="name"
                 type="text"
                 placeholder="Enter your full name"
                 value={name}
@@ -190,6 +192,8 @@ const RegistrationPage: React.FC = () => {
                 Email Address
               </label>
               <input
+                id="email"
+                name="email"
                 type="email"
                 placeholder="Enter your email"
                 value={email}
@@ -216,6 +220,8 @@ const RegistrationPage: React.FC = () => {
                 Password
               </label>
               <input
+                id="password"
+                name="password"
                 type="password"
                 placeholder="Enter your password"
                 value={password}
@@ -239,6 +245,8 @@ const RegistrationPage: React.FC = () => {
             
             <div className="flex items-start gap-3">
               <input 
+                id="terms-agreement"
+                name="termsAgreement"
                 type="checkbox" 
                 className="w-4 h-4 text-secondary bg-base-100 border-base-300 rounded focus:ring-secondary/20 focus:ring-2 mt-1" 
                 required

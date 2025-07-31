@@ -202,8 +202,8 @@ const SearchProviders: React.FC<SearchProvidersProps> = ({ initialSpecialty, ini
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold mb-2">Find Healthcare Providers</h1>
-        <p className="text-base-content/70">
+        <h1 className="text-4xl font-bold mb-2" style={{ color: '#0d9488' }}>Find Healthcare Providers</h1>
+        <p className="text-secondary text-lg font-semibold">
           Search and filter through our network of qualified doctors
         </p>
       </div>
@@ -217,6 +217,8 @@ const SearchProviders: React.FC<SearchProvidersProps> = ({ initialSpecialty, ini
               <span className="label-text">Search by name</span>
             </label>
             <input
+              id="search-name"
+              name="searchName"
               type="text"
               placeholder="Enter doctor name..."
               className="input input-bordered w-full"
@@ -252,6 +254,8 @@ const SearchProviders: React.FC<SearchProvidersProps> = ({ initialSpecialty, ini
               <span className="label-text">Location</span>
             </label>
             <input
+              id="search-location"
+              name="searchLocation"
               type="text"
               placeholder="Enter location..."
               className="input input-bordered w-full"

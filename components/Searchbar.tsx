@@ -47,6 +47,8 @@ const Searchbar = () => {
       <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-4 w-full">
         <div className="flex-1">
           <input
+            id="specialty-input"
+            name="specialty"
             type="text"
             className="input input-bordered w-full"
             placeholder="Medical Specialty"
@@ -73,6 +75,8 @@ const Searchbar = () => {
 
         <div className="flex-1">
           <input
+            id="provider-input"
+            name="provider"
             type="text"
             className="input input-bordered w-full"
             placeholder="Search by provider name"
@@ -99,6 +103,8 @@ const Searchbar = () => {
 
         <div className="flex-1">
           <input
+            id="location-input"
+            name="location"
             type="text"
             className="input input-bordered w-full"
             placeholder="Where in the Dallas Metroplex are you?"

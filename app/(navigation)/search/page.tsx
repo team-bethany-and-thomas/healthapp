@@ -277,8 +277,8 @@ function SearchPage() {
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold mb-2">Find Healthcare Providers</h1>
-        <p className="text-base-content/70">
+        <h1 className="text-4xl font-bold mb-2" style={{ color: '#0d9488' }}>Find Healthcare Providers</h1>
+        <p className="text-secondary text-lg font-semibold">
           Search and filter through our network of qualified doctors
         </p>
       </div>
@@ -293,6 +293,8 @@ function SearchPage() {
             </label>
             <div className="join w-full">
               <input
+                id="search-term"
+                name="searchTerm"
                 type="text"
                 placeholder="Doctor name or specialty..."
                 className="input input-bordered join-item w-full"
@@ -311,6 +313,8 @@ function SearchPage() {
               <span className="label-text">Specialty</span>
             </label>
             <select
+              id="specialty-select"
+              name="specialty"
               className="select select-bordered w-full"
               value={selectedSpecialty}
               onChange={(e) => handleSpecialtyChange(e.target.value)}
@@ -330,6 +334,8 @@ function SearchPage() {
               <span className="label-text">Location</span>
             </label>
             <select
+              id="location-select"
+              name="location"
               className="select select-bordered w-full"
               value={selectedLocation}
               onChange={(e) => handleLocationChange(e.target.value)}
@@ -408,6 +414,7 @@ function SearchPage() {
                       {[...Array(5)].map((_, i) => (
                         <input
                           key={i}
+                          id={`rating-${doctor.$id}-${i}`}
                           type="radio"
                           name={`rating-${doctor.$id}`}
                           className="mask mask-star-2 bg-orange-400"
