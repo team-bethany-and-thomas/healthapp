@@ -224,20 +224,20 @@ function SearchPage() {
 
   const getDoctorImage = (doctorName: string) => {
     const imageMap: { [key: string]: string } = {
-      "Dr. Emily Chen": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=48&h=48&fit=crop&crop=face",
-      "Dr. Marcus Patel": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=48&h=48&fit=crop&crop=face",
-      "Dr. Catherine Scott": "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=48&h=48&fit=crop&crop=face",
-      "Dr. Rachel Nguyen": "https://images.unsplash.com/photo-1594824475545-9d0c7c4951c1?w=48&h=48&fit=crop&crop=face",
-      "Dr. Thomas Brooks": "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=48&h=48&fit=crop&crop=face",
-      "Dr. Aisha Roberts": "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=48&h=48&fit=crop&crop=face",
-      "Dr. James Okafor": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=48&h=48&fit=crop&crop=face",
-      "Dr. Sofia Martinez": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=48&h=48&fit=crop&crop=face",
-      "Dr. Henry Kim": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=48&h=48&fit=crop&crop=face",
-      "Dr. Olivia Adams": "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=48&h=48&fit=crop&crop=face",
-      "Dr. Noah Singh": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=48&h=48&fit=crop&crop=face"
+      "Dr. Emily Chen": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=180&h=120&fit=crop&crop=face",
+      "Dr. Marcus Patel": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=180&h=120&fit=crop&crop=face",
+      "Dr. Catherine Scott": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=180&h=120&fit=crop&crop=face",
+      "Dr. Rachel Nguyen": "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=180&h=120&fit=crop&crop=face",
+      "Dr. Thomas Brooks": "https://images.unsplash.com/photo-1594824475545-9d0c7c4951c1?w=180&h=120&fit=crop&crop=face",
+      "Dr. Aisha Roberts": "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=180&h=120&fit=crop&crop=face",
+      "Dr. James Okafor": "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=180&h=120&fit=crop&crop=face",
+      "Dr. Sofia Martinez": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=180&h=120&fit=crop&crop=face",
+      "Dr. Henry Kim": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=180&h=120&fit=crop&crop=face",
+      "Dr. Olivia Adams": "https://images.unsplash.com/photo-1594824475545-9d0c7c4951c1?w=180&h=120&fit=crop&crop=face",
+      "Dr. Noah Singh": "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=180&h=120&fit=crop&crop=face"
     };
     
-    return imageMap[doctorName] || "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=48&h=48&fit=crop&crop=face";
+    return imageMap[doctorName] || "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=180&h=120&fit=crop&crop=face";
   };
 
   const handleSearchTermChange = (value: string) => {
@@ -390,7 +390,7 @@ function SearchPage() {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center space-x-3">
                     <div className="avatar">
-                      <div className="w-12 h-12 rounded-full ring-2 ring-primary ring-offset-2 ring-offset-base-100">
+                      <div className="w-16 h-16 rounded-full ring-2 ring-primary ring-offset-2 ring-offset-base-100">
                         <img 
                           src={getDoctorImage(doctor.name)}
                           alt={doctor.name}
