@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import React from "react";
 import { ChevronDown } from "lucide-react";
+import { DayPicker } from "react-day-picker";
 
 interface AppointmentBookingModalProps {
   isOpen: boolean;
@@ -74,13 +75,21 @@ const appointmentTypes: AppointmentType[] = [
 export const AppointmentBookingModal: React.FC<
   AppointmentBookingModalProps
 > = ({ isOpen, onClose, providerName }) => {
-  const [appointmentType, setAppointmentType] = useState(
-    "Select Appointment Type"
-  );
+  const [appointmentType, setAppointmentType] = useState("");
+
+  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [appointmentTime, setAppointmentTime] = useState("");
+  const [reasonForVisit, setReasonForVisit] = useState("");
 
   const handleAppointmentType = (e: React.ChangeEvent<HTMLSelectElement>) =>
     setAppointmentType(e.target.value);
   const modalRef = useRef<HTMLDialogElement>(null);
+
+  const handleTimeSelection = (e: React.ChangeEvent<HTMLSelectElement>) =>
+    setAppointmentTime(e.target.value);
+  const handleVisitReason = (e: React.ChangeEvent<HTMLTextAreaElement>) =>
+    setReasonForVisit(e.target.value);
+
   useEffect(() => {
     const modal = modalRef.current;
     if (!modal) return;
@@ -103,28 +112,67 @@ export const AppointmentBookingModal: React.FC<
         className="modal modal-bottom sm:modal-middle"
         onClose={onClose}
       >
-        <div className="modal-box bg-primary">
-          <h3 className="font-bold text-lg  text-primary-content text-center">
+        <div className="modal-box  bg-primary">
+          <h3 className="font-bold text-lg  text-base-content text-center">
             Book Appointment With: {providerName}
           </h3>
-          <select
-            value={appointmentType}
-            className=" select select-bordered w-full mt-2"
-            onChange={handleAppointmentType}
-          >
-            <option value="default">Select Appointment Type</option>
-            {appointmentTypes.map((aT) => (
-              <option key={aT.appointment_type_id} value={aT.duration_minutes}>
-                {aT.type_name}
-                {` (${aT.duration_minutes}) minutes`}
-              </option>
-            ))}
-          </select>
+          <div className="flex justify-center mt-2">
+            <select
+              defaultValue={appointmentType}
+              className=" select select-bordered w-3/4 mt-2 bg-base-200 text-base-content "
+              onChange={handleAppointmentType}
+            >
+              <option value="default">Select Appointment Type</option>
+              {appointmentTypes.map((aT) => (
+                <option
+                  key={aT.appointment_type_id}
+                  value={aT.duration_minutes}
+                >
+                  {aT.type_name}
+                  {` (${aT.duration_minutes}) minutes`}
+                </option>
+              ))}
+            </select>
+          </div>
 
-          <form className="py-4">
-            <input type="" name="" id="" />
+          <div className=" flex justify-center mt-6 mb-6">
+            <DayPicker
+              className="react-day-picker bg-base-200 border border-base-300 rounded-lg p-4 "
+              mode="single"
+              selected={date}
+              onSelect={setDate}
+              footer={
+                date ? `Selected: ${date.toLocaleDateString()}` : "Pick a day."
+              }
+            />
+          </div>
+          <div className="flex justify-center mt-2">
+            <select
+              value={appointmentTime}
+              className=" select  bg-base-200 text-base-content select-bordered w-3/4"
+              onChange={handleTimeSelection}
+            >
+              <option value="" disabled>
+                Please Select an Appointment Time
+              </option>
+              {/* can .split(":")[0] and check if number is lower than 12 for a.m. above 12 to conditionally render p.m. */}
+              <option value="01:00">01:00</option>
+            </select>
+          </div>
+          <form className="py-4 flex  justify-center">
+            <div className="flex flex-col  w-3/4">
+              <label className="mb-3">Reason for Visit:</label>
+              <textarea
+                value={reasonForVisit}
+                onChange={handleVisitReason}
+                id={"visitReason"}
+                className="textarea textarea-bordered bg-base-200 text-base-content w-full"
+                rows={5}
+              ></textarea>
+            </div>
           </form>
-          <div className="modal-action">
+          <div className="modal-action flex justify-center">
+            <button className="btn btn-primary">Book Appointment</button>
             <button type="button" className="btn btn-ghost" onClick={onClose}>
               Close
             </button>
