@@ -211,7 +211,7 @@ export function TopRatedDoctors() {
   const [topRatedDoctors, setTopRatedDoctors] = useState<Provider[]>([]);
 
   useEffect(() => {
-    // Get 5 random doctors from the list
+    // 5 rando doctors from the list
     const getRandomDoctors = () => {
       const shuffled = [...allProviders].sort(() => 0.5 - Math.random());
       return shuffled.slice(0, 5);

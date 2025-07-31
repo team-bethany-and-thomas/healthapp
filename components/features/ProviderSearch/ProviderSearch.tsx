@@ -31,7 +31,6 @@ type FormData = {
   location?: string;
 };
 
-// Provider data matching the datalist options from Searchbar
 const allProviders: Provider[] = [
   {
     first_name: "Emily",
