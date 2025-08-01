@@ -246,6 +246,21 @@ const PatientDashboard: React.FC = () => {
         </div>
       </div>
 
+      {/* CAUTION Banner */}
+      <div className="w-full relative">
+        <img 
+          src="/caution-warning-tape-yellow-black-600nw-2502722405.webp" 
+          alt="Caution Warning Tape" 
+          className="w-full h-24 object-cover"
+        />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center bg-black/50 px-6 py-2 rounded-lg">
+            <h3 className="text-lg font-bold text-white">Important Notice</h3>
+            <p className="text-sm text-white/90">Please review your health information carefully</p>
+          </div>
+        </div>
+      </div>
+
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Welcome Header */}
         <div className="hero bg-gradient-to-r from-primary to-primary-focus rounded-xl mb-8 text-primary-content">
