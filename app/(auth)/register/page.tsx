@@ -99,21 +99,20 @@ const RegistrationPage: React.FC = () => {
       router.push('/dashboard');
       
     } catch (error) {
+      console.error("Registration failed:", error);
       setUiState(prev => ({ 
         ...prev, 
         message: "Registration failed. Please try again." 
       }));
-      console.error("Registration error:", error);
     } finally {
       setUiState(prev => ({ ...prev, isRegistering: false }));
     }
   }, [formData, validateName, validateEmail, validatePassword, register, router]);
 
   // Memoized logout handler
-  const handleLogout = useCallback(async (): Promise<void> => {
+  const handleLogout = useCallback(async () => {
     try {
       await logout();
-      setUiState(prev => ({ ...prev, message: "" }));
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -121,28 +120,28 @@ const RegistrationPage: React.FC = () => {
 
   // Memoized loading component
   const loadingComponent = useMemo(() => (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="loading loading-spinner loading-lg text-primary"></div>
-      </div>
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="loading loading-spinner loading-lg text-primary"></div>
+    </div>
   ), []);
 
   // Memoized user welcome component
   const userWelcomeComponent = useMemo(() => (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="card bg-base-100 shadow-xl max-w-md w-full">
-          <div className="card-body">
-            <h2 className="card-title text-2xl mb-4">Welcome!</h2>
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="card bg-base-100 shadow-xl max-w-md w-full">
+        <div className="card-body">
+          <h2 className="card-title text-2xl mb-4">Welcome!</h2>
           <p className="mb-4">Logged in as {user?.name}</p>
-            <button 
-              type="button" 
-              onClick={handleLogout}
-              className="btn btn-primary"
-            >
-              Logout
-            </button>
-          </div>
+          <button 
+            type="button" 
+            onClick={handleLogout}
+            className="btn btn-primary"
+          >
+            Logout
+          </button>
         </div>
       </div>
+    </div>
   ), [user?.name, handleLogout]);
 
   if (authLoading) {
