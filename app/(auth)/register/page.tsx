@@ -121,28 +121,28 @@ const RegistrationPage: React.FC = () => {
 
   // Memoized loading component
   const loadingComponent = useMemo(() => (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="loading loading-spinner loading-lg text-primary"></div>
-    </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="loading loading-spinner loading-lg text-primary"></div>
+      </div>
   ), []);
 
   // Memoized user welcome component
   const userWelcomeComponent = useMemo(() => (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="card bg-base-100 shadow-xl max-w-md w-full">
-        <div className="card-body">
-          <h2 className="card-title text-2xl mb-4">Welcome!</h2>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="card bg-base-100 shadow-xl max-w-md w-full">
+          <div className="card-body">
+            <h2 className="card-title text-2xl mb-4">Welcome!</h2>
           <p className="mb-4">Logged in as {user?.name}</p>
-          <button 
-            type="button" 
-            onClick={handleLogout}
-            className="btn btn-primary"
-          >
-            Logout
-          </button>
+            <button 
+              type="button" 
+              onClick={handleLogout}
+              className="btn btn-primary"
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </div>
-    </div>
   ), [user?.name, handleLogout]);
 
   if (authLoading) {
@@ -164,7 +164,7 @@ const RegistrationPage: React.FC = () => {
               <span>{uiState.message}</span>
             </div>
           )}
-
+          
           <form onSubmit={(e) => { e.preventDefault(); handleRegister(); }} className="space-y-4">
             <div className="form-control">
               <label className="label">
@@ -183,7 +183,7 @@ const RegistrationPage: React.FC = () => {
                 </label>
               )}
             </div>
-
+            
             <div className="form-control">
               <label className="label">
                 <span className="label-text">Email</span>
@@ -201,7 +201,7 @@ const RegistrationPage: React.FC = () => {
                 </label>
               )}
             </div>
-
+            
             <div className="form-control">
               <label className="label">
                 <span className="label-text">Password</span>
@@ -219,7 +219,7 @@ const RegistrationPage: React.FC = () => {
                 </label>
               )}
             </div>
-
+            
             <div className="form-control mt-6">
               <button 
                 type="submit" 
@@ -232,7 +232,7 @@ const RegistrationPage: React.FC = () => {
           </form>
 
           <div className="divider">OR</div>
-
+            
           <div className="text-center">
             <p className="text-sm text-gray-600 mb-2">Already have an account?</p>
             <button 

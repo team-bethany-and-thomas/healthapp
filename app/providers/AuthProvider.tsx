@@ -29,7 +29,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       try {
         const currentUser = await account.get();
         setUser(currentUser);
-      } catch (error) {
+      } catch {
         setUser(null);
       } finally {
         setIsLoading(false);

@@ -1,5 +1,6 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import Image from 'next/image';
 import { 
   Heart, 
   Calendar, 
@@ -168,11 +169,11 @@ const PatientDashboard: React.FC = () => {
     }, 3000);
   };
 
-  const handleAppointmentEdit = (appointmentId: string) => {
+  const handleAppointmentEdit = () => {
     showNotificationMessage('Opening appointment editor...');
   };
 
-  const handleAppointmentCancel = (appointmentId: string) => {
+  const handleAppointmentCancel = () => {
     if (window.confirm('Are you sure you want to cancel this appointment?')) {
       showNotificationMessage('Appointment cancelled successfully');
     }
@@ -248,9 +249,11 @@ const PatientDashboard: React.FC = () => {
 
       {/* CAUTION Banner */}
       <div className="w-full relative">
-        <img 
+        <Image 
           src="/caution-warning-tape-yellow-black-600nw-2502722405.webp" 
           alt="Caution Warning Tape" 
+          width={1200}
+          height={96}
           className="w-full h-24 object-cover"
         />
         <div className="absolute inset-0 flex items-center justify-center">
@@ -393,14 +396,14 @@ const PatientDashboard: React.FC = () => {
                         <button 
                           className="btn btn-ghost btn-sm"
                           title="Edit appointment"
-                          onClick={() => handleAppointmentEdit(appointment.id)}
+                          onClick={() => handleAppointmentEdit()}
                         >
                           <Edit className="w-4 h-4" />
                         </button>
                         <button 
                           className="btn btn-ghost btn-sm text-error"
                           title="Cancel appointment"
-                          onClick={() => handleAppointmentCancel(appointment.id)}
+                          onClick={() => handleAppointmentCancel()}
                         >
                           <X className="w-4 h-4" />
                         </button>

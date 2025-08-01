@@ -1,7 +1,8 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Stethoscope, Search, MapPin, Star, Calendar, Clock } from 'lucide-react';
+import Image from 'next/image';
+import { MapPin, Calendar, Clock } from 'lucide-react';
 
 interface Doctor {
   $id: string;
@@ -154,7 +155,6 @@ const mockDoctors: Doctor[] = [
 
 function SearchPage() {
   const searchParams = useSearchParams();
-  const [doctors, setDoctors] = useState<Doctor[]>(mockDoctors);
   const [filteredDoctors, setFilteredDoctors] = useState<Doctor[]>(mockDoctors);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState('');
@@ -302,7 +302,7 @@ function SearchPage() {
                 onChange={(e) => handleSearchTermChange(e.target.value)}
               />
               <button className="btn btn-primary join-item">
-                <Search className="w-4 h-4" />
+                {/* <Search className="w-4 h-4" /> */}
               </button>
             </div>
           </div>
@@ -397,10 +397,12 @@ function SearchPage() {
                   <div className="flex items-center space-x-3">
                     <div className="avatar">
                       <div className="w-16 h-16 rounded-full ring-2 ring-primary ring-offset-2 ring-offset-base-100">
-                        <img 
+                        <Image 
                           src={getDoctorImage(doctor.name)}
                           alt={doctor.name}
-                          className="object-cover"
+                          width={64}
+                          height={64}
+                          className="object-cover rounded-full"
                         />
                       </div>
                     </div>
