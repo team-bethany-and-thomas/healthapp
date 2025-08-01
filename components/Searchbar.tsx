@@ -1,46 +1,84 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Stethoscope, Search } from "lucide-react";
+import { Stethoscope } from "lucide-react";
 
 const Searchbar = () => {
   const router = useRouter();
   
-  const [specialty, setSpecialty] = useState("");
-  const [provider, setProvider] = useState("");
-  const [location, setLocation] = useState("");
+  const [formData, setFormData] = useState({
+    specialty: "",
+    provider: "",
+    location: ""
+  });
 
-  const handleSearch = () => {
-    // Build search parameters
+  // Memoized search function to prevent unnecessary re-renders
+  const handleSearch = useCallback(() => {
     const searchParams = new URLSearchParams();
     
-    if (specialty) {
-      searchParams.append('specialty', specialty);
-    }
+    Object.entries(formData).forEach(([key, value]) => {
+      if (value) {
+        searchParams.append(key, value);
+      }
+    });
     
-    if (provider) {
-      searchParams.append('search', provider);
-    }
-    
-    if (location) {
-      searchParams.append('location', location);
-    }
-    
-    // Navigate to search page with parameters
     const searchUrl = `/search?${searchParams.toString()}`;
     router.push(searchUrl);
-  };
+  }, [formData, router]);
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  // Combined event handler for all inputs
+  const handleInputChange = useCallback((field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  }, []);
+
+  // Combined key press handler
+  const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSearch();
     }
-  };
+  }, [handleSearch]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Combined form submit handler
+  const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     handleSearch();
-  };
+  }, [handleSearch]);
+
+  // Memoized datalist options to prevent re-renders
+  const specialties = useMemo(() => [
+    "Primary Care (Family or Internal Medicine)",
+    "Pediatrics",
+    "Obstetrics & Gynecology",
+    "Cardiology",
+    "Dermatology",
+    "Orthopedics",
+    "Psychiatry & Mental Health",
+    "Gastroenterology",
+    "Neurology",
+    "Endocrinology",
+    "Pulmonology"
+  ], []);
+
+  const providers = useMemo(() => [
+    "Dr. Emily Chen",
+    "Dr. Marcus Patel",
+    "Dr. Rachel Nguyen",
+    "Dr. Thomas Brooks",
+    "Dr. Aisha Roberts",
+    "Dr. James Okafor",
+    "Dr. Sofia Martinez",
+    "Dr. Henry Kim",
+    "Dr. Olivia Adams",
+    "Dr. Noah Singh",
+    "Dr. Catherine Scott"
+  ], []);
+
+  const locations = useMemo(() => [
+    "Dallas", "Fort Worth", "Arlington", "Plano", "Frisco", "Irving",
+    "Carrollton", "Garland", "Richardson", "Grand Prairie", "McKinney",
+    "Allen", "The Colony", "Lewisville", "Mesquite", "Denton",
+    "Flower Mound", "Euless", "Keller", "Southlake"
+  ], []);
 
   return (
     <div className="w-full">
@@ -53,23 +91,15 @@ const Searchbar = () => {
             className="input input-bordered w-full"
             placeholder="Medical Specialty"
             list="specialties"
-            value={specialty}
-            onChange={(e) => setSpecialty(e.target.value)}
+            value={formData.specialty}
+            onChange={(e) => handleInputChange("specialty", e.target.value)}
             onKeyPress={handleKeyPress}
           />
 
           <datalist id="specialties">
-            <option value="Primary Care (Family or Internal Medicine)"></option>
-            <option value="Pediatrics"></option>
-            <option value="Obstetrics & Gynecology"></option>
-            <option value="Cardiology"></option>
-            <option value="Dermatology"></option>
-            <option value="Orthopedics"></option>
-            <option value="Psychiatry & Mental Health"></option>
-            <option value="Gastroenterology"></option>
-            <option value="Neurology"></option>
-            <option value="Endocrinology"></option>
-            <option value="Pulmonology"></option>
+            {specialties.map(specialty => (
+              <option key={specialty} value={specialty} />
+            ))}
           </datalist>
         </div>
 
@@ -81,23 +111,15 @@ const Searchbar = () => {
             className="input input-bordered w-full"
             placeholder="Search by provider name"
             list="providers"
-            value={provider}
-            onChange={(e) => setProvider(e.target.value)}
+            value={formData.provider}
+            onChange={(e) => handleInputChange("provider", e.target.value)}
             onKeyPress={handleKeyPress}
           />
 
           <datalist id="providers">
-            <option value="Dr. Emily Chen"></option>
-            <option value="Dr. Marcus Patel"></option>
-            <option value="Dr. Rachel Nguyen"></option>
-            <option value="Dr. Thomas Brooks"></option>
-            <option value="Dr. Aisha Roberts"></option>
-            <option value="Dr. James Okafor"></option>
-            <option value="Dr. Sofia Martinez"></option>
-            <option value="Dr. Henry Kim"></option>
-            <option value="Dr. Olivia Adams"></option>
-            <option value="Dr. Noah Singh"></option>
-            <option value="Dr. Catherine Scott"></option>
+            {providers.map(provider => (
+              <option key={provider} value={provider} />
+            ))}
           </datalist>
         </div>
 
@@ -109,32 +131,15 @@ const Searchbar = () => {
             className="input input-bordered w-full"
             placeholder="Where in the Dallas Metroplex are you?"
             list="locations"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
+            value={formData.location}
+            onChange={(e) => handleInputChange("location", e.target.value)}
             onKeyPress={handleKeyPress}
           />
 
           <datalist id="locations">
-            <option value="Dallas"></option>
-            <option value="Fort Worth"></option>
-            <option value="Arlington"></option>
-            <option value="Plano"></option>
-            <option value="Frisco"></option>
-            <option value="Irving"></option>
-            <option value="Carrollton"></option>
-            <option value="Garland"></option>
-            <option value="Richardson"></option>
-            <option value="Grand Prairie"></option>
-            <option value="McKinney"></option>
-            <option value="Allen"></option>
-            <option value="The Colony"></option>
-            <option value="Lewisville"></option>
-            <option value="Mesquite"></option>
-            <option value="Denton"></option>
-            <option value="Flower Mound"></option>
-            <option value="Euless"></option>
-            <option value="Keller"></option>
-            <option value="Southlake"></option>
+            {locations.map(location => (
+              <option key={location} value={location} />
+            ))}
           </datalist>
         </div>
 
@@ -150,4 +155,4 @@ const Searchbar = () => {
   );
 };
 
-export default Searchbar;
+export default React.memo(Searchbar);

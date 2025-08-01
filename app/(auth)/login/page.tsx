@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -10,219 +10,189 @@ interface ValidationErrors {
 
 const LoginPage: React.FC = () => {
   const { user, isLoading, login, logout } = useAuth();
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [loginError, setLoginError] = useState<string>("");
-  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: ""
+  });
+  const [uiState, setUiState] = useState({
+    loginError: "",
+    validationErrors: {} as ValidationErrors,
+    isSubmitting: false
+  });
   const router = useRouter();
 
-  const validateEmail = (email: string): string | undefined => {
+  // Memoized validation functions
+  const validateEmail = useCallback((email: string): string | undefined => {
     if (!email) return "Email is required";
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) return "Please enter a valid email address";
     return undefined;
-  };
+  }, []);
 
-  const validatePassword = (password: string): string | undefined => {
+  const validatePassword = useCallback((password: string): string | undefined => {
     if (!password) return "Password is required";
     if (password.length < 6) return "Password must be at least 6 characters long";
     if (!/[A-Z]/.test(password)) return "Password must contain at least one capital letter";
     if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) return "Password must contain at least one special character";
     return undefined;
-  };
+  }, []);
 
-  useEffect(() => {
-    const emailError = validateEmail(email);
-    const passwordError = validatePassword(password);
+  // Combined input change handler
+  const handleInputChange = useCallback((field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
     
-    setValidationErrors({
-      email: emailError,
-      password: passwordError
-    });
-  }, [email, password]);
+    // Validate on change and update errors
+    const error = field === 'email' ? validateEmail(value) : validatePassword(value);
+    setUiState(prev => ({
+      ...prev,
+      validationErrors: { ...prev.validationErrors, [field]: error }
+    }));
+  }, [validateEmail, validatePassword]);
 
-  const handleLogin = async () => {
-    setLoginError("");
+  // Memoized login handler
+  const handleLogin = useCallback(async () => {
+    setUiState(prev => ({ ...prev, loginError: "" }));
     
-    const emailError = validateEmail(email);
-    const passwordError = validatePassword(password);
+    const emailError = validateEmail(formData.email);
+    const passwordError = validatePassword(formData.password);
     
     if (emailError || passwordError) {
-      setValidationErrors({
-        email: emailError,
-        password: passwordError
-      });
+      setUiState(prev => ({
+        ...prev,
+        validationErrors: { email: emailError, password: passwordError }
+      }));
       return;
     }
 
-    setIsSubmitting(true);
+    setUiState(prev => ({ ...prev, isSubmitting: true }));
     
     try {
-      await login(email, password);
+      await login(formData.email, formData.password);
       router.push("/dashboard"); 
     } catch (error) {
       console.error("Login failed:", error);
-      setLoginError("Login failed. Please check your credentials.");
+      setUiState(prev => ({ 
+        ...prev, 
+        loginError: "Login failed. Please check your credentials." 
+      }));
     } finally {
-      setIsSubmitting(false);
+      setUiState(prev => ({ ...prev, isSubmitting: false }));
     }
-  };
+  }, [formData, validateEmail, validatePassword, login, router]);
 
-  const handleLogout = async () => {
+  // Memoized logout handler
+  const handleLogout = useCallback(async () => {
     try {
       await logout();
     } catch (error) {
       console.error("Logout failed:", error);
     }
-  };
+  }, [logout]);
+
+  // Memoized loading component
+  const loadingComponent = useMemo(() => (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="loading loading-spinner loading-lg text-primary"></div>
+    </div>
+  ), []);
+
+  // Memoized user welcome component
+  const userWelcomeComponent = useMemo(() => (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="card bg-base-100 shadow-xl max-w-md w-full">
+        <div className="card-body">
+          <h2 className="card-title text-2xl mb-4">Welcome Back!</h2>
+          <p className="mb-4">Logged in as {user?.name}</p>
+          <button 
+            type="button" 
+            onClick={handleLogout}
+            className="btn btn-primary"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  ), [user?.name, handleLogout]);
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="loading loading-spinner loading-lg text-primary"></div>
-      </div>
-    );
+    return loadingComponent;
   }
 
   if (user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="card bg-base-100 shadow-xl max-w-md w-full">
-          <div className="card-body">
-            <h2 className="card-title text-2xl mb-4">Welcome Back!</h2>
-            <p className="mb-4">Logged in as {user.name}</p>
-            <button 
-              type="button" 
-              onClick={handleLogout}
-              className="btn btn-primary"
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-      </div>
-    );
+    return userWelcomeComponent;
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-base-100 to-secondary/5 p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary to-primary-focus rounded-2xl mb-4 shadow-lg">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-            </svg>
-          </div>
-          <h1 className="text-3xl font-bold text-base-content mb-2">Welcome Back</h1>
-          <p className="text-base-content/70">Sign in to your account to continue</p>
-        </div>
-
-        <div className="bg-base-100 rounded-2xl shadow-xl border border-base-200/50 p-8">
-          {loginError && (
-            <div className="mb-6 p-4 bg-error/10 border border-error/20 rounded-xl flex items-center gap-3">
-              <svg className="w-5 h-5 text-error flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span className="text-error text-sm">{loginError}</span>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 to-secondary/10">
+      <div className="card bg-base-100 shadow-xl max-w-md w-full">
+        <div className="card-body">
+          <h1 className="card-title text-3xl mb-6 justify-center">Login</h1>
+          
+          {uiState.loginError && (
+            <div className="alert alert-error mb-4">
+              <span>{uiState.loginError}</span>
             </div>
           )}
-          
-          <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-base-content mb-2">
-                Email Address
+
+          <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }} className="space-y-4">
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Email</span>
               </label>
               <input
-                id="email"
-                name="email"
                 type="email"
                 placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className={`w-full px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/20 ${
-                  validationErrors.email 
-                    ? 'border-error bg-error/5' 
-                    : 'border-base-300 bg-base-50 focus:border-primary'
-                }`}
-                required
+                className={`input input-bordered w-full ${uiState.validationErrors.email ? 'input-error' : ''}`}
+                value={formData.email}
+                onChange={(e) => handleInputChange("email", e.target.value)}
               />
-              {validationErrors.email && (
-                <p className="mt-2 text-sm text-error flex items-center gap-1">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  {validationErrors.email}
-                </p>
+              {uiState.validationErrors.email && (
+                <label className="label">
+                  <span className="label-text-alt text-error">{uiState.validationErrors.email}</span>
+                </label>
               )}
             </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-base-content mb-2">
-                Password
+
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Password</span>
               </label>
               <input
-                id="password"
-                name="password"
                 type="password"
                 placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className={`w-full px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/20 ${
-                  validationErrors.password 
-                    ? 'border-error bg-error/5' 
-                    : 'border-base-300 bg-base-50 focus:border-primary'
-                }`}
-                required
+                className={`input input-bordered w-full ${uiState.validationErrors.password ? 'input-error' : ''}`}
+                value={formData.password}
+                onChange={(e) => handleInputChange("password", e.target.value)}
               />
-              {validationErrors.password && (
-                <p className="mt-2 text-sm text-error flex items-center gap-1">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  {validationErrors.password}
-                </p>
+              {uiState.validationErrors.password && (
+                <label className="label">
+                  <span className="label-text-alt text-error">{uiState.validationErrors.password}</span>
+                </label>
               )}
             </div>
-            
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input 
-                  id="remember-me"
-                  name="rememberMe"
-                  type="checkbox" 
-                  className="w-4 h-4 text-primary bg-base-100 border-base-300 rounded focus:ring-primary/20 focus:ring-2" 
-                />
-                <span className="text-sm text-base-content/80">Remember me</span>
-              </label>
-              <a href="#" className="text-sm text-primary hover:text-primary-focus transition-colors">
-                Forgot password?
-              </a>
+
+            <div className="form-control mt-6">
+              <button 
+                type="submit" 
+                className={`btn btn-primary ${uiState.isSubmitting ? 'loading' : ''}`}
+                disabled={uiState.isSubmitting}
+              >
+                {uiState.isSubmitting ? 'Logging in...' : 'Login'}
+              </button>
             </div>
-            
-            <button 
-              type="submit"
-              className="w-full bg-gradient-to-r from-primary to-primary-focus text-white font-semibold py-3 px-6 rounded-xl hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-              disabled={isSubmitting || !!validationErrors.email || !!validationErrors.password}
-            >
-              {isSubmitting ? (
-                <div className="flex items-center justify-center gap-2">
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  Signing In...
-                </div>
-              ) : (
-                'Sign In'
-              )}
-            </button>
           </form>
-          
-          <div className="mt-8 pt-6 border-t border-base-200">
-            <p className="text-center text-sm text-base-content/70">
-              Don't have an account?{' '}
-              <a href="/register" className="text-primary hover:text-primary-focus font-medium transition-colors">
-                Sign up here
-              </a>
-            </p>
+
+          <div className="divider">OR</div>
+
+          <div className="text-center">
+            <p className="text-sm text-gray-600 mb-2">Don't have an account?</p>
+            <button 
+              onClick={() => router.push('/register')}
+              className="btn btn-outline btn-secondary"
+            >
+              Create Account
+            </button>
           </div>
         </div>
       </div>
@@ -230,4 +200,4 @@ const LoginPage: React.FC = () => {
   );
 };
 
-export default LoginPage;
+export default React.memo(LoginPage);

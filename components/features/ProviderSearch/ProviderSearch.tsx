@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import { useForm } from "react-hook-form";
 import { Search, Stethoscope, Hospital, Syringe, Activity, Star, MapPin, Clock, Calendar } from "lucide-react";
 import styles from './ProviderSearch.module.css';
@@ -237,31 +237,40 @@ const allProviders: Provider[] = [
 ];
 
 export function ProviderSearch() {
-  const [filteredProviders, setFilteredProviders] = useState<Provider[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
-  const [activeField, setActiveField] = useState<string | null>(null);
+  const [searchState, setSearchState] = useState({
+    filteredProviders: [] as Provider[],
+    isSearching: false,
+    hasSearched: false,
+    activeField: null as string | null
+  });
 
-  const { register, handleSubmit, watch, setValue, reset } = useForm<FormData>();
+  const { register, handleSubmit, watch, setValue } = useForm<FormData>();
   const watchedValues = watch();
 
-  const handleFieldChange = (fieldName: keyof FormData, value: string) => {
-    // Clear other fields when a new field is selected
-    if (fieldName !== activeField) {
-      if (activeField && activeField !== fieldName) {
-        setValue(activeField as keyof FormData, '');
+  // Memoized field change handler to prevent unnecessary re-renders
+  const handleFieldChange = useCallback((fieldName: keyof FormData, value: string) => {
+    setSearchState(prev => {
+      const newState = { ...prev };
+      
+      // Clear other fields when a new field is selected
+      if (fieldName !== prev.activeField) {
+        if (prev.activeField && prev.activeField !== fieldName) {
+          setValue(prev.activeField as keyof FormData, '');
+        }
+        newState.activeField = fieldName;
       }
-      setActiveField(fieldName);
-    }
-    
-    // Reset search results when switching fields
-    setFilteredProviders([]);
-    setHasSearched(false);
-  };
+      
+      // Reset search results when switching fields
+      newState.filteredProviders = [];
+      newState.hasSearched = false;
+      
+      return newState;
+    });
+  }, [setValue]);
 
-  const onSubmit = (formData: FormData) => {
-    setIsSearching(true);
-    setHasSearched(true);
+  // Memoized submit handler
+  const onSubmit = useCallback((formData: FormData) => {
+    setSearchState(prev => ({ ...prev, isSearching: true, hasSearched: true }));
     
     // Simulate API call delay
     setTimeout(() => {
@@ -279,19 +288,59 @@ export function ProviderSearch() {
         return matchesSpecialty && matchesProvider && matchesLocation;
       });
       
-      setFilteredProviders(filtered);
-      setIsSearching(false);
+      setSearchState(prev => ({ 
+        ...prev, 
+        filteredProviders: filtered, 
+        isSearching: false 
+      }));
     }, 500);
-  };
+  }, []);
 
-  const formatDate = (dateString: string) => {
+  // Memoized date formatter to prevent recalculation
+  const formatDate = useCallback((dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { 
       weekday: 'short', 
       month: 'short', 
       day: 'numeric' 
     });
-  };
+  }, []);
+
+  // Memoized datalist options
+  const specialties = useMemo(() => [
+    "Primary Care (Family or Internal Medicine)",
+    "Pediatrics",
+    "Obstetrics & Gynecology",
+    "Cardiology",
+    "Dermatology",
+    "Orthopedics",
+    "Psychiatry & Mental Health",
+    "Gastroenterology",
+    "Neurology",
+    "Endocrinology",
+    "Pulmonology"
+  ], []);
+
+  const providers = useMemo(() => [
+    "Dr. Emily Chen",
+    "Dr. Marcus Patel",
+    "Dr. Rachel Nguyen",
+    "Dr. Thomas Brooks",
+    "Dr. Aisha Roberts",
+    "Dr. James Okafor",
+    "Dr. Sofia Martinez",
+    "Dr. Henry Kim",
+    "Dr. Olivia Adams",
+    "Dr. Noah Singh",
+    "Dr. Catherine Scott"
+  ], []);
+
+  const locations = useMemo(() => [
+    "Dallas", "Fort Worth", "Arlington", "Plano", "Frisco", "Irving",
+    "Carrollton", "Garland", "Richardson", "Grand Prairie", "McKinney",
+    "Allen", "The Colony", "Lewisville", "Mesquite", "Denton",
+    "Flower Mound", "Euless", "Keller", "Southlake"
+  ], []);
 
   return (
     <div className={styles['provider-search-container']}>
@@ -312,17 +361,9 @@ export function ProviderSearch() {
               onChange={(e) => handleFieldChange("specialty", e.target.value)}
             />
             <datalist id="specialties">
-              <option value="Primary Care (Family or Internal Medicine)"></option>
-              <option value="Pediatrics"></option>
-              <option value="Obstetrics & Gynecology"></option>
-              <option value="Cardiology"></option>
-              <option value="Dermatology"></option>
-              <option value="Orthopedics"></option>
-              <option value="Psychiatry & Mental Health"></option>
-              <option value="Gastroenterology"></option>
-              <option value="Neurology"></option>
-              <option value="Endocrinology"></option>
-              <option value="Pulmonology"></option>
+              {specialties.map(specialty => (
+                <option key={specialty} value={specialty} />
+              ))}
             </datalist>
           </div>
 
@@ -336,17 +377,9 @@ export function ProviderSearch() {
               onChange={(e) => handleFieldChange("provider", e.target.value)}
             />
             <datalist id="providers">
-              <option value="Dr. Emily Chen"></option>
-              <option value="Dr. Marcus Patel"></option>
-              <option value="Dr. Rachel Nguyen"></option>
-              <option value="Dr. Thomas Brooks"></option>
-              <option value="Dr. Aisha Roberts"></option>
-              <option value="Dr. James Okafor"></option>
-              <option value="Dr. Sofia Martinez"></option>
-              <option value="Dr. Henry Kim"></option>
-              <option value="Dr. Olivia Adams"></option>
-              <option value="Dr. Noah Singh"></option>
-              <option value="Dr. Catherine Scott"></option>
+              {providers.map(provider => (
+                <option key={provider} value={provider} />
+              ))}
             </datalist>
           </div>
 
@@ -360,38 +393,20 @@ export function ProviderSearch() {
               onChange={(e) => handleFieldChange("location", e.target.value)}
             />
             <datalist id="locations">
-              <option value="Dallas"></option>
-              <option value="Fort Worth"></option>
-              <option value="Arlington"></option>
-              <option value="Plano"></option>
-              <option value="Frisco"></option>
-              <option value="Irving"></option>
-              <option value="Carrollton"></option>
-              <option value="Garland"></option>
-              <option value="Richardson"></option>
-              <option value="Grand Prairie"></option>
-              <option value="McKinney"></option>
-              <option value="Allen"></option>
-              <option value="The Colony"></option>
-              <option value="Lewisville"></option>
-              <option value="Mesquite"></option>
-              <option value="Denton"></option>
-              <option value="Flower Mound"></option>
-              <option value="Euless"></option>
-              <option value="Keller"></option>
-              <option value="Southlake"></option>
+              {locations.map(location => (
+                <option key={location} value={location} />
+              ))}
             </datalist>
           </div>
-        </div>
 
-        <button 
-          type="submit"
-          className={searchbarStyles['search-button']}
-          disabled={isSearching}
-        >
-          <Stethoscope className={searchbarStyles['button-icon']} />
-          {isSearching ? 'Searching...' : 'Search'}
-        </button>
+          <button 
+            type="submit" 
+            className={searchbarStyles['search-button']}
+            disabled={searchState.isSearching}
+          >
+            {searchState.isSearching ? "Searching..." : "Search"}
+          </button>
+        </div>
       </form>
 
       <div className={styles['filter-chips']}>
@@ -410,13 +425,13 @@ export function ProviderSearch() {
       </div>
 
       {/* Search Results */}
-      {hasSearched && filteredProviders.length > 0 && (
+      {searchState.hasSearched && searchState.filteredProviders.length > 0 && (
         <div className={styles['search-results']}>
           <h2 className={styles['results-header']}>
-            Found {filteredProviders.length} provider{filteredProviders.length !== 1 ? 's' : ''}
+            Found {searchState.filteredProviders.length} provider{searchState.filteredProviders.length !== 1 ? 's' : ''}
           </h2>
           <div className={styles['results-grid']}>
-            {filteredProviders.map((provider, index) => (
+            {searchState.filteredProviders.map((provider, index) => (
               <div key={index} className={styles['provider-card']}>
                 <div className={styles['provider-header']}>
                   <div className={styles['provider-info']}>
@@ -468,7 +483,7 @@ export function ProviderSearch() {
         </div>
       )}
 
-      {hasSearched && filteredProviders.length === 0 && !isSearching && (
+      {searchState.hasSearched && searchState.filteredProviders.length === 0 && !searchState.isSearching && (
         <div className={styles['no-results']}>
           <p>No providers found matching your search criteria</p>
           <p>Try adjusting your search terms or browse all providers</p>
@@ -477,3 +492,5 @@ export function ProviderSearch() {
     </div>
   );
 }
+
+export default React.memo(ProviderSearch);
