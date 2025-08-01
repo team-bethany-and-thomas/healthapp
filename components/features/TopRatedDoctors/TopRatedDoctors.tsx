@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Search, Stethoscope, Hospital, Syringe, Activity, Star, MapPin, Clock, Calendar } from "lucide-react";
-import styles from './ProviderSearch.module.css';
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 
 interface Provider {
   first_name: string;
@@ -23,7 +23,6 @@ interface Provider {
   }[];
 }
 
-// Complete provider data with all 11 providers
 const allProviders: Provider[] = [
   {
     first_name: "Emily",
@@ -221,164 +220,123 @@ const allProviders: Provider[] = [
     rating: 4.9,
     imageUrl: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=180&h=120&fit=crop&crop=face",
     appointments: [
-      { date: "2025-07-26", start_time: "12:00", length_minutes: 45 },
-      { date: "2025-07-27", start_time: "15:30", length_minutes: 45 },
-      { date: "2025-07-29", start_time: "10:00", length_minutes: 45 },
+      { date: "2025-07-26", start_time: "09:00", length_minutes: 60 },
+      { date: "2025-07-27", start_time: "14:00", length_minutes: 60 },
+      { date: "2025-07-28", start_time: "11:00", length_minutes: 60 },
+      { date: "2025-07-29", start_time: "16:30", length_minutes: 60 },
     ],
   },
 ];
 
-export function ProviderSearch() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filteredProviders, setFilteredProviders] = useState<Provider[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
+export function TopRatedDoctors() {
+  const [topRatedDoctors, setTopRatedDoctors] = useState<Provider[]>([]);
 
-  const handleSearch = () => {
-    setIsSearching(true);
-    
-    // Simulate API call delay
-    setTimeout(() => {
-      const filtered = allProviders.filter(provider => {
-        const query = searchQuery.toLowerCase();
-        return (
-          provider.first_name.toLowerCase().includes(query) ||
-          provider.last_name.toLowerCase().includes(query) ||
-          provider.specialty.toLowerCase().includes(query) ||
-          provider.city.toLowerCase().includes(query) ||
-          provider.practice_name.toLowerCase().includes(query)
-        );
-      });
-      setFilteredProviders(filtered);
-      setIsSearching(false);
-    }, 500);
-  };
+  useEffect(() => {
+    // 5 rando doctors from the list
+    const getRandomDoctors = () => {
+      const shuffled = [...allProviders].sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, 5);
+    };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    handleSearch();
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'short', 
-      month: 'short', 
-      day: 'numeric' 
-    });
-  };
+    setTopRatedDoctors(getRandomDoctors());
+  }, []);
 
   return (
-    <div className={styles['provider-search-container']}>
-      <div className={styles['search-header']}>
-        <Hospital className={styles['hospital-icon']} />
-        <h1 className="text-black">Find a Healthcare Provider</h1>
+    <section className="max-w-7xl mx-auto px-4 py-12">
+      {/* Section Header */}
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-bold text-primary mb-2">
+          Top Rated
+        </h2>
+        <h2 className="text-3xl font-bold text-secondary mb-4">
+          Doctors Near You
+        </h2>
+        <div className="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-full"></div>
       </div>
 
-      <form onSubmit={handleSubmit} className={styles['search-bar']}>
-        <Search className={styles['search-icon']} />
-        <input 
-          type="text" 
-          placeholder="Search by name, specialty, or location..." 
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyPress={handleKeyPress}
-        />
-        <button 
-          type="submit"
-          className={styles['search-button']}
-          disabled={isSearching}
-        >
-          <Stethoscope className={styles['button-icon']} />
-          {isSearching ? 'Searching...' : 'Search'}
-        </button>
-      </form>
-
-      <div className={styles['filter-chips']}>
-        <div className={styles.chip}>
-          <Syringe size={16} />
-          <span>Primary Care</span>
-        </div>
-        <div className={styles.chip}>
-          <Stethoscope size={16} />
-          <span>Specialists</span>
-        </div>
-        <div className={styles.chip}>
-          <Activity size={16} />
-          <span>Available Today</span>
-        </div>
-      </div>
-
-      {/* Search Results */}
-      {filteredProviders.length > 0 && (
-        <div className={styles['search-results']}>
-          <h2 className={styles['results-header']}>
-            Found {filteredProviders.length} provider{filteredProviders.length !== 1 ? 's' : ''}
-          </h2>
-          <div className={styles['results-grid']}>
-            {filteredProviders.map((provider, index) => (
-              <div key={index} className={styles['provider-card']}>
-                <div className={styles['provider-header']}>
-                  <div className={styles['provider-info']}>
-                    <h3 className={styles['provider-name']}>
-                      Dr. {provider.first_name} {provider.last_name}
-                    </h3>
-                    <p className={styles['provider-specialty']}>{provider.specialty}</p>
-                    <p className={styles['provider-practice']}>{provider.practice_name}</p>
-                  </div>
-                  <div className={styles['provider-rating']}>
-                    <Star size={16} className={styles['star-icon']} />
-                    <span>{provider.rating}</span>
+      {/* Doctors Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+        {topRatedDoctors.map((doctor, index) => (
+          <div 
+            key={index} 
+            className="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 border border-base-200 group h-80"
+          >
+            <div className="card-body p-6 flex flex-col h-full">
+              {/* Doctor Image */}
+              <div className="flex justify-center mb-4">
+                <div className="avatar">
+                  <div className="w-16 h-16 rounded-full ring-2 ring-primary ring-offset-2 ring-offset-base-100">
+                    <Image 
+                      src={doctor.imageUrl} 
+                      alt={`Dr. ${doctor.first_name} ${doctor.last_name}`}
+                      width={64}
+                      height={64}
+                      className="object-cover rounded-full"
+                      onError={(e) => {
+                        // Fallback to a placeholder if image fails to load
+                        const target = e.target as HTMLImageElement;
+                        target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23e5e7eb'/%3E%3Ctext x='32' y='32' font-family='Arial' font-size='8' fill='%236b7280' text-anchor='middle' dy='.3em'%3EDr%3C/text%3E%3C/svg%3E";
+                      }}
+                    />
                   </div>
                 </div>
-                
-                <div className={styles['provider-details']}>
-                  <div className={styles['detail-item']}>
-                    <MapPin size={14} />
-                    <span>{provider.city}, {provider.state} {provider.zip}</span>
-                  </div>
-                  <div className={styles['detail-item']}>
-                    <Calendar size={14} />
-                    <span>{provider.appointments.length} appointments available</span>
-                  </div>
-                  <div className={styles['languages']}>
-                    <span className={styles['language-label']}>Languages:</span>
-                    <span>{provider.languages_spoken.join(', ')}</span>
-                  </div>
-                </div>
+              </div>
 
-                <div className={styles['appointments-preview']}>
-                  <h4 className={styles['appointments-title']}>Next Available:</h4>
-                  <div className={styles['appointment-slots']}>
-                    {provider.appointments.slice(0, 3).map((appointment, appIndex) => (
-                      <div key={appIndex} className={styles['appointment-slot']}>
-                        <Clock size={12} />
-                        <span>{formatDate(appointment.date)} at {appointment.start_time}</span>
-                      </div>
+              {/* Doctor Info */}
+              <div className="text-center space-y-2 mb-4 flex-1">
+                <h3 className="font-semibold text-base-content text-lg leading-tight">
+                  Dr. {doctor.first_name} {doctor.last_name}
+                </h3>
+                <p className="text-sm text-base-content/70 leading-relaxed min-h-[2.5rem] flex items-center justify-center">
+                  {doctor.specialty}
+                </p>
+                <div className="flex items-center justify-center gap-1">
+                  <div className="rating rating-sm">
+                    {[...Array(5)].map((_, i) => (
+                      <input
+                        key={i}
+                        id={`rating-${index}-${i}`}
+                        type="radio"
+                        name={`rating-${index}`}
+                        className="mask mask-star-2 bg-orange-400"
+                        checked={i < Math.floor(doctor.rating)}
+                        readOnly
+                      />
                     ))}
                   </div>
+                  <span className="text-sm font-medium text-base-content/80">
+                    {doctor.rating}
+                  </span>
                 </div>
-
-                <button className={styles['book-button']}>
-                  Book Appointment
-                </button>
+                <p className="text-xs text-base-content/60">
+                  {doctor.city}, {doctor.state}
+                </p>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
 
-      {searchQuery && filteredProviders.length === 0 && !isSearching && (
-        <div className={styles['no-results']}>
-          <p>No providers found matching &quot;{searchQuery}&quot;</p>
-          <p>Try adjusting your search terms or browse all providers</p>
-        </div>
-      )}
-    </div>
+              {/* Action Button */}
+              <Link 
+                href={`/search?specialty=${encodeURIComponent(doctor.specialty)}&search=${encodeURIComponent(`${doctor.first_name} ${doctor.last_name}`)}`}
+                className="btn btn-primary w-full group-hover:btn-secondary transition-all duration-300 mt-auto"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                Consult Now
+              </Link>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* View All Button */}
+      <div className="text-center mt-8">
+        <Link href="/search" className="btn btn-outline btn-secondary hover:btn-secondary">
+          View All Doctors
+          <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </Link>
+      </div>
+    </section>
   );
-}
+} 
