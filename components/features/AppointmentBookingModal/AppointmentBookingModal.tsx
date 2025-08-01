@@ -211,11 +211,15 @@ export const AppointmentBookingModal: React.FC<
                 ></textarea>
               </div>
             </form>
-            <div className="modal-action flex justify-center">
+            <div className="modal-action flex gap-4 justify-center">
               <button className="btn btn-primary btn-sm">
                 Book Appointment
               </button>
-              <button type="button" className="btn btn-ghost" onClick={onClose}>
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={onClose}
+              >
                 Close
               </button>
             </div>
@@ -238,14 +242,12 @@ export const AppointmentBookingModal: React.FC<
               manage appointments.
             </p>
             <div className="flex gap-4 justify-center">
-              <div className="flex gap-4 justify-center">
-                <Link href="/login" className="btn btn-primary flex-1">
-                  Sign In
-                </Link>
-                <Link href="/register" className="btn btn-outline flex-1">
-                  Sign Up
-                </Link>
-              </div>
+              <Link href="/login" className="btn btn-primary flex-1">
+                Sign In
+              </Link>
+              <Link href="/register" className="btn btn-outline flex-1">
+                Sign Up
+              </Link>
             </div>
 
             <div className="modal-action justify-center">
