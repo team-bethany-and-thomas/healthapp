@@ -116,6 +116,7 @@ export const AppointmentBookingModal: React.FC<
     bio: "",
     profile_picture_id: "",
   });
+  const [appointmentBooked, setAppointmentBooked] = useState<boolean>(false);
 
   const handleAppointmentType = (e: React.ChangeEvent<HTMLSelectElement>) =>
     setAppointmentType(e.target.value);
@@ -126,6 +127,9 @@ export const AppointmentBookingModal: React.FC<
   const handleVisitReason = (e: React.ChangeEvent<HTMLTextAreaElement>) =>
     setReasonForVisit(e.target.value);
 
+  const handleSubmit = (formData) => {
+    console.log(formData);
+  };
   useEffect(() => {
     const modal = modalRef.current;
     if (!modal) return;
