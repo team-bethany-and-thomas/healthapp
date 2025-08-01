@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Stethoscope } from "lucide-react";
 
@@ -12,8 +12,8 @@ const Searchbar = () => {
     location: ""
   });
 
-  // Memoized search function to prevent unnecessary re-renders
-  const handleSearch = useCallback(() => {
+  // Search function
+  const handleSearch = () => {
     const searchParams = new URLSearchParams();
     
     Object.entries(formData).forEach(([key, value]) => {
@@ -24,25 +24,25 @@ const Searchbar = () => {
     
     const searchUrl = `/search?${searchParams.toString()}`;
     router.push(searchUrl);
-  }, [formData, router]);
+  };
 
-  // Combined event handler for all inputs
-  const handleInputChange = useCallback((field: string, value: string) => {
+  // Event handler for all inputs
+  const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-  }, []);
+  };
 
-  // Combined key press handler
-  const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
+  // Key press handler
+  const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSearch();
     }
-  }, [handleSearch]);
+  };
 
-  // Combined form submit handler
-  const handleSubmit = useCallback((e: React.FormEvent) => {
+  // Form submit handler
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     handleSearch();
-  }, [handleSearch]);
+  };
 
   // Memoized datalist options to prevent re-renders
   const specialties = useMemo(() => [
@@ -155,4 +155,4 @@ const Searchbar = () => {
   );
 };
 
-export default React.memo(Searchbar);
+export default Searchbar;

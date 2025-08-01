@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import { Search, Stethoscope, Hospital, Syringe, Activity, Star, MapPin, Clock, Calendar } from "lucide-react";
 import styles from './ProviderSearch.module.css';
 
@@ -15,6 +15,7 @@ interface Provider {
   practice_name: string;
   languages_spoken: string[];
   rating: number;
+  imageUrl: string;
   appointments: {
     date: string;
     start_time: string;
@@ -22,7 +23,7 @@ interface Provider {
   }[];
 }
 
-// Dummy provider data from the search results component
+// Complete provider data with all 11 providers
 const allProviders: Provider[] = [
   {
     first_name: "Emily",
@@ -35,6 +36,7 @@ const allProviders: Provider[] = [
     practice_name: "Pulse Clinic - Downtown Dallas",
     languages_spoken: ["English", "Mandarin"],
     rating: 4.8,
+    imageUrl: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=180&h=120&fit=crop&crop=face",
     appointments: [
       { date: "2025-07-26", start_time: "09:00", length_minutes: 30 },
       { date: "2025-07-26", start_time: "10:30", length_minutes: 30 },
@@ -53,6 +55,7 @@ const allProviders: Provider[] = [
     practice_name: "Pulse Clinic - Plano",
     languages_spoken: ["English", "Hindi", "Gujarati"],
     rating: 4.9,
+    imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=180&h=120&fit=crop&crop=face",
     appointments: [
       { date: "2025-07-26", start_time: "11:00", length_minutes: 60 },
       { date: "2025-07-27", start_time: "09:30", length_minutes: 60 },
@@ -70,6 +73,7 @@ const allProviders: Provider[] = [
     practice_name: "Pulse Clinic - Frisco",
     languages_spoken: ["English", "Vietnamese"],
     rating: 4.7,
+    imageUrl: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=180&h=120&fit=crop&crop=face",
     appointments: [
       { date: "2025-07-26", start_time: "10:00", length_minutes: 30 },
       { date: "2025-07-26", start_time: "15:30", length_minutes: 30 },
@@ -88,6 +92,7 @@ const allProviders: Provider[] = [
     practice_name: "Pulse Clinic - Arlington",
     languages_spoken: ["English"],
     rating: 4.6,
+    imageUrl: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=180&h=120&fit=crop&crop=face",
     appointments: [
       { date: "2025-07-27", start_time: "08:30", length_minutes: 45 },
       { date: "2025-07-28", start_time: "10:15", length_minutes: 60 },
@@ -105,11 +110,120 @@ const allProviders: Provider[] = [
     practice_name: "Pulse Clinic - Fort Worth",
     languages_spoken: ["English", "Spanish"],
     rating: 4.8,
+    imageUrl: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=180&h=120&fit=crop&crop=face",
     appointments: [
       { date: "2025-07-26", start_time: "13:00", length_minutes: 30 },
       { date: "2025-07-27", start_time: "11:30", length_minutes: 45 },
       { date: "2025-07-29", start_time: "09:00", length_minutes: 30 },
       { date: "2025-07-30", start_time: "15:00", length_minutes: 30 },
+    ],
+  },
+  {
+    first_name: "James",
+    last_name: "Okafor",
+    specialty: "Dermatology",
+    city: "Irving",
+    state: "TX",
+    zip: "75038",
+    education: "MD - University of Texas Medical Branch",
+    practice_name: "Pulse Clinic - Irving",
+    languages_spoken: ["English", "Igbo"],
+    rating: 4.7,
+    imageUrl: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=180&h=120&fit=crop&crop=face",
+    appointments: [
+      { date: "2025-07-26", start_time: "14:00", length_minutes: 30 },
+      { date: "2025-07-27", start_time: "10:00", length_minutes: 30 },
+      { date: "2025-07-28", start_time: "16:30", length_minutes: 30 },
+    ],
+  },
+  {
+    first_name: "Sofia",
+    last_name: "Martinez",
+    specialty: "Psychiatry & Mental Health",
+    city: "Carrollton",
+    state: "TX",
+    zip: "75006",
+    education: "MD - UT Health San Antonio",
+    practice_name: "Pulse Clinic - Carrollton",
+    languages_spoken: ["English", "Spanish"],
+    rating: 4.9,
+    imageUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=180&h=120&fit=crop&crop=face",
+    appointments: [
+      { date: "2025-07-26", start_time: "09:30", length_minutes: 60 },
+      { date: "2025-07-27", start_time: "14:00", length_minutes: 60 },
+      { date: "2025-07-29", start_time: "11:00", length_minutes: 60 },
+    ],
+  },
+  {
+    first_name: "Henry",
+    last_name: "Kim",
+    specialty: "Gastroenterology",
+    city: "Garland",
+    state: "TX",
+    zip: "75040",
+    education: "MD - Baylor College of Medicine",
+    practice_name: "Pulse Clinic - Garland",
+    languages_spoken: ["English", "Korean"],
+    rating: 4.8,
+    imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=180&h=120&fit=crop&crop=face",
+    appointments: [
+      { date: "2025-07-26", start_time: "08:00", length_minutes: 45 },
+      { date: "2025-07-27", start_time: "13:30", length_minutes: 45 },
+      { date: "2025-07-30", start_time: "10:00", length_minutes: 45 },
+    ],
+  },
+  {
+    first_name: "Olivia",
+    last_name: "Adams",
+    specialty: "Neurology",
+    city: "Richardson",
+    state: "TX",
+    zip: "75080",
+    education: "MD - University of Texas Southwestern Medical School",
+    practice_name: "Pulse Clinic - Richardson",
+    languages_spoken: ["English"],
+    rating: 4.6,
+    imageUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=180&h=120&fit=crop&crop=face",
+    appointments: [
+      { date: "2025-07-26", start_time: "11:30", length_minutes: 60 },
+      { date: "2025-07-28", start_time: "09:00", length_minutes: 60 },
+      { date: "2025-07-29", start_time: "15:30", length_minutes: 60 },
+    ],
+  },
+  {
+    first_name: "Noah",
+    last_name: "Singh",
+    specialty: "Endocrinology",
+    city: "Grand Prairie",
+    state: "TX",
+    zip: "75050",
+    education: "MD - Texas A&M Health Science Center",
+    practice_name: "Pulse Clinic - Grand Prairie",
+    languages_spoken: ["English", "Punjabi"],
+    rating: 4.7,
+    imageUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=180&h=120&fit=crop&crop=face",
+    appointments: [
+      { date: "2025-07-26", start_time: "10:30", length_minutes: 45 },
+      { date: "2025-07-27", start_time: "16:00", length_minutes: 45 },
+      { date: "2025-07-30", start_time: "08:30", length_minutes: 45 },
+    ],
+  },
+  {
+    first_name: "Catherine",
+    last_name: "Scott",
+    specialty: "Pulmonology",
+    city: "McKinney",
+    state: "TX",
+    zip: "75070",
+    education: "MD - University of Texas Health Science Center at Houston",
+    practice_name: "Pulse Clinic - McKinney",
+    languages_spoken: ["English", "Spanish"],
+    rating: 4.9,
+    imageUrl: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=180&h=120&fit=crop&crop=face",
+    appointments: [
+      { date: "2025-07-26", start_time: "12:00", length_minutes: 45 },
+      { date: "2025-07-27", start_time: "15:30", length_minutes: 45 },
+      { date: "2025-07-29", start_time: "10:00", length_minutes: 45 },
     ],
   },
 ];
@@ -139,6 +253,11 @@ export function ProviderSearch() {
     }, 500);
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSearch();
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSearch();
@@ -161,7 +280,7 @@ export function ProviderSearch() {
         <h1 className="text-black">Find a Healthcare Provider</h1>
       </div>
 
-      <div className={styles['search-bar']}>
+      <form onSubmit={handleSubmit} className={styles['search-bar']}>
         <Search className={styles['search-icon']} />
         <input 
           type="text" 
@@ -171,14 +290,14 @@ export function ProviderSearch() {
           onKeyPress={handleKeyPress}
         />
         <button 
+          type="submit"
           className={styles['search-button']}
-          onClick={handleSearch}
           disabled={isSearching}
         >
           <Stethoscope className={styles['button-icon']} />
           {isSearching ? 'Searching...' : 'Search'}
         </button>
-      </div>
+      </form>
 
       <div className={styles['filter-chips']}>
         <div className={styles.chip}>

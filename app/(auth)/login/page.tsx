@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -21,24 +21,24 @@ const LoginPage: React.FC = () => {
   });
   const router = useRouter();
 
-  // Memoized validation functions
-  const validateEmail = useCallback((email: string): string | undefined => {
+  // Validation functions
+  const validateEmail = (email: string): string | undefined => {
     if (!email) return "Email is required";
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) return "Please enter a valid email address";
     return undefined;
-  }, []);
+  };
 
-  const validatePassword = useCallback((password: string): string | undefined => {
+  const validatePassword = (password: string): string | undefined => {
     if (!password) return "Password is required";
     if (password.length < 6) return "Password must be at least 6 characters long";
     if (!/[A-Z]/.test(password)) return "Password must contain at least one capital letter";
     if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) return "Password must contain at least one special character";
     return undefined;
-  }, []);
+  };
 
-  // Combined input change handler
-  const handleInputChange = useCallback((field: string, value: string) => {
+  // Input change handler
+  const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     
     // Validate on change and update errors
@@ -47,10 +47,10 @@ const LoginPage: React.FC = () => {
       ...prev,
       validationErrors: { ...prev.validationErrors, [field]: error }
     }));
-  }, [validateEmail, validatePassword]);
+  };
 
-  // Memoized login handler
-  const handleLogin = useCallback(async () => {
+  // Login handler
+  const handleLogin = async () => {
     setUiState(prev => ({ ...prev, loginError: "" }));
     
     const emailError = validateEmail(formData.email);
@@ -78,16 +78,22 @@ const LoginPage: React.FC = () => {
     } finally {
       setUiState(prev => ({ ...prev, isSubmitting: false }));
     }
-  }, [formData, validateEmail, validatePassword, login, router]);
+  };
 
-  // Memoized logout handler
-  const handleLogout = useCallback(async () => {
+  // Logout handler
+  const handleLogout = async () => {
     try {
       await logout();
     } catch (error) {
       console.error("Logout failed:", error);
     }
-  }, [logout]);
+  };
+
+  // Form submit handler
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleLogin();
+  };
 
   // Memoized loading component
   const loadingComponent = useMemo(() => (
@@ -135,7 +141,7 @@ const LoginPage: React.FC = () => {
             </div>
           )}
 
-          <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="form-control">
               <label className="label">
                 <span className="label-text">Email</span>

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Provider {
   first_name: string;
@@ -90,7 +91,7 @@ const allProviders: Provider[] = [
     practice_name: "Pulse Clinic - Arlington",
     languages_spoken: ["English"],
     rating: 4.6,
-    imageUrl: "https://images.unsplash.com/photo-1594824475545-9d0c7c4951c1?w=180&h=120&fit=crop&crop=face",
+    imageUrl: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=180&h=120&fit=crop&crop=face",
     appointments: [
       { date: "2025-07-27", start_time: "08:30", length_minutes: 45 },
       { date: "2025-07-28", start_time: "10:15", length_minutes: 60 },
@@ -265,10 +266,17 @@ export function TopRatedDoctors() {
               <div className="flex justify-center mb-4">
                 <div className="avatar">
                   <div className="w-16 h-16 rounded-full ring-2 ring-primary ring-offset-2 ring-offset-base-100">
-                    <img 
+                    <Image 
                       src={doctor.imageUrl} 
                       alt={`Dr. ${doctor.first_name} ${doctor.last_name}`}
-                      className="object-cover"
+                      width={64}
+                      height={64}
+                      className="object-cover rounded-full"
+                      onError={(e) => {
+                        // Fallback to a placeholder if image fails to load
+                        const target = e.target as HTMLImageElement;
+                        target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23e5e7eb'/%3E%3Ctext x='32' y='32' font-family='Arial' font-size='8' fill='%236b7280' text-anchor='middle' dy='.3em'%3EDr%3C/text%3E%3C/svg%3E";
+                      }}
                     />
                   </div>
                 </div>
