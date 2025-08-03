@@ -18,6 +18,7 @@ import {
   ClipboardCheck,
   Activity
 } from 'lucide-react';
+import SideBar from '@/components/ui/sideBar';
 
 interface Appointment {
   id: string;
@@ -54,93 +55,93 @@ const PatientDashboard: React.FC = () => {
   const [showNotification, setShowNotification] = useState(false);
 
   const appointments: Appointment[] = [
-    {
-      id: '1',
-      title: 'Annual Physical',
-      doctor: 'Dr. Sarah Johnson',
-      date: 'March 15, 2025',
-      time: '2:00 PM',
-      status: 'confirmed'
-    },
-    {
-      id: '2',
-      title: 'Blood Work Follow-up',
-      doctor: 'Dr. Michael Chen',
-      date: 'March 22, 2025',
-      time: '9:30 AM',
-      status: 'pending'
-    },
-    {
-      id: '3',
-      title: 'Cardiology Consultation',
-      doctor: 'Dr. Emily Rodriguez',
-      date: 'April 5, 2025',
-      time: '11:00 AM',
-      status: 'confirmed'
-    }
-  ];
+  //   {
+  //     id: '1',
+  //     title: 'Annual Physical',
+  //     doctor: 'Dr. Sarah Johnson',
+  //     date: 'March 15, 2025',
+  //     time: '2:00 PM',
+  //     status: 'confirmed'
+  //   },
+  //   {
+  //     id: '2',
+  //     title: 'Blood Work Follow-up',
+  //     doctor: 'Dr. Michael Chen',
+  //     date: 'March 22, 2025',
+  //     time: '9:30 AM',
+  //     status: 'pending'
+  //   },
+  //   {
+  //     id: '3',
+  //     title: 'Cardiology Consultation',
+  //     doctor: 'Dr. Emily Rodriguez',
+  //     date: 'April 5, 2025',
+  //     time: '11:00 AM',
+  //     status: 'confirmed'
+  //   }
+   ];
 
-  const healthMetrics: HealthMetric[] = [
-    {
-      name: 'Blood Pressure',
-      value: 'Normal',
-      status: 'normal',
-      lastReading: 'Last reading: 120/80 mmHg'
-    },
-    {
-      name: 'Cholesterol',
-      value: 'Monitor',
-      status: 'monitor',
-      lastReading: 'Last test: 195 mg/dL'
-    },
-    {
-      name: 'BMI',
-      value: 'Normal',
-      status: 'normal',
-      lastReading: 'Current: 23.5'
-    }
-  ];
+   const healthMetrics: HealthMetric[] = [
+  //   {
+  //     name: 'Blood Pressure',
+  //     value: 'Normal',
+  //     status: 'normal',
+  //     lastReading: 'Last reading: 120/80 mmHg'
+  //   },
+  //   {
+  //     name: 'Cholesterol',
+  //     value: 'Monitor',
+  //     status: 'monitor',
+  //     lastReading: 'Last test: 195 mg/dL'
+  //   },
+  //   {
+  //     name: 'BMI',
+  //     value: 'Normal',
+  //     status: 'normal',
+  //     lastReading: 'Current: 23.5'
+  //   }
+   ];
 
   const recentActivities: Activity[] = [
-    {
-      id: '1',
-      title: 'Blood pressure reading uploaded',
-      time: '2 hours ago',
-      type: 'check'
-    },
-    {
-      id: '2',
-      title: 'Lab results available',
-      time: 'Yesterday at 3:45 PM',
-      type: 'file'
-    },
-    {
-      id: '3',
-      title: 'Message from Dr. Johnson',
-      time: 'March 10, 2025',
-      type: 'message'
-    },
-    {
-      id: '4',
-      title: 'Prescription refill completed',
-      time: 'March 8, 2025',
-      type: 'pill'
-    }
-  ];
+  //   {
+  //     id: '1',
+  //     title: 'Blood pressure reading uploaded',
+  //     time: '2 hours ago',
+  //     type: 'check'
+  //   },
+  //   {
+  //     id: '2',
+  //     title: 'Lab results available',
+  //     time: 'Yesterday at 3:45 PM',
+  //     type: 'file'
+  //   },
+  //   {
+  //     id: '3',
+  //     title: 'Message from Dr. Johnson',
+  //     time: 'March 10, 2025',
+  //     type: 'message'
+  //   },
+  //   {
+  //     id: '4',
+  //     title: 'Prescription refill completed',
+  //     time: 'March 8, 2025',
+  //     type: 'pill'
+  //   }
+   ];
 
-  const pendingTasks: Task[] = [
-    {
-      id: '1',
-      title: 'Complete Pre-Visit Form',
-      description: 'Due before March 15th appointment',
-      priority: 'high'
-    },
-    {
-      id: '2',
-      title: 'Update Insurance Information',
-      description: 'Verify current coverage',
-      priority: 'medium'
-    }
+   const pendingTasks: Task[] = [
+  //   {
+  //     id: '1',
+  //     title: 'Complete Pre-Visit Form',
+  //     description: 'Due before March 15th appointment',
+  //     priority: 'high'
+  //   },
+  //   {
+  //     id: '2',
+  //     title: 'Update Insurance Information',
+  //     description: 'Verify current coverage',
+  //     priority: 'medium'
+  //   }
   ];
 
   const quickStats = [
@@ -208,7 +209,9 @@ const PatientDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-base-200" data-theme="light">
+    <div className="flex min-h-screen bg-base-200" data-theme="light">
+      <SideBar  />
+      <div className='flex-1'>
       {/* Navigation */}
       <div className="navbar bg-base-100 shadow-sm border-b border-base-300">
         <div className="navbar-start">
@@ -525,6 +528,7 @@ const PatientDashboard: React.FC = () => {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 };
