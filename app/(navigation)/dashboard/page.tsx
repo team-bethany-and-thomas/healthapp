@@ -18,7 +18,7 @@ import {
   ClipboardCheck,
   Activity
 } from 'lucide-react';
-import SideBar from '@/components/ui/sideBar';
+import SideBar from '@/components/ui/SideBar';
 
 interface Appointment {
   id: string;
