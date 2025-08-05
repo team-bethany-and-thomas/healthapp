@@ -259,9 +259,16 @@ export const AppointmentBookingModal: React.FC<
             </h2>
 
             <p className="mb-6">
-              We&apos;ve reserved your spot with {selectedDoctor.name} on
-              {formattedDate} at {formatTime(appointmentTime)}. To help us
-              prepare for your visit, please fill out a few forms.
+              We&apos;ve reserved your spot with{" "}
+              <span className="font-semibold text-primary">
+                {selectedDoctor.name}
+              </span>
+              {" on "}
+              <span className="font-semibold">{formattedDate}</span> {" at "}
+              <span className="font-semibold">
+                {formatTime(appointmentTime)}
+              </span>
+              . To help us prepare for your visit, please fill out a few forms.
             </p>
             <div className="flex gap-4 justify-center">
               <Link
