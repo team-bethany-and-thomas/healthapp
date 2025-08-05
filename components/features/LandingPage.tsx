@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import { ProviderSearch } from './ProviderSearch'
 import { TopRatedDoctors } from './TopRatedDoctors/TopRatedDoctors'
 import { HomePageHero } from './HomePageHero'

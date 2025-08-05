@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -23,31 +23,31 @@ const RegistrationPage: React.FC = () => {
     validationErrors: {} as ValidationErrors
   });
 
-  // Memoized validation functions
-  const validateName = useCallback((name: string): string | undefined => {
+  // Validation functions
+  const validateName = (name: string): string | undefined => {
     if (!name) return "Name is required";
     if (name.length < 2) return "Name must be at least 2 characters long";
     if (!/^[a-zA-Z\s]+$/.test(name)) return "Name can only contain letters and spaces";
     return undefined;
-  }, []);
+  };
 
-  const validateEmail = useCallback((email: string): string | undefined => {
+  const validateEmail = (email: string): string | undefined => {
     if (!email) return "Email is required";
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) return "Please enter a valid email address";
     return undefined;
-  }, []);
+  };
 
-  const validatePassword = useCallback((password: string): string | undefined => {
+  const validatePassword = (password: string): string | undefined => {
     if (!password) return "Password is required";
     if (password.length < 6) return "Password must be at least 6 characters long";
     if (!/[A-Z]/.test(password)) return "Password must contain at least one capital letter";
     if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) return "Password must contain at least one special character";
     return undefined;
-  }, []);
+  };
 
-  // Combined input change handler
-  const handleInputChange = useCallback((field: string, value: string) => {
+  // Input change handler
+  const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     
     // Validate on change and update errors
@@ -68,10 +68,10 @@ const RegistrationPage: React.FC = () => {
       ...prev,
       validationErrors: { ...prev.validationErrors, [field]: error }
     }));
-  }, [validateName, validateEmail, validatePassword]);
+  };
 
-  // Memoized register handler
-  const handleRegister = useCallback(async (): Promise<void> => {
+  // Register handler
+  const handleRegister = async (): Promise<void> => {
     setUiState(prev => ({ ...prev, message: "" }));
     
     const nameError = validateName(formData.name);
@@ -109,14 +109,20 @@ const RegistrationPage: React.FC = () => {
     }
   }, [formData, validateName, validateEmail, validatePassword, register, router]);
 
-  // Memoized logout handler
-  const handleLogout = useCallback(async () => {
+  // Logout handler
+  const handleLogout = async () => {
     try {
       await logout();
     } catch (error) {
       console.error("Logout failed:", error);
     }
   }, [logout]);
+
+  // Form submit handler
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleRegister();
+  };
 
   // Memoized loading component
   const loadingComponent = useMemo(() => (
@@ -164,7 +170,7 @@ const RegistrationPage: React.FC = () => {
             </div>
           )}
           
-          <form onSubmit={(e) => { e.preventDefault(); handleRegister(); }} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="form-control">
               <label className="label">
                 <span className="label-text">Full Name</span>
