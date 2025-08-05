@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { MapPin, Calendar, Clock } from "lucide-react";
 import { AppointmentBookingModal } from "@/components/features/AppointmentBookingModal/AppointmentBookingModal";
+import SearchProviders from "@/components/features/SearchProviders";
 
 interface Doctor {
   $id: string;
@@ -160,7 +161,8 @@ function SearchPage() {
   const [selectedSpecialty, setSelectedSpecialty] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const [selectedDoctorId, setSelectedDoctorId] = useState<string>("");
 
   const specialties = [
     "Primary Care (Family or Internal Medicine)",
@@ -258,7 +260,7 @@ function SearchPage() {
       "Dr. Rachel Nguyen":
         "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=180&h=120&fit=crop&crop=face",
       "Dr. Thomas Brooks":
-        "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=180&h=120&fit=crop&crop=face",
+        "https://images.unsplash.com/photo-1594824475545-9d0c7c4951c1?w=180&h=120&fit=crop&crop=face",
       "Dr. Aisha Roberts":
         "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=180&h=120&fit=crop&crop=face",
       "Dr. James Okafor":
@@ -268,7 +270,7 @@ function SearchPage() {
       "Dr. Henry Kim":
         "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=180&h=120&fit=crop&crop=face",
       "Dr. Olivia Adams":
-        "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=180&h=120&fit=crop&crop=face",
+        "https://images.unsplash.com/photo-1594824475545-9d0c7c4951c1?w=180&h=120&fit=crop&crop=face",
       "Dr. Noah Singh":
         "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=180&h=120&fit=crop&crop=face",
     };
@@ -497,19 +499,19 @@ function SearchPage() {
                   <button className="btn btn-outline btn-sm">
                     View Profile
                   </button>
-                 <button
+                  <button
                     className="btn btn-primary btn-sm"
-                    onClick={() => setIsOpen(true)}
+                    onClick={() => setSelectedDoctorId(doctor.$id)}
                   >
                     Book Appointment
                   </button>
                   <AppointmentBookingModal
-                    isOpen={isOpen}
-                    onClose={() => setIsOpen(false)}
+                    isOpen={selectedDoctorId === doctor.$id} // Only open for this doctor
+                    onClose={() => setSelectedDoctorId("")} // Clear selection
                     providerId={doctor.$id}
                     providerList={mockDoctors}
                   />
-
+                </div>
               </div>
             </div>
           ))}

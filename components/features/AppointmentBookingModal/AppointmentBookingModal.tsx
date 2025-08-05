@@ -111,10 +111,6 @@ export const AppointmentBookingModal: React.FC<
   const { user, isLoading } = useAuth();
   // const allProviders = providerList;
 
-  const fetchSelectedDoctor = (id: string) => {
-    return providerList.filter((provider) => provider.$id === id);
-  };
-
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [appointmentTime, setAppointmentTime] = useState("");
   const [reasonForVisit, setReasonForVisit] = useState("");
@@ -196,7 +192,25 @@ export const AppointmentBookingModal: React.FC<
     formatAppointment();
     mockPostRequest(dataSubmitted);
   };
+
+  const handleCloseSuccess = () => {
+    // Close modal immediately
+    onClose();
+
+    // Delay state reset until modal animation completes
+    setTimeout(() => {
+      setAppointmentBooked(false);
+      setAppointmentType("");
+      setDate(new Date());
+      setAppointmentTime("");
+      setReasonForVisit("");
+    }, 300);
+  };
   useEffect(() => {
+    const fetchSelectedDoctor = (id: string) => {
+      return providerList.filter((provider) => provider.$id === id);
+    };
+
     const modal = modalRef.current;
     if (!modal) return;
 
@@ -250,10 +264,18 @@ export const AppointmentBookingModal: React.FC<
               prepare for your visit, please fill out a few forms.
             </p>
             <div className="flex gap-4 justify-center">
-              <Link href="/#" className="btn btn-primary flex-1">
+              <Link
+                href="/#"
+                className="btn btn-primary flex-1"
+                onClick={handleCloseSuccess}
+              >
                 Complete Intake Forms
               </Link>
-              <Link href="/dashboard" className="btn btn-outline flex-1">
+              <Link
+                href="/dashboard"
+                className="btn btn-outline flex-1"
+                onClick={handleCloseSuccess}
+              >
                 I&apos;ll Do it Later
               </Link>
             </div>
@@ -262,7 +284,7 @@ export const AppointmentBookingModal: React.FC<
               <button
                 type="button"
                 className="btn btn-ghost btn-sm"
-                onClick={onClose}
+                onClick={handleCloseSuccess}
               >
                 Close
               </button>
