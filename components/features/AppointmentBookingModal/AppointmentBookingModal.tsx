@@ -118,6 +118,17 @@ export const AppointmentBookingModal: React.FC<
   });
   const [appointmentBooked, setAppointmentBooked] = useState<boolean>(false);
 
+  const formatAppointment = () => {
+    if (!date || !appointmentTime) return;
+
+    // Create new date with selected date and time
+    const [hours, minutes] = appointmentTime.split(":");
+    const appointmentDate = new Date(date);
+    appointmentDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
+    // console.log(appointmentDate);
+  };
+
   const handleAppointmentType = (e: React.ChangeEvent<HTMLSelectElement>) =>
     setAppointmentType(e.target.value);
   const modalRef = useRef<HTMLDialogElement>(null);
@@ -127,8 +138,37 @@ export const AppointmentBookingModal: React.FC<
   const handleVisitReason = (e: React.ChangeEvent<HTMLTextAreaElement>) =>
     setReasonForVisit(e.target.value);
 
-  const handleSubmit = (formData) => {
-    console.log(formData);
+  const handleSubmit = () => {
+    const dataSubmitted = {
+      date: date,
+      appointmentTime: appointmentTime,
+      reasonForVisit: reasonForVisit,
+      selectedDoctor: selectedDoctor,
+    };
+    // console.log(dataSubmitted);
+    formatAppointment();
+
+    const formattedDate = date?.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
+    // Convert 24-hour time to 12-hour format for display
+    const formatTime = (time: string) => {
+      const [hours, minutes] = time.split(":");
+      const hour12 = parseInt(hours) % 12 || 12;
+      const ampm = parseInt(hours) >= 12 ? "PM" : "AM";
+      return `${hour12}:${minutes} ${ampm}`;
+    };
+    console.log(
+      `We've reserved your spot with ${
+        selectedDoctor.name
+      } on ${formattedDate} at ${formatTime(
+        appointmentTime
+      )}. To help us prepare for your visit, please fill out a few forms.`
+    );
   };
   useEffect(() => {
     const modal = modalRef.current;
@@ -199,8 +239,23 @@ export const AppointmentBookingModal: React.FC<
                 <option value="" disabled>
                   Please Select an Appointment Time
                 </option>
-                {/* can .split(":")[0] and check if number is lower than 12 for a.m. above 12 to conditionally render p.m. */}
-                <option value="01:00">01:00</option>
+                <option value="09:00">09:00 AM</option>
+                <option value="09:30">09:30 AM</option>
+                <option value="10:00">10:00 AM</option>
+                <option value="10:30">10:30 AM</option>
+                <option value="11:00">11:00 AM</option>
+                <option value="11:30">11:30 AM</option>
+                <option value="12:00">12:00 PM</option>
+                <option value="12:30">12:30 PM</option>
+                <option value="13:00">01:00 PM</option>
+                <option value="13:30">01:30 PM</option>
+                <option value="14:00">02:00 PM</option>
+                <option value="14:30">02:30 PM</option>
+                <option value="15:00">03:00 PM</option>
+                <option value="15:30">03:30 PM</option>
+                <option value="16:00">04:00 PM</option>
+                <option value="16:30">04:30 PM</option>
+                <option value="17:00">05:00 PM</option>
               </select>
             </div>
             <form className="py-4 flex  justify-center">
@@ -216,7 +271,7 @@ export const AppointmentBookingModal: React.FC<
               </div>
             </form>
             <div className="modal-action flex gap-4 justify-center">
-              <button className="btn btn-primary btn-sm">
+              <button className="btn btn-primary btn-sm" onClick={handleSubmit}>
                 Book Appointment
               </button>
               <button
