@@ -14,6 +14,29 @@ interface AppointmentBookingModalProps {
   providerList: Doctor[];
   // providerId
 }
+interface Appointment {
+  appointment_id: string;
+  patient_id: string;
+  provider_id: string;
+  appointment_type_id: string;
+  appointment_date: string | Date;
+  appointment_time: string | Date;
+  status: string;
+  reason_for_visit: string;
+  notes?: string;
+  created_at: string | Date;
+  updated_at: string | Date;
+}
+
+interface AppointmentType {
+  appointment_type_id: number;
+  type_name: string;
+  description: string;
+  duration_minutes: number;
+  base_cost: number;
+  created_at: string;
+  is_active: boolean;
+}
 
 interface Doctor {
   $id: string;
@@ -26,15 +49,6 @@ interface Doctor {
   weekend_available: boolean;
   bio: string;
   profile_picture_id: string;
-}
-interface AppointmentType {
-  appointment_type_id: number;
-  type_name: string;
-  description: string;
-  duration_minutes: number;
-  base_cost: number;
-  created_at: string;
-  is_active: boolean;
 }
 
 const appointmentTypes: AppointmentType[] = [
@@ -118,6 +132,9 @@ export const AppointmentBookingModal: React.FC<
   });
   const [appointmentBooked, setAppointmentBooked] = useState<boolean>(false);
 
+  const [appointmentIsSaving, setAppointmentIsSaving] =
+    useState<boolean>(false);
+
   const formatAppointment = () => {
     if (!date || !appointmentTime) return;
 
@@ -128,9 +145,23 @@ export const AppointmentBookingModal: React.FC<
 
     // console.log(appointmentDate);
   };
+  const formattedDate = date?.toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 
-  const handleAppointmentType = (e: React.ChangeEvent<HTMLSelectElement>) =>
+  // Convert 24-hour time to 12-hour format for display
+  const formatTime = (time: string) => {
+    const [hours, minutes] = time.split(":");
+    const hour12 = parseInt(hours) % 12 || 12;
+    const ampm = parseInt(hours) >= 12 ? "PM" : "AM";
+    return `${hour12}:${minutes} ${ampm}`;
+  };
+  const handleAppointmentType = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setAppointmentType(e.target.value);
+  };
   const modalRef = useRef<HTMLDialogElement>(null);
 
   const handleTimeSelection = (e: React.ChangeEvent<HTMLSelectElement>) =>
@@ -139,36 +170,31 @@ export const AppointmentBookingModal: React.FC<
     setReasonForVisit(e.target.value);
 
   const handleSubmit = () => {
-    const dataSubmitted = {
-      date: date,
-      appointmentTime: appointmentTime,
-      reasonForVisit: reasonForVisit,
-      selectedDoctor: selectedDoctor,
+    const mockPostRequest = (dataSubmitted: Appointment) => {
+      setAppointmentIsSaving(true);
+      setTimeout(() => {
+        console.log("appointment booked", dataSubmitted);
+        setAppointmentIsSaving(false);
+        setAppointmentBooked(true);
+      }, 2500);
+    };
+
+    const dataSubmitted: Appointment = {
+      appointment_id: String(Math.floor(Math.random() * 10000 + 1)),
+      patient_id: user?.$id || "",
+      provider_id: selectedDoctor.$id,
+      appointment_type_id: appointmentType,
+      appointment_date: date || "",
+      appointment_time: appointmentTime,
+      status: "booked",
+      reason_for_visit: reasonForVisit || "",
+      notes: "",
+      created_at: new Date(),
+      updated_at: new Date(),
     };
     // console.log(dataSubmitted);
     formatAppointment();
-
-    const formattedDate = date?.toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-
-    // Convert 24-hour time to 12-hour format for display
-    const formatTime = (time: string) => {
-      const [hours, minutes] = time.split(":");
-      const hour12 = parseInt(hours) % 12 || 12;
-      const ampm = parseInt(hours) >= 12 ? "PM" : "AM";
-      return `${hour12}:${minutes} ${ampm}`;
-    };
-    console.log(
-      `We've reserved your spot with ${
-        selectedDoctor.name
-      } on ${formattedDate} at ${formatTime(
-        appointmentTime
-      )}. To help us prepare for your visit, please fill out a few forms.`
-    );
+    mockPostRequest(dataSubmitted);
   };
   useEffect(() => {
     const modal = modalRef.current;
@@ -186,6 +212,67 @@ export const AppointmentBookingModal: React.FC<
       }
     }
   }, [isOpen, providerId]);
+  // returns Loading... if checking for user. this ensures unauthorized does not show automatically.
+  if (isLoading) {
+    return (
+      <dialog
+        ref={modalRef}
+        className="modal modal-bottom sm:modal-middle"
+        onClose={onClose}
+      >
+        <div className="modal-box bg-base-100">
+          <div className="text-center py-8">
+            <span className="loading loading-spinner loading-lg text-primary"></span>
+            <p className="mt-4">Loading...</p>
+          </div>
+        </div>
+      </dialog>
+    );
+  }
+  // return a success modal with booking info
+  if (appointmentBooked) {
+    return (
+      <dialog
+        ref={modalRef}
+        className="modal modal-bottom sm:modal-middle"
+        onClose={onClose}
+      >
+        <div className="modal-box bg-base-100">
+          <div className="text-center">
+            <h1 className="font-bold text-lg mb-2">Success!</h1>
+            <h2 className="font-bold text-lg mb-4">
+              Your appointment is confirmed!
+            </h2>
+
+            <p className="mb-6">
+              We&apos;ve reserved your spot with {selectedDoctor.name} on
+              {formattedDate} at {formatTime(appointmentTime)}. To help us
+              prepare for your visit, please fill out a few forms.
+            </p>
+            <div className="flex gap-4 justify-center">
+              <Link href="/#" className="btn btn-primary flex-1">
+                Complete Intake Forms
+              </Link>
+              <Link href="/dashboard" className="btn btn-outline flex-1">
+                I&apos;ll Do it Later
+              </Link>
+            </div>
+
+            <div className="modal-action justify-center">
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={onClose}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </dialog>
+    );
+  }
+  // return a booking modal if there is a user signed in
   if (user) {
     return (
       <>
@@ -208,7 +295,7 @@ export const AppointmentBookingModal: React.FC<
                 {appointmentTypes.map((aT) => (
                   <option
                     key={aT.appointment_type_id}
-                    value={aT.duration_minutes}
+                    value={aT.appointment_type_id}
                   >
                     {aT.type_name}
                     {` (${aT.duration_minutes}) minutes`}
@@ -271,8 +358,17 @@ export const AppointmentBookingModal: React.FC<
               </div>
             </form>
             <div className="modal-action flex gap-4 justify-center">
-              <button className="btn btn-primary btn-sm" onClick={handleSubmit}>
-                Book Appointment
+              <button
+                className="btn btn-primary btn-sm"
+                disabled={appointmentIsSaving}
+                onClick={handleSubmit}
+              >
+                {appointmentIsSaving && (
+                  <span className="loading loading-spinner loading-xs"></span>
+                )}
+                {appointmentIsSaving
+                  ? "Saving Appointment"
+                  : "Book Appointment"}
               </button>
               <button
                 type="button"
@@ -287,6 +383,7 @@ export const AppointmentBookingModal: React.FC<
       </>
     );
   } else {
+    // returns an unauthorized modal if the there is not an authorized user
     return (
       <dialog
         ref={modalRef}
