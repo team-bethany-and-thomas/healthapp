@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { saveAppointment } from '@/app/lib/saveAppointment';
+import { getProviders } from '@/app/lib/getProviders';
 
 type Appointment = {
   $id: number;
@@ -16,6 +17,14 @@ export default function TestAppointmentPage() {
   useEffect(() => {
     const createTest = async () => {
       try {
+        // Test fetching providers
+        const fetchProviders = async () => {
+          const result = await getProviders();
+          console.log("✅ Providers from Appwrite:", result);
+        };
+
+        await fetchProviders();
+
         await saveAppointment({
           appointment_id: 103,
           patient_id: 1,
