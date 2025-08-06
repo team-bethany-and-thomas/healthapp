@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "use client";
 import React, { useState } from 'react';
 import Image from 'next/image';
@@ -206,8 +207,14 @@ const PatientDashboard: React.FC = () => {
       default: return <Clock className="w-4 h-4 text-gray-600" />;
     }
   };
+=======
+import SideBar from '@/components/ui/SideBar'
+import React from 'react'
+>>>>>>> e2ab5b6dbf85e5d9875f006a10875e19d01fdbd6
 
+function page() {
   return (
+<<<<<<< HEAD
     <div className="min-h-screen bg-base-200" data-theme="light">
       {/* Navigation */}
       <div className="navbar bg-base-100 shadow-sm border-b border-base-300">
@@ -528,5 +535,12 @@ const PatientDashboard: React.FC = () => {
     </div>
   );
 };
+=======
+    <>
+    <SideBar />
+    </>
+  )
+}
+>>>>>>> e2ab5b6dbf85e5d9875f006a10875e19d01fdbd6
 
-export default PatientDashboard;
+export default page

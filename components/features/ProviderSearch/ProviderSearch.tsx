@@ -245,7 +245,11 @@ export function ProviderSearch() {
           provider.last_name.toLowerCase().includes(query) ||
           provider.specialty.toLowerCase().includes(query) ||
           provider.city.toLowerCase().includes(query) ||
-          provider.practice_name.toLowerCase().includes(query)
+          provider.practice_name.toLowerCase().includes(query) ||
+          // Add language search functionality
+          provider.languages_spoken.some(language => 
+            language.toLowerCase().includes(query)
+          )
         );
       });
       setFilteredProviders(filtered);
@@ -284,7 +288,7 @@ export function ProviderSearch() {
         <Search className={styles['search-icon']} />
         <input 
           type="text" 
-          placeholder="Search by name, specialty, or location..." 
+          placeholder="Search by name, specialty, location, or language..." 
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyPress={handleKeyPress}
@@ -311,6 +315,10 @@ export function ProviderSearch() {
         <div className={styles.chip}>
           <Activity size={16} />
           <span>Available Today</span>
+        </div>
+        <div className={styles.chip}>
+          <span>🌐</span>
+          <span>Language Search</span>
         </div>
       </div>
 
@@ -348,7 +356,13 @@ export function ProviderSearch() {
                   </div>
                   <div className={styles['languages']}>
                     <span className={styles['language-label']}>Languages:</span>
-                    <span>{provider.languages_spoken.join(', ')}</span>
+                    <div className={styles['language-tags']}>
+                      {provider.languages_spoken.map((language, langIndex) => (
+                        <span key={langIndex} className={styles['language-tag']}>
+                          {language}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
