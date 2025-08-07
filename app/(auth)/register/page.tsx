@@ -17,19 +17,20 @@ const RegistrationPage: React.FC = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    name: ""
+    name: "",
   });
   const [uiState, setUiState] = useState({
     isRegistering: false,
     message: "",
-    validationErrors: {} as ValidationErrors
+    validationErrors: {} as ValidationErrors,
   });
 
   // Validation functions
   const validateName = (name: string): string | undefined => {
     if (!name) return "Name is required";
     if (name.length < 2) return "Name must be at least 2 characters long";
-    if (!/^[a-zA-Z\s]+$/.test(name)) return "Name can only contain letters and spaces";
+    if (!/^[a-zA-Z\s]+$/.test(name))
+      return "Name can only contain letters and spaces";
     return undefined;
   };
 
@@ -42,72 +43,78 @@ const RegistrationPage: React.FC = () => {
 
   const validatePassword = (password: string): string | undefined => {
     if (!password) return "Password is required";
-    if (password.length < 6) return "Password must be at least 6 characters long";
-    if (!/[A-Z]/.test(password)) return "Password must contain at least one capital letter";
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) return "Password must contain at least one special character";
+    if (password.length < 6)
+      return "Password must be at least 6 characters long";
+    if (!/[A-Z]/.test(password))
+      return "Password must contain at least one capital letter";
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password))
+      return "Password must contain at least one special character";
     return undefined;
   };
 
   // Input change handler
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
+    setFormData((prev) => ({ ...prev, [field]: value }));
+
     // Validate on change and update errors
     let error: string | undefined;
     switch (field) {
-      case 'name':
+      case "name":
         error = validateName(value);
         break;
-      case 'email':
+      case "email":
         error = validateEmail(value);
         break;
-      case 'password':
+      case "password":
         error = validatePassword(value);
         break;
     }
-    
-    setUiState(prev => ({
+
+    setUiState((prev) => ({
       ...prev,
-      validationErrors: { ...prev.validationErrors, [field]: error }
+      validationErrors: { ...prev.validationErrors, [field]: error },
     }));
   };
 
   // Register handler
   const handleRegister = async (): Promise<void> => {
-    setUiState(prev => ({ ...prev, message: "" }));
-    
+    setUiState((prev) => ({ ...prev, message: "" }));
+
     const nameError = validateName(formData.name);
     const emailError = validateEmail(formData.email);
     const passwordError = validatePassword(formData.password);
-    
+
     if (nameError || emailError || passwordError) {
-      setUiState(prev => ({
+      setUiState((prev) => ({
         ...prev,
-        validationErrors: { name: nameError, email: emailError, password: passwordError }
+        validationErrors: {
+          name: nameError,
+          email: emailError,
+          password: passwordError,
+        },
       }));
       return;
     }
 
     try {
-      setUiState(prev => ({ ...prev, isRegistering: true }));
-      
+      setUiState((prev) => ({ ...prev, isRegistering: true }));
+
       await register(formData.email, formData.password, formData.name);
-      
-      setUiState(prev => ({ 
-        ...prev, 
-        message: "Registration successful! Redirecting to dashboard..." 
+
+      setUiState((prev) => ({
+        ...prev,
+        message: "Registration successful! Redirecting to dashboard...",
       }));
-      
-      router.push('/dashboard');
-      
+
+      router.push("/dashboard");
     } catch (error) {
       console.error("Registration failed:", error);
-      setUiState(prev => ({ 
-        ...prev, 
-        message: "Registration failed. Please try again." 
+      setUiState((prev) => ({
+        ...prev,
+        message: "Registration failed. Please try again.",
       }));
     } finally {
-      setUiState(prev => ({ ...prev, isRegistering: false }));
+      setUiState((prev) => ({ ...prev, isRegistering: false }));
     }
   };
 

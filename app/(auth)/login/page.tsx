@@ -14,12 +14,12 @@ const LoginPage: React.FC = () => {
   const { user, isLoading, login, logout } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
-    password: ""
+    password: "",
   });
   const [uiState, setUiState] = useState({
     loginError: "",
     validationErrors: {} as ValidationErrors,
-    isSubmitting: false
+    isSubmitting: false,
   });
   const router = useRouter();
 
@@ -33,52 +33,56 @@ const LoginPage: React.FC = () => {
 
   const validatePassword = (password: string): string | undefined => {
     if (!password) return "Password is required";
-    if (password.length < 6) return "Password must be at least 6 characters long";
-    if (!/[A-Z]/.test(password)) return "Password must contain at least one capital letter";
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) return "Password must contain at least one special character";
+    if (password.length < 6)
+      return "Password must be at least 6 characters long";
+    if (!/[A-Z]/.test(password))
+      return "Password must contain at least one capital letter";
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password))
+      return "Password must contain at least one special character";
     return undefined;
   };
 
   // Input change handler
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
+    setFormData((prev) => ({ ...prev, [field]: value }));
+
     // Validate on change and update errors
-    const error = field === 'email' ? validateEmail(value) : validatePassword(value);
-    setUiState(prev => ({
+    const error =
+      field === "email" ? validateEmail(value) : validatePassword(value);
+    setUiState((prev) => ({
       ...prev,
-      validationErrors: { ...prev.validationErrors, [field]: error }
+      validationErrors: { ...prev.validationErrors, [field]: error },
     }));
   };
 
   // Login handler
   const handleLogin = async () => {
-    setUiState(prev => ({ ...prev, loginError: "" }));
-    
+    setUiState((prev) => ({ ...prev, loginError: "" }));
+
     const emailError = validateEmail(formData.email);
     const passwordError = validatePassword(formData.password);
-    
+
     if (emailError || passwordError) {
-      setUiState(prev => ({
+      setUiState((prev) => ({
         ...prev,
-        validationErrors: { email: emailError, password: passwordError }
+        validationErrors: { email: emailError, password: passwordError },
       }));
       return;
     }
 
-    setUiState(prev => ({ ...prev, isSubmitting: true }));
-    
+    setUiState((prev) => ({ ...prev, isSubmitting: true }));
+
     try {
       await login(formData.email, formData.password);
-      router.push("/dashboard"); 
+      router.push("/dashboard");
     } catch (error) {
       console.error("Login failed:", error);
-      setUiState(prev => ({ 
-        ...prev, 
-        loginError: "Login failed. Please check your credentials." 
+      setUiState((prev) => ({
+        ...prev,
+        loginError: "Login failed. Please check your credentials.",
       }));
     } finally {
-      setUiState(prev => ({ ...prev, isSubmitting: false }));
+      setUiState((prev) => ({ ...prev, isSubmitting: false }));
     }
   };
 

@@ -1,8 +1,10 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
-import Image from 'next/image';
-import { MapPin, Calendar, Clock } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import Image from "next/image";
+import { MapPin, Calendar, Clock } from "lucide-react";
+import { AppointmentBookingModal } from "@/components/features/AppointmentBookingModal/AppointmentBookingModal";
+import SearchProviders from "@/components/features/SearchProviders";
 
 interface Doctor {
   $id: string;
@@ -17,7 +19,6 @@ interface Doctor {
   profile_picture_id: string;
 }
 
-
 const mockDoctors: Doctor[] = [
   {
     $id: "1",
@@ -29,7 +30,7 @@ const mockDoctors: Doctor[] = [
     availability: "Mon-Fri 8AM-5PM",
     weekend_available: false,
     bio: "Experienced primary care physician with over 10 years of practice.",
-    profile_picture_id: "emily_chen.jpg"
+    profile_picture_id: "emily_chen.jpg",
   },
   {
     $id: "2",
@@ -41,7 +42,7 @@ const mockDoctors: Doctor[] = [
     availability: "Mon-Fri 9AM-6PM",
     weekend_available: true,
     bio: "Board-certified cardiologist specializing in preventive cardiology.",
-    profile_picture_id: "marcus_patel.jpg"
+    profile_picture_id: "marcus_patel.jpg",
   },
   {
     $id: "3",
@@ -53,7 +54,7 @@ const mockDoctors: Doctor[] = [
     availability: "Mon-Fri 8AM-5PM",
     weekend_available: false,
     bio: "Pulmonologist with expertise in respiratory conditions and sleep medicine.",
-    profile_picture_id: "catherine_scott.jpg"
+    profile_picture_id: "catherine_scott.jpg",
   },
   {
     $id: "4",
@@ -65,7 +66,7 @@ const mockDoctors: Doctor[] = [
     availability: "Mon-Fri 8AM-6PM",
     weekend_available: true,
     bio: "Pediatrician dedicated to providing comprehensive care for children.",
-    profile_picture_id: "rachel_nguyen.jpg"
+    profile_picture_id: "rachel_nguyen.jpg",
   },
   {
     $id: "5",
@@ -77,7 +78,7 @@ const mockDoctors: Doctor[] = [
     availability: "Mon-Fri 9AM-5PM",
     weekend_available: false,
     bio: "Orthopedic surgeon specializing in sports medicine and joint replacement.",
-    profile_picture_id: "thomas_brooks.jpg"
+    profile_picture_id: "thomas_brooks.jpg",
   },
   {
     $id: "6",
@@ -89,7 +90,7 @@ const mockDoctors: Doctor[] = [
     availability: "Mon-Fri 8AM-6PM",
     weekend_available: true,
     bio: "OB/GYN specialist providing comprehensive women's healthcare services.",
-    profile_picture_id: "aisha_roberts.jpg"
+    profile_picture_id: "aisha_roberts.jpg",
   },
   {
     $id: "7",
@@ -101,7 +102,7 @@ const mockDoctors: Doctor[] = [
     availability: "Mon-Fri 9AM-5PM",
     weekend_available: false,
     bio: "Board-certified dermatologist specializing in medical and cosmetic dermatology.",
-    profile_picture_id: "james_okafor.jpg"
+    profile_picture_id: "james_okafor.jpg",
   },
   {
     $id: "8",
@@ -113,7 +114,7 @@ const mockDoctors: Doctor[] = [
     availability: "Mon-Fri 9AM-6PM",
     weekend_available: false,
     bio: "Psychiatrist specializing in adult and adolescent mental health treatment.",
-    profile_picture_id: "sofia_martinez.jpg"
+    profile_picture_id: "sofia_martinez.jpg",
   },
   {
     $id: "9",
@@ -125,7 +126,7 @@ const mockDoctors: Doctor[] = [
     availability: "Mon-Fri 8AM-5PM",
     weekend_available: false,
     bio: "Gastroenterologist with expertise in digestive disorders and endoscopy.",
-    profile_picture_id: "henry_kim.jpg"
+    profile_picture_id: "henry_kim.jpg",
   },
   {
     $id: "10",
@@ -137,7 +138,7 @@ const mockDoctors: Doctor[] = [
     availability: "Mon-Fri 9AM-6PM",
     weekend_available: false,
     bio: "Neurologist specializing in neurological disorders and stroke treatment.",
-    profile_picture_id: "olivia_adams.jpg"
+    profile_picture_id: "olivia_adams.jpg",
   },
   {
     $id: "11",
@@ -149,17 +150,19 @@ const mockDoctors: Doctor[] = [
     availability: "Mon-Fri 8AM-5PM",
     weekend_available: false,
     bio: "Endocrinologist specializing in diabetes management and hormone disorders.",
-    profile_picture_id: "noah_singh.jpg"
-  }
+    profile_picture_id: "noah_singh.jpg",
+  },
 ];
 
 function SearchPage() {
   const searchParams = useSearchParams();
   const [filteredDoctors, setFilteredDoctors] = useState<Doctor[]>(mockDoctors);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedSpecialty, setSelectedSpecialty] = useState('');
-  const [selectedLocation, setSelectedLocation] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedSpecialty, setSelectedSpecialty] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const [selectedDoctorId, setSelectedDoctorId] = useState<string>("");
 
   const specialties = [
     "Primary Care (Family or Internal Medicine)",
@@ -176,18 +179,34 @@ function SearchPage() {
   ];
 
   const locations = [
-    "Dallas", "Fort Worth", "Arlington", "Plano", "Frisco", "Irving",
-    "Carrollton", "Garland", "Richardson", "Grand Prairie", "McKinney",
-    "Allen", "The Colony", "Lewisville", "Mesquite", "Denton",
-    "Flower Mound", "Euless", "Keller", "Southlake"
+    "Dallas",
+    "Fort Worth",
+    "Arlington",
+    "Plano",
+    "Frisco",
+    "Irving",
+    "Carrollton",
+    "Garland",
+    "Richardson",
+    "Grand Prairie",
+    "McKinney",
+    "Allen",
+    "The Colony",
+    "Lewisville",
+    "Mesquite",
+    "Denton",
+    "Flower Mound",
+    "Euless",
+    "Keller",
+    "Southlake",
   ];
 
   // Handle initial URL parameters
   useEffect(() => {
     if (searchParams) {
-      const specialty = searchParams.get('specialty');
-      const search = searchParams.get('search');
-      const location = searchParams.get('location');
+      const specialty = searchParams.get("specialty");
+      const search = searchParams.get("search");
+      const location = searchParams.get("location");
 
       if (specialty) setSelectedSpecialty(specialty);
       if (search) setSearchTerm(search);
@@ -198,54 +217,76 @@ function SearchPage() {
   // Filter doctors based on search criteria
   useEffect(() => {
     setLoading(true);
-    
-    const filtered = mockDoctors.filter(doctor => {
+
+    const filtered = mockDoctors.filter((doctor) => {
       // Only use the first non-empty filter
       if (searchTerm) {
         const trimmedSearchTerm = searchTerm.trim().toLowerCase();
-        const normalizedDoctorName = doctor.name.toLowerCase().replace(/\s+/g, ' ');
-        const normalizedSpecialty = doctor.specialty.toLowerCase().replace(/\s+/g, ' ');
-        
-        return normalizedDoctorName.includes(trimmedSearchTerm) ||
-               normalizedSpecialty.includes(trimmedSearchTerm);
+        const normalizedDoctorName = doctor.name
+          .toLowerCase()
+          .replace(/\s+/g, " ");
+        const normalizedSpecialty = doctor.specialty
+          .toLowerCase()
+          .replace(/\s+/g, " ");
+
+        return (
+          normalizedDoctorName.includes(trimmedSearchTerm) ||
+          normalizedSpecialty.includes(trimmedSearchTerm)
+        );
       } else if (selectedSpecialty) {
         return doctor.specialty === selectedSpecialty;
       } else if (selectedLocation) {
-        return doctor.location.toLowerCase().includes(selectedLocation.toLowerCase());
+        return doctor.location
+          .toLowerCase()
+          .includes(selectedLocation.toLowerCase());
       }
-      
+
       // If no filters are active, show all doctors
       return true;
     });
-    
+
     setFilteredDoctors(filtered);
     setLoading(false);
   }, [searchTerm, selectedSpecialty, selectedLocation]);
 
   const getDoctorImage = (doctorName: string) => {
     const imageMap: { [key: string]: string } = {
-      "Dr. Emily Chen": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=180&h=120&fit=crop&crop=face",
-      "Dr. Marcus Patel": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=180&h=120&fit=crop&crop=face",
-      "Dr. Catherine Scott": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=180&h=120&fit=crop&crop=face",
-      "Dr. Rachel Nguyen": "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=180&h=120&fit=crop&crop=face",
-      "Dr. Thomas Brooks": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=180&h=120&fit=crop&crop=face",
-      "Dr. Aisha Roberts": "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=180&h=120&fit=crop&crop=face",
-      "Dr. James Okafor": "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=180&h=120&fit=crop&crop=face",
-      "Dr. Sofia Martinez": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=180&h=120&fit=crop&crop=face",
-      "Dr. Henry Kim": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=180&h=120&fit=crop&crop=face",
-      "Dr. Olivia Adams": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=180&h=120&fit=crop&crop=face",
-      "Dr. Noah Singh": "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=180&h=120&fit=crop&crop=face"
+      "Dr. Emily Chen":
+        "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=180&h=120&fit=crop&crop=face",
+      "Dr. Marcus Patel":
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=180&h=120&fit=crop&crop=face",
+      "Dr. Catherine Scott":
+        "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=180&h=120&fit=crop&crop=face",
+      "Dr. Rachel Nguyen":
+        "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=180&h=120&fit=crop&crop=face",
+      "Dr. Thomas Brooks":
+        "https://images.unsplash.com/photo-1594824475545-9d0c7c4951c1?w=180&h=120&fit=crop&crop=face",
+      "Dr. Aisha Roberts":
+        "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=180&h=120&fit=crop&crop=face",
+      "Dr. James Okafor":
+        "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=180&h=120&fit=crop&crop=face",
+      "Dr. Sofia Martinez":
+        "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=180&h=120&fit=crop&crop=face",
+      "Dr. Henry Kim":
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=180&h=120&fit=crop&crop=face",
+      "Dr. Olivia Adams":
+        "https://images.unsplash.com/photo-1594824475545-9d0c7c4951c1?w=180&h=120&fit=crop&crop=face",
+      "Dr. Noah Singh":
+        "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=180&h=120&fit=crop&crop=face",
     };
-    
-    return imageMap[doctorName] || "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=180&h=120&fit=crop&crop=face";
+
+    return (
+      imageMap[doctorName] ||
+      "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=180&h=120&fit=crop&crop=face"
+    );
   };
 
   const handleSearchTermChange = (value: string) => {
     setSearchTerm(value);
     // Clear other fields when search term is used
     if (value) {
-      setSelectedSpecialty('');
-      setSelectedLocation('');
+      setSelectedSpecialty("");
+      setSelectedLocation("");
     }
   };
 
@@ -253,8 +294,8 @@ function SearchPage() {
     setSelectedSpecialty(value);
     // Clear other fields when specialty is selected
     if (value) {
-      setSearchTerm('');
-      setSelectedLocation('');
+      setSearchTerm("");
+      setSelectedLocation("");
     }
   };
 
@@ -262,22 +303,24 @@ function SearchPage() {
     setSelectedLocation(value);
     // Clear other fields when location is selected
     if (value) {
-      setSearchTerm('');
-      setSelectedSpecialty('');
+      setSearchTerm("");
+      setSelectedSpecialty("");
     }
   };
 
   const clearFilters = () => {
-    setSearchTerm('');
-    setSelectedSpecialty('');
-    setSelectedLocation('');
+    setSearchTerm("");
+    setSelectedSpecialty("");
+    setSelectedLocation("");
   };
 
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold mb-2" style={{ color: '#0d9488' }}>Find Healthcare Providers</h1>
+        <h1 className="text-4xl font-bold mb-2" style={{ color: "#0d9488" }}>
+          Find Healthcare Providers
+        </h1>
         <p className="text-secondary text-lg font-semibold">
           Search and filter through our network of qualified doctors
         </p>
@@ -364,7 +407,8 @@ function SearchPage() {
       {/* Results count */}
       <div className="mb-6">
         <p className="text-base-content/70">
-          Found {filteredDoctors.length} provider{filteredDoctors.length !== 1 ? "s" : ""}
+          Found {filteredDoctors.length} provider
+          {filteredDoctors.length !== 1 ? "s" : ""}
         </p>
       </div>
 
@@ -397,7 +441,7 @@ function SearchPage() {
                   <div className="flex items-center space-x-3">
                     <div className="avatar">
                       <div className="w-16 h-16 rounded-full ring-2 ring-primary ring-offset-2 ring-offset-base-100">
-                        <Image 
+                        <Image
                           src={getDoctorImage(doctor.name)}
                           alt={doctor.name}
                           width={64}
@@ -408,7 +452,9 @@ function SearchPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-lg">{doctor.name}</h3>
-                      <p className="text-sm text-primary font-medium">{doctor.specialty}</p>
+                      <p className="text-sm text-primary font-medium">
+                        {doctor.specialty}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-1">
@@ -441,7 +487,9 @@ function SearchPage() {
                   </div>
                   <div className="flex items-center text-sm text-base-content/70">
                     <Clock className="w-4 h-4 mr-2" />
-                    {doctor.weekend_available ? "Weekend Available" : "Weekdays Only"}
+                    {doctor.weekend_available
+                      ? "Weekend Available"
+                      : "Weekdays Only"}
                   </div>
                   <p className="text-sm text-base-content/70">{doctor.bio}</p>
                 </div>
@@ -462,4 +510,3 @@ function SearchPage() {
 }
 
 export default SearchPage;
-
