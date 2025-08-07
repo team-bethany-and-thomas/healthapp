@@ -37,6 +37,7 @@ const SideBar: React.FC = () => {
         <button
           onClick={() => setCollapsed(!collapsed)}
           className="text-stone-950 focus:outline-none"
+          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           <Menu size={20} />
         </button>
