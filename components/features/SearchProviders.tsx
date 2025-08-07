@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useAuth } from "../../app/hooks/useAuth";
 import { providerService, Doctor, SearchFilters, useProviders } from "../../app/services/providerService";
 import { MapPin, Calendar, Clock } from "lucide-react";
+import { AppointmentBookingModal } from "./AppointmentBookingModal/AppointmentBookingModal";
 
 const SearchProviders: React.FC = () => {
   const { user, isLoading: authLoading } = useAuth();
@@ -11,6 +12,10 @@ const SearchProviders: React.FC = () => {
   const [selectedSpecialty, setSelectedSpecialty] = useState<string>("");
   const [selectedLocation, setSelectedLocation] = useState<string>("");
   const [weekendFilter, setWeekendFilter] = useState<boolean | null>(null);
+  
+  // Modal state management
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProviderId, setSelectedProviderId] = useState<string | null>(null);
 
   const filters: SearchFilters = useMemo(() => ({
     searchTerm: searchTerm || undefined,
@@ -40,6 +45,16 @@ const SearchProviders: React.FC = () => {
     return doctors.filter(doctor => doctor.location === selectedLocation);
   }, [doctors, selectedLocation]);
 
+  // Transform doctors for modal compatibility
+  const transformedDoctors = React.useMemo(() => {
+    return filteredDoctors.map(doctor => ({
+      ...doctor,
+      name: doctor.name || `${doctor.first_name} ${doctor.last_name}`,
+      location: doctor.location || `${doctor.city}, ${doctor.state}`,
+      availability: doctor.availability || `${doctor.availability_start} - ${doctor.availability_end}`,
+    }));
+  }, [filteredDoctors]);
+
   // Handler functions
   const handleSearchTermChange = (value: string) => {
     setSearchTerm(value);
@@ -65,6 +80,17 @@ const SearchProviders: React.FC = () => {
     setSelectedSpecialty("");
     setSelectedLocation("");
     setWeekendFilter(null);
+  };
+
+  // Modal handler functions
+  const handleBookAppointment = (providerId: string) => {
+    setSelectedProviderId(providerId);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedProviderId(null);
   };
 
   // Show loading state
@@ -321,7 +347,10 @@ const SearchProviders: React.FC = () => {
                   <button className="btn btn-outline btn-sm">
                     View Profile
                   </button>
-                  <button className="btn btn-primary btn-sm">
+                  <button 
+                    className="btn btn-primary btn-sm"
+                    onClick={() => handleBookAppointment(doctor.$id)}
+                  >
                     Book Appointment
                   </button>
                 </div>
@@ -330,6 +359,14 @@ const SearchProviders: React.FC = () => {
           ))}
         </div>
       )}
+
+      {/* Appointment Booking Modal */}
+      <AppointmentBookingModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        providerId={selectedProviderId || ""}
+        providerList={transformedDoctors}
+      />
     </div>
   );
 };
