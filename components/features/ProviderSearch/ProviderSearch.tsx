@@ -261,7 +261,6 @@ export function ProviderSearch() {
     e.preventDefault();
     handleSearch();
   };
-
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSearch();
