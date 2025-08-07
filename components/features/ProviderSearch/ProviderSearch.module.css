@@ -10,6 +10,7 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     max-width: 1200px;
     margin: 2rem auto;
+    -webkit-backdrop-filter: blur(2px);
     backdrop-filter: blur(2px);
     border: 1px solid #9ca3af;
     border-radius: 16px;
