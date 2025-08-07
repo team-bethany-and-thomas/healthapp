@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../app/hooks/useAuth';
@@ -8,6 +8,7 @@ import Image from "next/image";
 const NavBar = () => {
   const router = useRouter();
   const { user, isLoading, logout } = useAuth();
+  const [showAuthMessage, setShowAuthMessage] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -15,6 +16,26 @@ const NavBar = () => {
       router.push('/');
     } catch (error) {
       console.error("Logout failed:", error);
+    }
+  };
+
+  const handleDashboardClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    if (isLoading) {
+      return; // Don't do anything while loading
+    }
+    
+    if (user) {
+      // User is logged in - redirect to dashboard
+      router.push('/dashboard');
+    } else {
+      // User is not logged in - show message and redirect to login
+      setShowAuthMessage(true);
+      setTimeout(() => {
+        setShowAuthMessage(false);
+        router.push('/login');
+      }, 2000);
     }
   };
 
@@ -62,6 +83,21 @@ const NavBar = () => {
 
   return (
     <>
+      {/* Auth Message Toast */}
+      {showAuthMessage && (
+        <div className="fixed top-4 right-4 z-50 bg-primary text-primary-content px-4 py-2 rounded-lg shadow-lg">
+          <div className="flex items-center gap-2">
+            <span>Please sign up or login to access the dashboard.</span>
+            <button 
+              onClick={() => setShowAuthMessage(false)}
+              className="text-primary-content hover:text-white"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="navbar bg-white shadow-sm">
         <div className="navbar-start">
           <div className="dropdown">
@@ -75,11 +111,12 @@ const NavBar = () => {
               className="menu menu-sm dropdown-content bg-white rounded-box z-[1] mt-3 w-52 p-2 shadow">
               <li><a className="text-black">Contact</a></li>
               <li>
-                <a className="text-black">Services</a>
-                <ul className="p-2">
-                  <li><a className="text-black">Conventional</a></li>
-                  <li><a className="text-black">Traditional</a></li>
-                </ul>
+                <a 
+                  className="text-black cursor-pointer hover:text-primary transition-colors" 
+                  onClick={handleDashboardClick}
+                >
+                  Dashboard
+                </a>
               </li>
               <li><a className="text-black">About Us</a></li>
               {/* Mobile auth buttons */}
@@ -104,13 +141,12 @@ const NavBar = () => {
           <ul className="menu menu-horizontal px-1">
             <li><a className="text-black">Contact</a></li>
             <li>
-              <details>
-                <summary className="text-black">Services</summary>
-                <ul className="p-2">
-                  <li><a className="text-black">Conventional</a></li>
-                  <li><a className="text-black">Tradtional</a></li>
-                </ul>
-              </details>
+              <a 
+                className="text-black cursor-pointer hover:text-primary transition-colors" 
+                onClick={handleDashboardClick}
+              >
+                Dashboard
+              </a>
             </li>
             <li><a className="text-black">About Us</a></li>
           </ul>

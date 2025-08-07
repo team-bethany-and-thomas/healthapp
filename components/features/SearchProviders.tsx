@@ -361,11 +361,8 @@ const SearchProviders: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="card-actions justify-between mt-4">
-                  <button className="btn btn-outline btn-sm">
-                    View Profile
-                  </button>
-                  <button className="btn btn-primary btn-sm">
+                <div className="card-actions justify-center mt-4">
+                  <button className="btn btn-primary w-full">
                     Book Appointment
                   </button>
                 </div>

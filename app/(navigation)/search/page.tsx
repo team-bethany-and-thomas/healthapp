@@ -447,11 +447,8 @@ function SearchPage() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="card-actions justify-between">
-                  <button className="btn btn-outline btn-sm">
-                    View Profile
-                  </button>
-                  <button className="btn btn-primary btn-sm">
+                <div className="card-actions justify-center">
+                  <button className="btn btn-primary w-full">
                     Book Appointment
                   </button>
                 </div>
