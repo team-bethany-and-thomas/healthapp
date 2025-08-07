@@ -2,6 +2,8 @@
 import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../hooks/useAuth";
+import { UserPlus, User } from "lucide-react";
+import styles from "./register.module.css";
 
 interface ValidationErrors {
   name?: string;
@@ -132,36 +134,32 @@ const RegistrationPage: React.FC = () => {
   };
 
   // Memoized loading component
-  const loadingComponent = useMemo(
-    () => (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="loading loading-spinner loading-lg text-primary"></div>
-      </div>
-    ),
-    []
-  );
+  const loadingComponent = useMemo(() => (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className={styles['loading-spinner']}></div>
+      <span>Loading...</span>
+    </div>
+  ), []);
 
   // Memoized user welcome component
-  const userWelcomeComponent = useMemo(
-    () => (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="card bg-base-100 shadow-xl max-w-md w-full">
-          <div className="card-body">
-            <h2 className="card-title text-2xl mb-4">Welcome!</h2>
-            <p className="mb-4">Logged in as {user?.name}</p>
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="btn btn-primary"
-            >
-              Logout
-            </button>
-          </div>
+  const userWelcomeComponent = useMemo(() => (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className={styles['register-container']}>
+        <div className={styles['register-header']}>
+          <User className={styles['register-icon']} />
+          <h2 className={styles['register-title']}>Welcome!</h2>
         </div>
+        <p className="mb-4">Logged in as {user?.name}</p>
+        <button 
+          type="button" 
+          onClick={handleLogout}
+          className={styles['register-button']}
+        >
+          Logout
+        </button>
       </div>
-    ),
-    [user?.name, handleLogout]
-  );
+    </div>
+  ), [user?.name, handleLogout]);
 
   if (authLoading) {
     return loadingComponent;
@@ -172,120 +170,88 @@ const RegistrationPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 to-secondary/10">
-      <div className="card bg-base-100 shadow-xl max-w-md w-full">
-        <div className="card-body">
-          <h1 className="card-title text-3xl mb-6 justify-center">
-            Create Account
-          </h1>
-
-          {uiState.message && (
-            <div
-              className={`alert ${
-                uiState.message.includes("successful")
-                  ? "alert-success"
-                  : "alert-error"
-              } mb-4`}
-            >
-              <span>{uiState.message}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">Full Name</span>
-              </label>
-              <input
-                type="text"
-                placeholder="Enter your full name"
-                className={`input input-bordered w-full ${
-                  uiState.validationErrors.name ? "input-error" : ""
-                }`}
-                value={formData.name}
-                onChange={(e) => handleInputChange("name", e.target.value)}
-              />
-              {uiState.validationErrors.name && (
-                <label className="label">
-                  <span className="label-text-alt text-error">
-                    {uiState.validationErrors.name}
-                  </span>
-                </label>
-              )}
-            </div>
-
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">Email</span>
-              </label>
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className={`input input-bordered w-full ${
-                  uiState.validationErrors.email ? "input-error" : ""
-                }`}
-                value={formData.email}
-                onChange={(e) => handleInputChange("email", e.target.value)}
-              />
-              {uiState.validationErrors.email && (
-                <label className="label">
-                  <span className="label-text-alt text-error">
-                    {uiState.validationErrors.email}
-                  </span>
-                </label>
-              )}
-            </div>
-
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">Password</span>
-              </label>
-              <input
-                type="password"
-                placeholder="Enter your password"
-                className={`input input-bordered w-full ${
-                  uiState.validationErrors.password ? "input-error" : ""
-                }`}
-                value={formData.password}
-                onChange={(e) => handleInputChange("password", e.target.value)}
-              />
-              {uiState.validationErrors.password && (
-                <label className="label">
-                  <span className="label-text-alt text-error">
-                    {uiState.validationErrors.password}
-                  </span>
-                </label>
-              )}
-            </div>
-
-            <div className="form-control mt-6">
-              <button
-                type="submit"
-                className={`btn btn-primary ${
-                  uiState.isRegistering ? "loading" : ""
-                }`}
-                disabled={uiState.isRegistering}
-              >
-                {uiState.isRegistering
-                  ? "Creating Account..."
-                  : "Create Account"}
-              </button>
-            </div>
-          </form>
-
-          <div className="divider">OR</div>
-
-          <div className="text-center">
-            <p className="text-sm text-gray-600 mb-2">
-              Already have an account?
-            </p>
-            <button
-              onClick={() => router.push("/login")}
-              className="btn btn-outline btn-secondary"
-            >
-              Sign In
-            </button>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 to-secondary/10 p-4">
+      <div className={styles['register-container']}>
+        <div className={styles['register-header']}>
+          <UserPlus className={styles['register-icon']} />
+          <h1 className={styles['register-title']}>Create Account</h1>
+        </div>
+        
+        {uiState.message && (
+          <div className={`${styles.alert} ${uiState.message.includes('successful') ? styles['alert-success'] : styles['alert-error']}`}>
+            <span>{uiState.message}</span>
           </div>
+        )}
+        
+        <form onSubmit={handleSubmit} className={styles['register-form']}>
+          <div className={styles['form-group']}>
+            <label className={styles['form-label']}>
+              Full Name
+            </label>
+            <input
+              type="text"
+              placeholder="Enter your full name"
+              className={`${styles['form-input']} ${uiState.validationErrors.name ? styles.error : ''}`}
+              value={formData.name}
+              onChange={(e) => handleInputChange("name", e.target.value)}
+            />
+            {uiState.validationErrors.name && (
+              <span className={styles['error-message']}>{uiState.validationErrors.name}</span>
+            )}
+          </div>
+          
+          <div className={styles['form-group']}>
+            <label className={styles['form-label']}>
+              Email
+            </label>
+            <input
+              type="email"
+              placeholder="Enter your email"
+              className={`${styles['form-input']} ${uiState.validationErrors.email ? styles.error : ''}`}
+              value={formData.email}
+              onChange={(e) => handleInputChange("email", e.target.value)}
+            />
+            {uiState.validationErrors.email && (
+              <span className={styles['error-message']}>{uiState.validationErrors.email}</span>
+            )}
+          </div>
+          
+          <div className={styles['form-group']}>
+            <label className={styles['form-label']}>
+              Password
+            </label>
+            <input
+              type="password"
+              placeholder="Enter your password"
+              className={`${styles['form-input']} ${uiState.validationErrors.password ? styles.error : ''}`}
+              value={formData.password}
+              onChange={(e) => handleInputChange("password", e.target.value)}
+            />
+            {uiState.validationErrors.password && (
+              <span className={styles['error-message']}>{uiState.validationErrors.password}</span>
+            )}
+          </div>
+          
+          <button 
+            type="submit" 
+            className={`${styles['register-button']} ${uiState.isRegistering ? 'opacity-75' : ''}`}
+            disabled={uiState.isRegistering}
+          >
+            {uiState.isRegistering && <div className={styles['loading-spinner']}></div>}
+            {uiState.isRegistering ? 'Creating Account...' : 'Create Account'}
+          </button>
+        </form>
+
+        <div className={styles.divider}>OR</div>
+          
+        <div className={styles['alternate-action']}>
+          <p>Already have an account?</p>
+          <button 
+            onClick={() => router.push('/login')}
+            className={styles['alternate-button']}
+          >
+            Sign In
+          </button>
         </div>
       </div>
     </div>
