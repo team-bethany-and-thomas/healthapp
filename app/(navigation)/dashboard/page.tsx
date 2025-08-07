@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import Image from 'next/image';
-import SideBar from '@/components/ui/sideBar';
+import SideBar from '@/components/ui/SideBar';
 import { 
   Heart, 
   Calendar, 
