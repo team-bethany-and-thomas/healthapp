@@ -1,8 +1,4 @@
-// "use client";
-// import React, { useState, useEffect } from 'react';
-// import { useSearchParams } from 'next/navigation';
-// import Image from 'next/image';
-// import { MapPin, Calendar, Clock } from 'lucide-react';
+
 
 // interface Doctor {
 //   $id: string;
@@ -16,8 +12,6 @@
 //   bio: string;
 //   profile_picture_id: string;
 // }
-
-
 // const mockDoctors: Doctor[] = [
 //   {
 //     $id: "1",
@@ -189,6 +183,7 @@
 //       const search = searchParams.get('search');
 //       const location = searchParams.get('location');
 
+
 //       if (specialty) setSelectedSpecialty(specialty);
 //       if (search) setSearchTerm(search);
 //       if (location) setSelectedLocation(location);
@@ -283,6 +278,7 @@
 //         </p>
 //       </div>
 
+
 //       {/* Search Section */}
 //       <div className="bg-base-200 p-6 rounded-lg mb-8">
 //         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -367,6 +363,7 @@
 //           Found {filteredDoctors.length} provider{filteredDoctors.length !== 1 ? "s" : ""}
 //         </p>
 //       </div>
+
 
 //       {/* Loading state */}
 //       {loading && (
@@ -480,3 +477,4 @@ function page() {
 }
 
 export default page
+

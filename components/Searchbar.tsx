@@ -7,11 +7,11 @@ import styles from './Searchbar.module.css';
 
 const Searchbar = () => {
   const router = useRouter();
-  
+
   const [formData, setFormData] = useState({
     specialty: "",
     provider: "",
-    location: ""
+    location: "",
   });
 
   // Get all providers for autocomplete suggestions
@@ -49,6 +49,7 @@ const Searchbar = () => {
   // Search function
   const handleSearch = () => {
     const searchParams = new URLSearchParams();
+
     
     // Map form fields to search parameters
     if (formData.specialty) {
@@ -67,12 +68,12 @@ const Searchbar = () => {
 
   // Event handler for all inputs
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   // Key press handler
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleSearch();
     }
   };
@@ -82,6 +83,7 @@ const Searchbar = () => {
     e.preventDefault();
     handleSearch();
   };
+
 
   // Get specialties from provider service
   const specialties = useMemo(() => providerService.getSpecialties(), []);
@@ -94,12 +96,14 @@ const Searchbar = () => {
     "Flower Mound", "Euless", "Keller", "Southlake"
   ], []);
 
+
   // Use dynamic data if available, otherwise use fallback
   const providersToShow = dynamicProviders.length > 0 ? dynamicProviders : [];
   const locationsToShow = dynamicLocations.length > 0 ? dynamicLocations : fallbackLocations;
 
   return (
     <div className="w-full">
+
       <form onSubmit={handleSubmit} className={styles['search-form']}>
         <div className={styles['search-inputs']}>
           <div className={styles['input-group']}>
@@ -171,8 +175,10 @@ const Searchbar = () => {
             <Stethoscope className={`${styles['button-icon']} w-4 h-4`} />
             {loading ? "Loading..." : "Search"}
           </button>
+
         </div>
       </form>
+
 
       {/* Show loading indicator when fetching provider data */}
       {loading && (
@@ -181,8 +187,9 @@ const Searchbar = () => {
           <span className="ml-2 text-sm text-gray-500">Loading provider data...</span>
         </div>
       )}
+
     </div>
   );
 };
 
-export default Searchbar;
+export default React.memo(Searchbar);

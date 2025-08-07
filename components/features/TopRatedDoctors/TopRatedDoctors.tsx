@@ -1,10 +1,10 @@
 "use client";
 
+
 import React from 'react';
 import Link from 'next/link';
 import { useTopRatedDoctors, providerService } from '../../../app/services/providerService';
 import styles from './TopRatedDoctors.module.css';
-
 
 
 export function TopRatedDoctors() {
@@ -57,9 +57,7 @@ export function TopRatedDoctors() {
     <section className="max-w-7xl mx-auto px-4 py-12">
       {/* Section Header */}
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-primary mb-2">
-          Top Rated
-        </h2>
+        <h2 className="text-3xl font-bold text-primary mb-2">Top Rated</h2>
         <h2 className="text-3xl font-bold text-secondary mb-4">
           Doctors Near You
         </h2>
@@ -69,6 +67,7 @@ export function TopRatedDoctors() {
       {/* Doctors Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
         {topRatedDoctors.map((doctor, index) => (
+
           <div key={doctor.$id || index} className="flex flex-col">
             <div className="card bg-base-100 shadow-lg rounded-2xl hover:shadow-xl transition-all duration-300 border border-base-200 group h-80">
               <div className="card-body p-6 flex flex-col h-full">
@@ -89,6 +88,7 @@ export function TopRatedDoctors() {
                         }}
                       />
                     </div>
+
                   </div>
                 </div>
 
@@ -128,6 +128,7 @@ export function TopRatedDoctors() {
                   </div>
                 </div>
               </div>
+
             </div>
             
             {/* Action Button - Outside the card */}
@@ -145,11 +146,23 @@ export function TopRatedDoctors() {
       </div>
 
       {/* View All Button */}
+
       <div className="text-center mt-24">
         <Link href="/search" className="btn btn-outline btn-secondary hover:btn-secondary">
+
           View All Doctors
-          <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          <svg
+            className="w-4 h-4 ml-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5l7 7-7 7"
+            />
           </svg>
         </Link>
       </div>
