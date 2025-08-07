@@ -64,7 +64,6 @@ export function ProviderSearch() {
     e.preventDefault();
     handleSearch();
   };
-
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       handleSearch();
@@ -317,6 +316,10 @@ export function ProviderSearch() {
         >
           <Activity size={16} />
           <span>Available Today</span>
+        </div>
+        <div className={styles.chip}>
+          <span>🌐</span>
+          <span>Language Search</span>
         </div>
       </div>
 
