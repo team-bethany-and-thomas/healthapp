@@ -30,27 +30,55 @@ export function ProviderSearch() {
     }
 
     setIsSearching(true);
-    
-    // Simulate API call delay
-    setTimeout(() => {
-      const filtered = allProviders.filter(provider => {
-        const query = searchQuery.toLowerCase();
-        return (
-          provider.first_name.toLowerCase().includes(query) ||
-          provider.last_name.toLowerCase().includes(query) ||
-          provider.specialty.toLowerCase().includes(query) ||
-          provider.city.toLowerCase().includes(query) ||
-          provider.practice_name.toLowerCase().includes(query) ||
-          // Add language search functionality
-          provider.languages_spoken.some(language => 
-            language.toLowerCase().includes(query)
-          )
-        );
-      });
+
+    try {
+      // Get all doctors to search through
+      const allResults = await providerService.fetchDoctors({});
       
-      setFilteredProviders(filtered);
+      const searchTerm = searchQuery.trim().toLowerCase();
+      
+      // Search through all doctors for matches in name, specialty, location, or language
+      const matchingResults = allResults.filter((doctor) => {
+        // Check name match
+        const nameMatch = 
+          doctor.first_name?.toLowerCase().includes(searchTerm) ||
+          doctor.last_name?.toLowerCase().includes(searchTerm) ||
+          `${doctor.first_name} ${doctor.last_name}`.toLowerCase().includes(searchTerm);
+        
+        // Check specialty match
+        const specialtyMatch = doctor.specialty?.toLowerCase().includes(searchTerm);
+        
+        // Check location match
+        const locationMatch = 
+          doctor.city?.toLowerCase().includes(searchTerm) ||
+          doctor.state?.toLowerCase().includes(searchTerm) ||
+          doctor.practice_name?.toLowerCase().includes(searchTerm);
+        
+        // Check language match (note: raw API data uses language_spoken, not languages_spoken)
+        const languageMatch = doctor.language_spoken?.toLowerCase().includes(searchTerm);
+        
+        return nameMatch || specialtyMatch || locationMatch || languageMatch;
+      });
+
+      // Transform the results to match the expected format
+      const transformedResults = matchingResults.map((doctor) => {
+        const transformed = providerService.transformDoctorData(doctor);
+        return {
+          ...transformed,
+          imageUrl: providerService.getProfileImageUrl(
+            doctor.profile_picture_id
+          ),
+          appointments: generateNextAvailableSlots(doctor),
+        };
+      });
+
+      setFilteredProviders(transformedResults);
+    } catch (error) {
+      console.error("Search error:", error);
+      setFilteredProviders([]);
+    } finally {
       setIsSearching(false);
-    }, 500);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -197,10 +225,10 @@ export function ProviderSearch() {
         <h1 className="text-black">Find a Healthcare Provider</h1>
       </div>
 
-      <form onSubmit={handleSubmit} className={styles['search-bar']}>
-        <Search className={styles['search-icon']} />
-        <input 
-          type="text" 
+      <form onSubmit={handleSubmit} className={styles["search-bar"]}>
+        <Search className={styles["search-icon"]} />
+        <input
+          type="text"
           placeholder="Search by name, specialty, location, or language..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -219,15 +247,29 @@ export function ProviderSearch() {
       <div className={styles["filter-chips"]}>
         <div
           className={styles.chip}
-          onClick={() => {
+          onClick={async () => {
             setIsSearching(true);
-            setTimeout(() => {
-              const filtered = allProviders.filter(provider => 
-                provider.specialty === "Primary Care (Family or Internal Medicine)"
-              );
-              setFilteredProviders(filtered);
+            try {
+              const results = await providerService.fetchDoctors({
+                selectedSpecialty: "Primary Care (Family or Internal Medicine)",
+              });
+              const transformedResults = results.map((doctor) => {
+                const transformed = providerService.transformDoctorData(doctor);
+                return {
+                  ...transformed,
+                  imageUrl: providerService.getProfileImageUrl(
+                    doctor.profile_picture_id
+                  ),
+                  appointments: generateNextAvailableSlots(doctor),
+                };
+              });
+              setFilteredProviders(transformedResults);
+            } catch (error) {
+              console.error("Search error:", error);
+              setFilteredProviders([]);
+            } finally {
               setIsSearching(false);
-            }, 500);
+            }
           }}
         >
           <Syringe size={16} />
@@ -235,15 +277,33 @@ export function ProviderSearch() {
         </div>
         <div
           className={styles.chip}
-          onClick={() => {
+          onClick={async () => {
             setIsSearching(true);
-            setTimeout(() => {
-              const filtered = allProviders.filter(provider => 
-                provider.specialty !== "Primary Care (Family or Internal Medicine)"
+            try {
+              // Get all doctors first, then filter out Primary Care to show specialists
+              const allResults = await providerService.fetchDoctors({});
+              const specialistResults = allResults.filter(
+                (doctor) =>
+                  doctor.specialty !==
+                  "Primary Care (Family or Internal Medicine)"
               );
-              setFilteredProviders(filtered);
+              const transformedResults = specialistResults.map((doctor) => {
+                const transformed = providerService.transformDoctorData(doctor);
+                return {
+                  ...transformed,
+                  imageUrl: providerService.getProfileImageUrl(
+                    doctor.profile_picture_id
+                  ),
+                  appointments: generateNextAvailableSlots(doctor),
+                };
+              });
+              setFilteredProviders(transformedResults);
+            } catch (error) {
+              console.error("Search error:", error);
+              setFilteredProviders([]);
+            } finally {
               setIsSearching(false);
-            }, 500);
+            }
           }}
         >
           <Stethoscope size={16} />
@@ -251,25 +311,68 @@ export function ProviderSearch() {
         </div>
         <div
           className={styles.chip}
-          onClick={() => {
+          onClick={async () => {
             setIsSearching(true);
-            setTimeout(() => {
-              // For demo purposes, show providers with appointments today
-              const today = new Date().toISOString().split('T')[0];
-              const filtered = allProviders.filter(provider => 
-                provider.appointments.some(appointment => appointment.date === today)
-              );
-              setFilteredProviders(filtered);
+            try {
+              const results = await providerService.fetchDoctors({
+                weekendFilter: true,
+              });
+              const transformedResults = results.map((doctor) => {
+                const transformed = providerService.transformDoctorData(doctor);
+                return {
+                  ...transformed,
+                  imageUrl: providerService.getProfileImageUrl(
+                    doctor.profile_picture_id
+                  ),
+                  appointments: generateNextAvailableSlots(doctor),
+                };
+              });
+              setFilteredProviders(transformedResults);
+            } catch (error) {
+              console.error("Search error:", error);
+              setFilteredProviders([]);
+            } finally {
               setIsSearching(false);
-            }, 500);
+            }
           }}
         >
           <Activity size={16} />
           <span>Available Today</span>
         </div>
-        <div className={styles.chip}>
+        <div
+          className={styles.chip}
+          onClick={async () => {
+            setIsSearching(true);
+            try {
+              // Get all doctors and filter by common languages
+              const allResults = await providerService.fetchDoctors({});
+              const multilingualResults = allResults.filter(
+                (doctor) =>
+                  doctor.language_spoken && 
+                  doctor.language_spoken.toLowerCase() !== 'english' &&
+                  doctor.language_spoken.toLowerCase() !== ''
+              );
+              const transformedResults = multilingualResults.map((doctor) => {
+                const transformed = providerService.transformDoctorData(doctor);
+                return {
+                  ...transformed,
+                  imageUrl: providerService.getProfileImageUrl(
+                    doctor.profile_picture_id
+                  ),
+                  appointments: generateNextAvailableSlots(doctor),
+                };
+              });
+              setFilteredProviders(transformedResults);
+            } catch (error) {
+              console.error("Search error:", error);
+              setFilteredProviders([]);
+            } finally {
+              setIsSearching(false);
+            }
+          }}
+        >
           <span>🌐</span>
-          <span>Language Search</span>
+          <span>Multilingual Providers</span>
         </div>
       </div>
 
@@ -321,11 +424,11 @@ export function ProviderSearch() {
                   <div className={styles['languages']}>
                     <span className={styles['language-label']}>Languages:</span>
                     <div className={styles['language-tags']}>
-                      {provider.languages_spoken.map((language, langIndex) => (
+                      {provider.languages_spoken?.map((language, langIndex) => (
                         <span key={langIndex} className={styles['language-tag']}>
                           {language}
                         </span>
-                      ))}
+                      )) || <span className={styles['language-tag']}>English</span>}
                     </div>
                   </div>
                 </div>
