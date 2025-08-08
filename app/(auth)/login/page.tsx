@@ -197,7 +197,7 @@ const LoginPage: React.FC = () => {
         <div className={styles.divider}>OR</div>
 
         <div className={styles['alternate-action']}>
-          <p>Don't have an account?</p>
+          <p>Don&apos;t have an account?</p>
           <button 
             onClick={() => router.push('/register')}
             className={styles['alternate-button']}
