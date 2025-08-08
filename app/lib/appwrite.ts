@@ -1,6 +1,10 @@
+<<<<<<< Updated upstream
 import {
    Client, Account, Databases, Storage 
 } from 'appwrite';
+=======
+import { Client, Account, Databases, Storage, ID } from 'appwrite';
+>>>>>>> Stashed changes
 
 export const client: Client = new Client();
 
@@ -12,4 +16,3 @@ export const account = new Account(client);
 export const databases = new Databases(client);
 export const storage = new Storage(client);
 export default client;
-export { ID } from 'appwrite';
