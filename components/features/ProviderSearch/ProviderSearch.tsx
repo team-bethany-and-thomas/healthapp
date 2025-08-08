@@ -17,11 +17,14 @@ import {
   providerService,
   type Doctor,
 } from "../../../app/services/providerService";
+import { AppointmentBookingModal } from "@/components/features/AppointmentBookingModal/AppointmentBookingModal";
 
 export function ProviderSearch() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredProviders, setFilteredProviders] = useState<Doctor[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProviderId, setSelectedProviderId] = useState<string>("");
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) {
@@ -455,7 +458,13 @@ export function ProviderSearch() {
                   </div>
                 </div>
 
-                <button className={styles["book-button"]}>
+                <button 
+                  className={styles["book-button"]}
+                  onClick={() => {
+                    setSelectedProviderId(provider.$id);
+                    setIsModalOpen(true);
+                  }}
+                >
                   Book Appointment
                 </button>
               </div>
@@ -470,6 +479,24 @@ export function ProviderSearch() {
           <p>Try adjusting your search terms or browse all providers</p>
         </div>
       )}
+
+      <AppointmentBookingModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        providerId={selectedProviderId}
+        providerList={filteredProviders.map(provider => ({
+          $id: provider.$id,
+          name: `${provider.first_name} ${provider.last_name}`.trim(),
+          gender: provider.gender,
+          specialty: provider.specialty,
+          location: `${provider.city}, ${provider.state}`,
+          phone: provider.phone,
+          availability: provider.availability,
+          weekend_available: provider.weekend_available,
+          bio: provider.bio,
+          profile_picture_id: provider.profile_picture_id,
+        }))}
+      />
     </div>
   );
 }
