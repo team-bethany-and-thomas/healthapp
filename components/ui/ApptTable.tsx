@@ -14,7 +14,7 @@ type Appointment = {
   contact: string;
 };
 
-export const AppointTable = () => {
+export const ApptTable = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
 
