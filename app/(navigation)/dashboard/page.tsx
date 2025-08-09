@@ -1,3 +1,4 @@
+
 import SideBar from '@/components/ui/sideBar'
 import { ApptTable } from '@/components/ui/ApptTable'
 import React from 'react'
@@ -10,6 +11,3 @@ function page() {
     <ApptTable />
     </>
   )
-}
-
-export default page

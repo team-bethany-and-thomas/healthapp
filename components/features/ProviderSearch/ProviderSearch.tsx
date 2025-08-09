@@ -1,370 +1,482 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Search, Stethoscope, Hospital, Syringe, Activity, Star, MapPin, Clock, Calendar } from "lucide-react";
-import styles from './ProviderSearch.module.css';
-
-interface Provider {
-  first_name: string;
-  last_name: string;
-  specialty: string;
-  city: string;
-  state: string;
-  zip: string;
-  education: string;
-  practice_name: string;
-  languages_spoken: string[];
-  rating: number;
-  imageUrl: string;
-  appointments: {
-    date: string;
-    start_time: string;
-    length_minutes: number;
-  }[];
-}
-
-// Complete provider data with all 11 providers
-const allProviders: Provider[] = [
-  {
-    first_name: "Emily",
-    last_name: "Chen",
-    specialty: "Primary Care (Family or Internal Medicine)",
-    city: "Dallas",
-    state: "TX",
-    zip: "75201",
-    education: "MD - University of Texas Southwestern Medical School",
-    practice_name: "Pulse Clinic - Downtown Dallas",
-    languages_spoken: ["English", "Mandarin"],
-    rating: 4.8,
-    imageUrl: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=180&h=120&fit=crop&crop=face",
-    appointments: [
-      { date: "2025-07-26", start_time: "09:00", length_minutes: 30 },
-      { date: "2025-07-26", start_time: "10:30", length_minutes: 30 },
-      { date: "2025-07-27", start_time: "08:00", length_minutes: 30 },
-      { date: "2025-07-28", start_time: "14:00", length_minutes: 45 },
-    ],
-  },
-  {
-    first_name: "Marcus",
-    last_name: "Patel",
-    specialty: "Cardiology",
-    city: "Plano",
-    state: "TX",
-    zip: "75023",
-    education: "MD - Baylor College of Medicine",
-    practice_name: "Pulse Clinic - Plano",
-    languages_spoken: ["English", "Hindi", "Gujarati"],
-    rating: 4.9,
-    imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=180&h=120&fit=crop&crop=face",
-    appointments: [
-      { date: "2025-07-26", start_time: "11:00", length_minutes: 60 },
-      { date: "2025-07-27", start_time: "09:30", length_minutes: 60 },
-      { date: "2025-07-29", start_time: "13:00", length_minutes: 45 },
-    ],
-  },
-  {
-    first_name: "Rachel",
-    last_name: "Nguyen",
-    specialty: "Pediatrics",
-    city: "Frisco",
-    state: "TX",
-    zip: "75034",
-    education: "MD - Texas A&M Health Science Center",
-    practice_name: "Pulse Clinic - Frisco",
-    languages_spoken: ["English", "Vietnamese"],
-    rating: 4.7,
-    imageUrl: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=180&h=120&fit=crop&crop=face",
-    appointments: [
-      { date: "2025-07-26", start_time: "10:00", length_minutes: 30 },
-      { date: "2025-07-26", start_time: "15:30", length_minutes: 30 },
-      { date: "2025-07-28", start_time: "09:00", length_minutes: 30 },
-      { date: "2025-07-29", start_time: "16:00", length_minutes: 30 },
-    ],
-  },
-  {
-    first_name: "Thomas",
-    last_name: "Brooks",
-    specialty: "Orthopedics",
-    city: "Arlington",
-    state: "TX",
-    zip: "76010",
-    education: "MD - University of Texas Medical Branch",
-    practice_name: "Pulse Clinic - Arlington",
-    languages_spoken: ["English"],
-    rating: 4.6,
-    imageUrl: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=180&h=120&fit=crop&crop=face",
-    appointments: [
-      { date: "2025-07-27", start_time: "08:30", length_minutes: 45 },
-      { date: "2025-07-28", start_time: "10:15", length_minutes: 60 },
-      { date: "2025-07-30", start_time: "14:30", length_minutes: 45 },
-    ],
-  },
-  {
-    first_name: "Aisha",
-    last_name: "Roberts",
-    specialty: "Obstetrics & Gynecology",
-    city: "Fort Worth",
-    state: "TX",
-    zip: "76102",
-    education: "MD - UT Health San Antonio",
-    practice_name: "Pulse Clinic - Fort Worth",
-    languages_spoken: ["English", "Spanish"],
-    rating: 4.8,
-    imageUrl: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=180&h=120&fit=crop&crop=face",
-    appointments: [
-      { date: "2025-07-26", start_time: "13:00", length_minutes: 30 },
-      { date: "2025-07-27", start_time: "11:30", length_minutes: 45 },
-      { date: "2025-07-29", start_time: "09:00", length_minutes: 30 },
-      { date: "2025-07-30", start_time: "15:00", length_minutes: 30 },
-    ],
-  },
-  {
-    first_name: "James",
-    last_name: "Okafor",
-    specialty: "Dermatology",
-    city: "Irving",
-    state: "TX",
-    zip: "75038",
-    education: "MD - University of Texas Medical Branch",
-    practice_name: "Pulse Clinic - Irving",
-    languages_spoken: ["English", "Igbo"],
-    rating: 4.7,
-    imageUrl: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=180&h=120&fit=crop&crop=face",
-    appointments: [
-      { date: "2025-07-26", start_time: "14:00", length_minutes: 30 },
-      { date: "2025-07-27", start_time: "10:00", length_minutes: 30 },
-      { date: "2025-07-28", start_time: "16:30", length_minutes: 30 },
-    ],
-  },
-  {
-    first_name: "Sofia",
-    last_name: "Martinez",
-    specialty: "Psychiatry & Mental Health",
-    city: "Carrollton",
-    state: "TX",
-    zip: "75006",
-    education: "MD - UT Health San Antonio",
-    practice_name: "Pulse Clinic - Carrollton",
-    languages_spoken: ["English", "Spanish"],
-    rating: 4.9,
-    imageUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=180&h=120&fit=crop&crop=face",
-    appointments: [
-      { date: "2025-07-26", start_time: "09:30", length_minutes: 60 },
-      { date: "2025-07-27", start_time: "14:00", length_minutes: 60 },
-      { date: "2025-07-29", start_time: "11:00", length_minutes: 60 },
-    ],
-  },
-  {
-    first_name: "Henry",
-    last_name: "Kim",
-    specialty: "Gastroenterology",
-    city: "Garland",
-    state: "TX",
-    zip: "75040",
-    education: "MD - Baylor College of Medicine",
-    practice_name: "Pulse Clinic - Garland",
-    languages_spoken: ["English", "Korean"],
-    rating: 4.8,
-    imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=180&h=120&fit=crop&crop=face",
-    appointments: [
-      { date: "2025-07-26", start_time: "08:00", length_minutes: 45 },
-      { date: "2025-07-27", start_time: "13:30", length_minutes: 45 },
-      { date: "2025-07-30", start_time: "10:00", length_minutes: 45 },
-    ],
-  },
-  {
-    first_name: "Olivia",
-    last_name: "Adams",
-    specialty: "Neurology",
-    city: "Richardson",
-    state: "TX",
-    zip: "75080",
-    education: "MD - University of Texas Southwestern Medical School",
-    practice_name: "Pulse Clinic - Richardson",
-    languages_spoken: ["English"],
-    rating: 4.6,
-    imageUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=180&h=120&fit=crop&crop=face",
-    appointments: [
-      { date: "2025-07-26", start_time: "11:30", length_minutes: 60 },
-      { date: "2025-07-28", start_time: "09:00", length_minutes: 60 },
-      { date: "2025-07-29", start_time: "15:30", length_minutes: 60 },
-    ],
-  },
-  {
-    first_name: "Noah",
-    last_name: "Singh",
-    specialty: "Endocrinology",
-    city: "Grand Prairie",
-    state: "TX",
-    zip: "75050",
-    education: "MD - Texas A&M Health Science Center",
-    practice_name: "Pulse Clinic - Grand Prairie",
-    languages_spoken: ["English", "Punjabi"],
-    rating: 4.7,
-    imageUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=180&h=120&fit=crop&crop=face",
-    appointments: [
-      { date: "2025-07-26", start_time: "10:30", length_minutes: 45 },
-      { date: "2025-07-27", start_time: "16:00", length_minutes: 45 },
-      { date: "2025-07-30", start_time: "08:30", length_minutes: 45 },
-    ],
-  },
-  {
-    first_name: "Catherine",
-    last_name: "Scott",
-    specialty: "Pulmonology",
-    city: "McKinney",
-    state: "TX",
-    zip: "75070",
-    education: "MD - University of Texas Health Science Center at Houston",
-    practice_name: "Pulse Clinic - McKinney",
-    languages_spoken: ["English", "Spanish"],
-    rating: 4.9,
-    imageUrl: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=180&h=120&fit=crop&crop=face",
-    appointments: [
-      { date: "2025-07-26", start_time: "12:00", length_minutes: 45 },
-      { date: "2025-07-27", start_time: "15:30", length_minutes: 45 },
-      { date: "2025-07-29", start_time: "10:00", length_minutes: 45 },
-    ],
-  },
-];
+import React, { useState, useCallback, useMemo } from "react";
+import {
+  Search,
+  Stethoscope,
+  Hospital,
+  Syringe,
+  Activity,
+  Star,
+  MapPin,
+  Clock,
+  Calendar,
+} from "lucide-react";
+import styles from "./ProviderSearch.module.css";
+import {
+  providerService,
+  type Doctor,
+} from "../../../app/services/providerService";
+import { AppointmentBookingModal } from "@/components/features/AppointmentBookingModal/AppointmentBookingModal";
 
 export function ProviderSearch() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filteredProviders, setFilteredProviders] = useState<Provider[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredProviders, setFilteredProviders] = useState<Doctor[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProviderId, setSelectedProviderId] = useState<string>("");
 
-  const handleSearch = () => {
+  // Memoize the appointment slot generation
+  const generateNextAvailableSlots = useCallback((doctor: Doctor) => {
+    const slots = [];
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    // Helper function to parse time string (e.g., "09:00" to hours and minutes)
+    const parseTime = (timeStr: string) => {
+      if (!timeStr) return null;
+      const [hours, minutes] = timeStr.split(":").map(Number);
+      return { hours, minutes };
+    };
+
+    // Helper function to create date with specific time
+    const createDateTime = (date: Date, timeStr: string) => {
+      const time = parseTime(timeStr);
+      if (!time) return null;
+      const dateTime = new Date(date);
+      dateTime.setHours(time.hours, time.minutes, 0, 0);
+      return dateTime;
+    };
+
+    // Generate slots for the next 7 days
+    for (let dayOffset = 0; dayOffset < 7 && slots.length < 3; dayOffset++) {
+      const currentDate = new Date(today);
+      currentDate.setDate(today.getDate() + dayOffset);
+      const dayOfWeek = currentDate.getDay(); // 0 = Sunday, 1 = Monday, etc.
+
+      let availableStart = null;
+      let availableEnd = null;
+
+      // Check if it's a weekend day (Saturday = 6, Sunday = 0)
+      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+
+      if (
+        isWeekend &&
+        doctor.weekend_available &&
+        doctor.weekend_start &&
+        doctor.weekend_end
+      ) {
+        // Use weekend hours
+        availableStart = doctor.weekend_start;
+        availableEnd = doctor.weekend_end;
+      } else if (
+        !isWeekend &&
+        doctor.availability_start &&
+        doctor.availability_end
+      ) {
+        // Use weekday hours
+        availableStart = doctor.availability_start;
+        availableEnd = doctor.availability_end;
+      }
+
+      if (availableStart && availableEnd) {
+        const startTime = createDateTime(currentDate, availableStart);
+        const endTime = createDateTime(currentDate, availableEnd);
+
+        if (startTime && endTime) {
+          // If it's today, make sure the appointment is in the future
+          if (dayOffset === 0) {
+            const currentTime = new Date();
+            if (startTime <= currentTime) {
+              // Round up to next hour
+              const nextHour = new Date(currentTime);
+              nextHour.setHours(currentTime.getHours() + 1, 0, 0, 0);
+              if (nextHour < endTime) {
+                startTime.setTime(nextHour.getTime());
+              } else {
+                continue; // Skip today if no time available
+              }
+            }
+          }
+
+          // Generate 2-3 time slots for this day
+          const slotDuration = 60; // 1 hour slots
+          const currentSlot = new Date(startTime);
+          let slotsForDay = 0;
+
+          while (currentSlot < endTime && slotsForDay < 2 && slots.length < 3) {
+            slots.push({
+              $id: `${doctor.$id}-${slots.length}`,
+              date: currentSlot.toISOString().split("T")[0],
+              start_time: currentSlot.toTimeString().slice(0, 5),
+              length_minutes: 30,
+            });
+
+            currentSlot.setMinutes(currentSlot.getMinutes() + slotDuration);
+            slotsForDay++;
+          }
+        }
+      }
+    }
+
+    return slots.length > 0
+      ? slots
+      : [
+          {
+            $id: "1",
+            date: "2025-08-07",
+            start_time: "09:00",
+            length_minutes: 30,
+          },
+          {
+            $id: "2",
+            date: "2025-08-07",
+            start_time: "14:00",
+            length_minutes: 30,
+          },
+          {
+            $id: "3",
+            date: "2025-08-08",
+            start_time: "10:00",
+            length_minutes: 30,
+          },
+        ];
+  }, []);
+
+  // Memoize the search function to prevent unnecessary re-renders
+  const handleSearch = useCallback(async () => {
+    if (!searchQuery.trim()) {
+      setFilteredProviders([]);
+      return;
+    }
+
     setIsSearching(true);
-    
-    // Simulate API call delay
-    setTimeout(() => {
-      const filtered = allProviders.filter(provider => {
-        const query = searchQuery.toLowerCase();
-        return (
-          provider.first_name.toLowerCase().includes(query) ||
-          provider.last_name.toLowerCase().includes(query) ||
-          provider.specialty.toLowerCase().includes(query) ||
-          provider.city.toLowerCase().includes(query) ||
-          provider.practice_name.toLowerCase().includes(query)
-        );
-      });
-      setFilteredProviders(filtered);
-      setIsSearching(false);
-    }, 500);
-  };
 
-  const handleSubmit = (e: React.FormEvent) => {
+    try {
+      // Get all doctors to search through
+      const allResults = await providerService.fetchDoctors({});
+      
+      const searchTerm = searchQuery.trim().toLowerCase();
+      
+      // Optimize search by using more efficient string operations
+      const matchingResults = allResults.filter((doctor) => {
+        const fullName = `${doctor.first_name || ''} ${doctor.last_name || ''}`.toLowerCase();
+        const specialty = (doctor.specialty || '').toLowerCase();
+        const city = (doctor.city || '').toLowerCase();
+        const state = (doctor.state || '').toLowerCase();
+        const practice = (doctor.practice_name || '').toLowerCase();
+        const language = (doctor.language_spoken || '').toLowerCase();
+        
+        return fullName.includes(searchTerm) ||
+               specialty.includes(searchTerm) ||
+               city.includes(searchTerm) ||
+               state.includes(searchTerm) ||
+               practice.includes(searchTerm) ||
+               language.includes(searchTerm);
+      });
+
+      // Transform the results to match the expected format
+      const transformedResults = matchingResults.map((doctor) => {
+        const transformed = providerService.transformDoctorData(doctor);
+        return {
+          ...transformed,
+          imageUrl: providerService.getProfileImageUrl(
+            doctor.profile_picture_id
+          ),
+          appointments: generateNextAvailableSlots(doctor),
+        };
+      });
+
+      setFilteredProviders(transformedResults);
+    } catch (error) {
+      console.error("Search error:", error);
+      setFilteredProviders([]);
+    } finally {
+      setIsSearching(false);
+    }
+  }, [searchQuery, generateNextAvailableSlots]);
+
+  const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     handleSearch();
-  };
+  }, [handleSearch]);
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+  const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
       handleSearch();
     }
-  };
+  }, [handleSearch]);
 
-  const formatDate = (dateString: string) => {
+  // Memoize the date formatting function
+  const formatDate = useCallback((dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'short', 
-      month: 'short', 
-      day: 'numeric' 
+    return date.toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
     });
-  };
+  }, []);
+
+  // Memoize the provider list for the modal
+  const providerListForModal = useMemo(() => 
+    filteredProviders.map(provider => ({
+      $id: provider.$id,
+      name: `${provider.first_name} ${provider.last_name}`.trim(),
+      gender: provider.gender,
+      specialty: provider.specialty,
+      location: `${provider.city}, ${provider.state}`,
+      phone: provider.phone,
+      availability: provider.availability,
+      weekend_available: provider.weekend_available,
+      bio: provider.bio,
+      profile_picture_id: provider.profile_picture_id,
+    })), [filteredProviders]
+  );
 
   return (
-    <div className={styles['provider-search-container']}>
-      <div className={styles['search-header']}>
-        <Hospital className={styles['hospital-icon']} />
+    <div className={styles["provider-search-container"]}>
+      <div className={styles["search-header"]}>
+        <Hospital className={styles["hospital-icon"]} />
         <h1 className="text-black">Find a Healthcare Provider</h1>
       </div>
 
-      <form onSubmit={handleSubmit} className={styles['search-bar']}>
-        <Search className={styles['search-icon']} />
-        <input 
-          type="text" 
-          placeholder="Search by name, specialty, or location..." 
+      <form onSubmit={handleSubmit} className={styles["search-bar"]}>
+        <Search className={styles["search-icon"]} />
+        <input
+          type="text"
+          placeholder="Search by name, specialty, location, or language..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyPress={handleKeyPress}
         />
-        <button 
+        <button
           type="submit"
-          className={styles['search-button']}
+          className={styles["search-button"]}
           disabled={isSearching}
         >
-          <Stethoscope className={styles['button-icon']} />
-          {isSearching ? 'Searching...' : 'Search'}
+          <Stethoscope className={styles["button-icon"]} />
+          {isSearching ? "Searching..." : "Search"}
         </button>
       </form>
 
-      <div className={styles['filter-chips']}>
-        <div className={styles.chip}>
+      <div className={styles["filter-chips"]}>
+        <div
+          className={styles.chip}
+          onClick={async () => {
+            setIsSearching(true);
+            try {
+              const results = await providerService.fetchDoctors({
+                selectedSpecialty: "Primary Care (Family or Internal Medicine)",
+              });
+              const transformedResults = results.map((doctor) => {
+                const transformed = providerService.transformDoctorData(doctor);
+                return {
+                  ...transformed,
+                  imageUrl: providerService.getProfileImageUrl(
+                    doctor.profile_picture_id
+                  ),
+                  appointments: generateNextAvailableSlots(doctor),
+                };
+              });
+              setFilteredProviders(transformedResults);
+            } catch (error) {
+              console.error("Search error:", error);
+              setFilteredProviders([]);
+            } finally {
+              setIsSearching(false);
+            }
+          }}
+        >
           <Syringe size={16} />
           <span>Primary Care</span>
         </div>
-        <div className={styles.chip}>
+        <div
+          className={styles.chip}
+          onClick={async () => {
+            setIsSearching(true);
+            try {
+              // Get all doctors first, then filter out Primary Care to show specialists
+              const allResults = await providerService.fetchDoctors({});
+              const specialistResults = allResults.filter(
+                (doctor) =>
+                  doctor.specialty !==
+                  "Primary Care (Family or Internal Medicine)"
+              );
+              const transformedResults = specialistResults.map((doctor) => {
+                const transformed = providerService.transformDoctorData(doctor);
+                return {
+                  ...transformed,
+                  imageUrl: providerService.getProfileImageUrl(
+                    doctor.profile_picture_id
+                  ),
+                  appointments: generateNextAvailableSlots(doctor),
+                };
+              });
+              setFilteredProviders(transformedResults);
+            } catch (error) {
+              console.error("Search error:", error);
+              setFilteredProviders([]);
+            } finally {
+              setIsSearching(false);
+            }
+          }}
+        >
           <Stethoscope size={16} />
           <span>Specialists</span>
         </div>
-        <div className={styles.chip}>
+        <div
+          className={styles.chip}
+          onClick={async () => {
+            setIsSearching(true);
+            try {
+              const results = await providerService.fetchDoctors({
+                weekendFilter: true,
+              });
+              const transformedResults = results.map((doctor) => {
+                const transformed = providerService.transformDoctorData(doctor);
+                return {
+                  ...transformed,
+                  imageUrl: providerService.getProfileImageUrl(
+                    doctor.profile_picture_id
+                  ),
+                  appointments: generateNextAvailableSlots(doctor),
+                };
+              });
+              setFilteredProviders(transformedResults);
+            } catch (error) {
+              console.error("Search error:", error);
+              setFilteredProviders([]);
+            } finally {
+              setIsSearching(false);
+            }
+          }}
+        >
           <Activity size={16} />
           <span>Available Today</span>
+        </div>
+        <div
+          className={styles.chip}
+          onClick={async () => {
+            setIsSearching(true);
+            try {
+              // Get all doctors and filter by common languages
+              const allResults = await providerService.fetchDoctors({});
+              const multilingualResults = allResults.filter(
+                (doctor) =>
+                  doctor.language_spoken && 
+                  doctor.language_spoken.toLowerCase() !== 'english' &&
+                  doctor.language_spoken.toLowerCase() !== ''
+              );
+              const transformedResults = multilingualResults.map((doctor) => {
+                const transformed = providerService.transformDoctorData(doctor);
+                return {
+                  ...transformed,
+                  imageUrl: providerService.getProfileImageUrl(
+                    doctor.profile_picture_id
+                  ),
+                  appointments: generateNextAvailableSlots(doctor),
+                };
+              });
+              setFilteredProviders(transformedResults);
+            } catch (error) {
+              console.error("Search error:", error);
+              setFilteredProviders([]);
+            } finally {
+              setIsSearching(false);
+            }
+          }}
+        >
+          <span>🌐</span>
+          <span>Multilingual Providers</span>
         </div>
       </div>
 
       {/* Search Results */}
       {filteredProviders.length > 0 && (
-        <div className={styles['search-results']}>
-          <h2 className={styles['results-header']}>
-            Found {filteredProviders.length} provider{filteredProviders.length !== 1 ? 's' : ''}
+        <div className={styles["search-results"]}>
+          <h2 className={styles["results-header"]}>
+            Found {filteredProviders.length} provider
+            {filteredProviders.length !== 1 ? "s" : ""}
           </h2>
-          <div className={styles['results-grid']}>
+          <div className={styles["results-grid"]}>
             {filteredProviders.map((provider, index) => (
-              <div key={index} className={styles['provider-card']}>
-                <div className={styles['provider-header']}>
-                  <div className={styles['provider-info']}>
-                    <h3 className={styles['provider-name']}>
-                      Dr. {provider.first_name} {provider.last_name}
+              <div
+                key={provider.$id || index}
+                className={styles["provider-card"]}
+              >
+                <div className={styles["provider-header"]}>
+                  <div className={styles["provider-info"]}>
+                    <h3 className={styles["provider-name"]}>
+                      {provider.first_name} {provider.last_name}
                     </h3>
-                    <p className={styles['provider-specialty']}>{provider.specialty}</p>
-                    <p className={styles['provider-practice']}>{provider.practice_name}</p>
+                    <p className={styles["provider-specialty"]}>
+                      {provider.specialty}
+                    </p>
+                    <p className={styles["provider-practice"]}>
+                      {provider.practice_name}
+                    </p>
                   </div>
-                  <div className={styles['provider-rating']}>
-                    <Star size={16} className={styles['star-icon']} />
-                    <span>{provider.rating}</span>
+                  <div className={styles["provider-rating"]}>
+                    <Star size={16} className={styles["star-icon"]} />
+                    <span>{provider.rating?.toFixed(1) || "4.5"}</span>
                   </div>
                 </div>
-                
-                <div className={styles['provider-details']}>
-                  <div className={styles['detail-item']}>
+
+                <div className={styles["provider-details"]}>
+                  <div className={styles["detail-item"]}>
                     <MapPin size={14} />
-                    <span>{provider.city}, {provider.state} {provider.zip}</span>
+                    <span>
+                      {provider.city}, {provider.state} {provider.zip}
+                    </span>
                   </div>
-                  <div className={styles['detail-item']}>
+                  <div className={styles["detail-item"]}>
                     <Calendar size={14} />
-                    <span>{provider.appointments.length} appointments available</span>
+                    <span>
+                      {provider.appointments?.length || 0} appointments
+                      available
+                    </span>
                   </div>
                   <div className={styles['languages']}>
                     <span className={styles['language-label']}>Languages:</span>
-                    <span>{provider.languages_spoken.join(', ')}</span>
+                    <div className={styles['language-tags']}>
+                      {provider.languages_spoken?.map((language, langIndex) => (
+                        <span key={langIndex} className={styles['language-tag']}>
+                          {language}
+                        </span>
+                      )) || <span className={styles['language-tag']}>English</span>}
+                    </div>
                   </div>
                 </div>
 
-                <div className={styles['appointments-preview']}>
-                  <h4 className={styles['appointments-title']}>Next Available:</h4>
-                  <div className={styles['appointment-slots']}>
-                    {provider.appointments.slice(0, 3).map((appointment, appIndex) => (
-                      <div key={appIndex} className={styles['appointment-slot']}>
-                        <Clock size={12} />
-                        <span>{formatDate(appointment.date)} at {appointment.start_time}</span>
-                      </div>
-                    ))}
+                <div className={styles["appointments-preview"]}>
+                  <h4 className={styles["appointments-title"]}>
+                    Next Available:
+                  </h4>
+                  <div className={styles["appointment-slots"]}>
+                    {(provider.appointments || [])
+                      .slice(0, 3)
+                      .map((appointment, appIndex) => (
+                        <div
+                          key={appIndex}
+                          className={styles["appointment-slot"]}
+                        >
+                          <Clock size={12} />
+                          <span>
+                            {formatDate(appointment.date)} at{" "}
+                            {appointment.start_time}
+                          </span>
+                        </div>
+                      ))}
                   </div>
                 </div>
 
-                <button className={styles['book-button']}>
+                <button 
+                  className={styles["book-button"]}
+                  onClick={() => {
+                    setSelectedProviderId(provider.$id);
+                    setIsModalOpen(true);
+                  }}
+                >
                   Book Appointment
                 </button>
               </div>
@@ -374,11 +486,18 @@ export function ProviderSearch() {
       )}
 
       {searchQuery && filteredProviders.length === 0 && !isSearching && (
-        <div className={styles['no-results']}>
+        <div className={styles["no-results"]}>
           <p>No providers found matching &quot;{searchQuery}&quot;</p>
           <p>Try adjusting your search terms or browse all providers</p>
         </div>
       )}
+
+      <AppointmentBookingModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        providerId={selectedProviderId}
+        providerList={providerListForModal}
+      />
     </div>
   );
 }

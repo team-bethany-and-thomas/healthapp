@@ -1,154 +1,100 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Client, Databases, Storage, Query } from "appwrite";
+import React, { useState, useEffect, useMemo } from "react";
 import { useAuth } from "../../app/hooks/useAuth";
-
-// Types
-interface Doctor {
-  $id: string;
-  name: string;
-  gender: string;
-  specialty: string;
-  location: string;
-  phone: string;
-  availability: string;
-  weekend_available: boolean;
-  bio: string;
-  profile_picture_id: string;
-}
-
-// Appwrite configuration using environment variables
-const client = new Client()
-  .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
-  .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!);
-
-const databases = new Databases(client);
-const storage = new Storage(client);
-
-// Environment variables for Appwrite configuration
-const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!;
-const COLLECTION_ID =
-  process.env.NEXT_PUBLIC_APPWRITE_PROVIDERS_COLLECTION_ID!;
-const PROVIDERS_BUCKET_ID =
-  process.env.NEXT_PUBLIC_APPWRITE_PROVIDERS_BUCKET_ID!;
+import { providerService, Doctor, SearchFilters, useProviders } from "../../app/services/providerService";
+import { MapPin, Calendar, Clock } from "lucide-react";
+import { AppointmentBookingModal } from "./AppointmentBookingModal/AppointmentBookingModal";
 
 const SearchProviders: React.FC = () => {
   const { user, isLoading: authLoading } = useAuth();
-  const [doctors, setDoctors] = useState<Doctor[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedSpecialty, setSelectedSpecialty] = useState<string>("");
+  const [selectedLocation, setSelectedLocation] = useState<string>("");
   const [weekendFilter, setWeekendFilter] = useState<boolean | null>(null);
+  
+  // Modal state management
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProviderId, setSelectedProviderId] = useState<string | null>(null);
 
-  const specialties = [
-    "Primary Care (Family or Internal Medicine)",
-    "Pediatrics",
-    "Obstetrics & Gynecology",
-    "Cardiology",
-    "Dermatology",
-    "Orthopedics",
-    "Psychiatry & Mental Health",
-    "Gastroenterology",
-    "Neurology",
-    "Endocrinology",
-  ];
+  const filters: SearchFilters = useMemo(() => ({
+    searchTerm: searchTerm || undefined,
+    selectedSpecialty: selectedSpecialty || undefined,
+    weekendFilter,
+  }), [searchTerm, selectedSpecialty, weekendFilter]);
 
-  // Fetch doctors from Appwrite
-  useEffect(() => {
-    const fetchDoctors = async () => {
-      // Don't fetch if still loading auth or user is not authenticated
-      if (authLoading) {
-        return;
+  const { doctors, loading, error } = useProviders(filters);
+
+  // Get specialties from the service
+  const specialties = providerService.getSpecialties();
+
+  // Get locations from doctors for location filter
+  const locations = React.useMemo(() => {
+    const uniqueLocations = new Set<string>();
+    doctors.forEach(doctor => {
+      if (doctor.location) {
+        uniqueLocations.add(doctor.location);
       }
+    });
+    return Array.from(uniqueLocations).sort();
+  }, [doctors]);
 
-      if (!user) {
-        setError("Please log in to view healthcare providers.");
-        setLoading(false);
-        return;
-      }
+  // Filter doctors based on location (client-side filtering for location)
+  const filteredDoctors = React.useMemo(() => {
+    if (!selectedLocation) return doctors;
+    return doctors.filter(doctor => doctor.location === selectedLocation);
+  }, [doctors, selectedLocation]);
 
-      try {
-        setLoading(true);
+  // Transform doctors for modal compatibility
+  const transformedDoctors = React.useMemo(() => {
+    return filteredDoctors.map(doctor => ({
+      ...doctor,
+      name: doctor.name || `${doctor.first_name} ${doctor.last_name}`,
+      location: doctor.location || `${doctor.city}, ${doctor.state}`,
+      availability: doctor.availability || `${doctor.availability_start} - ${doctor.availability_end}`,
+    }));
+  }, [filteredDoctors]);
 
-        // Build queries based on filters
-        const queries: string[] = [];
+  // Handler functions
+  const handleSearchTermChange = (value: string) => {
+    setSearchTerm(value);
+  };
 
-        if (searchTerm) {
-          queries.push(Query.search("name", searchTerm));
-        }
+  const handleSpecialtyChange = (value: string) => {
+    setSelectedSpecialty(value);
+  };
 
-        if (selectedSpecialty) {
-          queries.push(Query.equal("specialty", selectedSpecialty));
-        }
+  const handleLocationChange = (value: string) => {
+    setSelectedLocation(value);
+  };
 
-        if (weekendFilter !== null) {
-          queries.push(Query.equal("weekend_available", weekendFilter));
-        }
-
-        const response = await databases.listDocuments(
-          DATABASE_ID,
-          COLLECTION_ID,
-          queries
-        );
-
-        setDoctors(response.documents as unknown as Doctor[]);
-        setError(null);
-      } catch (err) {
-        console.error("Error fetching doctors:", err);
-        if (err instanceof Error && err.message.includes("unauthorized")) {
-          setError(
-            "You are not authorized to view this content. Please check your permissions."
-          );
-        } else {
-          setError("Failed to fetch doctors. Please try again.");
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDoctors();
-  }, [searchTerm, selectedSpecialty, weekendFilter, user, authLoading]);
-
-  // Get profile image URL
-  const getProfileImageUrl = (profilePictureId: string): string => {
-    if (!profilePictureId) {
-      return "/default-avatar.png"; // Fallback image
-    }
-
-    try {
-      return storage
-        .getFilePreview(
-          PROVIDERS_BUCKET_ID, // Using providers bucket for doctor profile images
-          profilePictureId,
-          300, // width
-          300, // height
-          undefined, // gravity
-          85, // quality
-          0, // borderWidth
-          "000000", // borderColor
-          0, // borderRadius
-          1, // opacity
-          0, // rotation
-          "ffffff" // background
-        )
-        .toString();
-    } catch (error) {
-      console.error("Error getting image URL:", error);
-      return "/default-avatar.png";
-    }
+  // Get doctor image with fallback
+  const getDoctorImage = (doctorName: string): string => {
+    // You can implement a more sophisticated image mapping here
+    return "/default-avatar.png";
   };
 
   // Clear all filters
   const clearFilters = () => {
     setSearchTerm("");
     setSelectedSpecialty("");
+    setSelectedLocation("");
     setWeekendFilter(null);
   };
 
-  if (loading) {
+  // Modal handler functions
+  const handleBookAppointment = (providerId: string) => {
+    setSelectedProviderId(providerId);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedProviderId(null);
+  };
+
+  // Show loading state
+  if (authLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="loading loading-spinner loading-lg"></div>
@@ -156,6 +102,29 @@ const SearchProviders: React.FC = () => {
     );
   }
 
+  // Show auth error
+  if (!user) {
+    return (
+      <div className="alert alert-warning max-w-md mx-auto mt-8">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="stroke-current shrink-0 h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 15.5c-.77.833.192 2.5 1.732 2.5z"
+          />
+        </svg>
+        <span>Please log in to view healthcare providers.</span>
+      </div>
+    );
+  }
+
+  // Show error state
   if (error) {
     return (
       <div className="alert alert-error max-w-md mx-auto mt-8">
@@ -181,27 +150,39 @@ const SearchProviders: React.FC = () => {
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold mb-2">Find Healthcare Providers</h1>
-        <p className="text-base-content/70">
+        <h1 className="text-4xl font-bold mb-2" style={{ color: '#0d9488' }}>Find Healthcare Providers</h1>
+        <p className="text-secondary text-lg font-semibold">
           Search and filter through our network of qualified doctors
         </p>
       </div>
 
-      {/* Search and Filter Section */}
+      {/* Search Section */}
       <div className="bg-base-200 p-6 rounded-lg mb-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Search by name */}
+          {/* Search by name/specialty */}
           <div className="form-control">
             <label className="label">
-              <span className="label-text">Search by name</span>
+              <span className="label-text">Search</span>
             </label>
-            <input
-              type="text"
-              placeholder="Enter doctor name..."
-              className="input input-bordered w-full"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <div className="join w-full">
+              <input
+                id="search-term"
+                name="searchTerm"
+                type="text"
+                placeholder="Doctor name or specialty..."
+                className="input input-bordered join-item w-full"
+                value={searchTerm}
+                onChange={(e) => handleSearchTermChange(e.target.value)}
+              />
+              <button 
+                className="btn btn-primary join-item"
+                type="button"
+                aria-label="Search providers"
+                title="Search for healthcare providers"
+              >
+                🔍
+              </button>
+            </div>
           </div>
 
           {/* Filter by specialty */}
@@ -211,10 +192,12 @@ const SearchProviders: React.FC = () => {
             </label>
             <select
               id="specialty-select"
+              name="specialty"
               className="select select-bordered w-full"
               value={selectedSpecialty}
-              onChange={(e) => setSelectedSpecialty(e.target.value)}
-              title="Specialty Filter"
+              onChange={(e) => handleSpecialtyChange(e.target.value)}
+              aria-label="Filter by specialty"
+              title="Select a medical specialty to filter providers"
             >
               <option value="">All Specialties</option>
               {specialties.map((specialty) => (
@@ -225,27 +208,26 @@ const SearchProviders: React.FC = () => {
             </select>
           </div>
 
-          {/* Filter by weekend availability */}
+          {/* Filter by location */}
           <div className="form-control">
-            <label className="label">
-              <span className="label-text">Weekend Availability</span>
-            </label>
-            <label htmlFor="weekend-availability-select" className="sr-only">
-              Weekend Availability
+            <label className="label" htmlFor="location-select">
+              <span className="label-text">Location</span>
             </label>
             <select
-              id="weekend-availability-select"
+              id="location-select"
+              name="location"
               className="select select-bordered w-full"
-              value={weekendFilter === null ? "" : weekendFilter.toString()}
-              onChange={(e) => {
-                const value = e.target.value;
-                setWeekendFilter(value === "" ? null : value === "true");
-              }}
-              title="Weekend Availability"
+              value={selectedLocation}
+              onChange={(e) => handleLocationChange(e.target.value)}
+              aria-label="Filter by location"
+              title="Select a location to filter providers"
             >
-              <option value="">All</option>
-              <option value="true">Available Weekends</option>
-              <option value="false">Weekdays Only</option>
+              <option value="">All Locations</option>
+              {locations.map((location) => (
+                <option key={location} value={location}>
+                  {location}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -264,12 +246,19 @@ const SearchProviders: React.FC = () => {
       {/* Results count */}
       <div className="mb-6">
         <p className="text-base-content/70">
-          Found {doctors.length} provider{doctors.length !== 1 ? "s" : ""}
+          Found {filteredDoctors.length} provider{filteredDoctors.length !== 1 ? "s" : ""}
         </p>
       </div>
 
+      {/* Loading state */}
+      {loading && (
+        <div className="flex justify-center items-center py-12">
+          <span className="loading loading-spinner loading-lg"></span>
+        </div>
+      )}
+
       {/* Doctors Grid */}
-      {doctors.length === 0 ? (
+      {!loading && filteredDoctors.length === 0 ? (
         <div className="text-center py-12">
           <div className="text-6xl mb-4">🔍</div>
           <h3 className="text-2xl font-semibold mb-2">No providers found</h3>
@@ -278,94 +267,90 @@ const SearchProviders: React.FC = () => {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {doctors.map((doctor) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredDoctors.map((doctor) => (
             <div
               key={doctor.$id}
-              className="card bg-base-100 shadow-sm hover:shadow-md transition-shadow"
+              className="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300"
             >
-              <figure className="px-4 pt-4">
-                <img
-                  src={getProfileImageUrl(doctor.profile_picture_id)}
-                  alt={`${doctor.name} profile`}
-                  className="rounded-lg w-full h-48 object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = "/default-avatar.png";
-                  }}
-                />
-              </figure>
-              <div className="card-body p-4">
-                <h2 className="card-title text-lg font-semibold">
-                  {doctor.name}
-                </h2>
-
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center gap-2">
-                    <span className="badge badge-primary badge-sm">
-                      {doctor.gender}
-                    </span>
-                    {doctor.weekend_available && (
-                      <span className="badge badge-success badge-sm">
-                        Weekend Available
-                      </span>
-                    )}
+              <div className="card-body p-6">
+                {/* Doctor Header */}
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="avatar">
+                      <div className="w-16 h-16 rounded-full ring-2 ring-primary ring-offset-2 ring-offset-base-100">
+                        <img 
+                          src={providerService.getProfileImageUrl(doctor.profile_picture_id)}
+                          alt={doctor.name || `${doctor.first_name} ${doctor.last_name}`}
+                          width={64}
+                          height={64}
+                          className="object-cover rounded-full"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = "/default-avatar.svg";
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg">
+                        {doctor.name || `${doctor.first_name} ${doctor.last_name}`}
+                      </h3>
+                      <p className="text-sm text-primary font-medium">{doctor.specialty}</p>
+                    </div>
                   </div>
-
-                  <p className="text-primary font-medium">{doctor.specialty}</p>
-
-                  <div className="flex items-center gap-1">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 text-base-content/60"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                    </svg>
-                    <span className="text-base-content/60">
-                      {doctor.location}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-1">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 text-base-content/60"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    <span className="text-base-content/60 text-xs">
-                      {doctor.availability}
-                    </span>
+                  <div className="flex items-center space-x-1">
+                    <div className="rating rating-sm" role="img" aria-label={`Rating: ${doctor.rating || 4.5} out of 5 stars`}>
+                      {[...Array(5)].map((_, i) => (
+                        <input
+                          key={i}
+                          id={`rating-${doctor.$id}-${i}`}
+                          type="radio"
+                          name={`rating-${doctor.$id}`}
+                          className="mask mask-star-2 bg-orange-400"
+                          checked={i < Math.floor(doctor.rating || 4.5)}
+                          readOnly
+                          aria-label={`${i + 1} star${i !== 0 ? 's' : ''}`}
+                          title={`${i + 1} star${i !== 0 ? 's' : ''} out of 5`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-sm font-medium">{doctor.rating || 4.5}</span>
                   </div>
                 </div>
 
-                <div className="card-actions justify-between mt-4">
+                {/* Doctor Details */}
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center text-sm text-base-content/70">
+                    <MapPin className="w-4 h-4 mr-2" />
+                    {doctor.location || `${doctor.city}, ${doctor.state}`}
+                  </div>
+                  <div className="flex items-center text-sm text-base-content/70">
+                    <Calendar className="w-4 h-4 mr-2" />
+                    {doctor.availability || `${doctor.availability_start} - ${doctor.availability_end}`}
+                  </div>
+                  <div className="flex items-center text-sm text-base-content/70">
+                    <Clock className="w-4 h-4 mr-2" />
+                    {doctor.weekend_available ? "Weekend Available" : "Weekdays Only"}
+                  </div>
+                  {doctor.practice_name && (
+                    <div className="flex items-center text-sm text-base-content/70">
+                      <span className="font-medium mr-2">Practice:</span>
+                      {doctor.practice_name}
+                    </div>
+                  )}
+                  <p className="text-sm text-base-content/70">{doctor.bio}</p>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="card-actions justify-between">
                   <button className="btn btn-outline btn-sm">
                     View Profile
                   </button>
-                  <button className="btn btn-primary btn-sm">
+                  <button 
+                    className="btn btn-primary btn-sm"
+                    onClick={() => handleBookAppointment(doctor.$id)}
+                  >
                     Book Appointment
                   </button>
                 </div>
@@ -374,6 +359,14 @@ const SearchProviders: React.FC = () => {
           ))}
         </div>
       )}
+
+      {/* Appointment Booking Modal */}
+      <AppointmentBookingModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        providerId={selectedProviderId || ""}
+        providerList={transformedDoctors}
+      />
     </div>
   );
 };
