@@ -27,9 +27,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     const checkUser = async () => {
       try {
+        // Add a small delay to ensure client is properly initialized
+        await new Promise(resolve => setTimeout(resolve, 50));
         const currentUser = await account.get();
         setUser(currentUser);
-      } catch {
+      } catch (error) {
+        // Log the error for debugging but don't throw
+        console.log("No active session found:", error);
         setUser(null);
       } finally {
         setIsLoading(false);
@@ -41,11 +45,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const login = async (email: string, password: string): Promise<void> => {
     try {
-      await account.createEmailPasswordSession(email, password);
+      // First, ensure any existing session is cleared
+      try {
+        await account.deleteSession('current');
+      } catch {
+        // Ignore errors if no session exists
+      }
+      
+      // Create new session
+      const session = await account.createEmailPasswordSession(email, password);
+      
+      // Wait a moment for session to be established
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Get user data
       const currentUser = await account.get();
       setUser(currentUser);
     } catch (error) {
       console.error("Login failed:", error);
+      setUser(null);
       throw error;
     }
   };
@@ -62,12 +80,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const register = async (email: string, password: string, name: string): Promise<void> => {
     try {
+      // Create the user account
       await account.create(ID.unique(), email, password, name);
+      
+      // Create session
       await account.createEmailPasswordSession(email, password);
+      
+      // Wait a moment for session to be established
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Get user data
       const currentUser = await account.get();
       setUser(currentUser);
     } catch (error) {
       console.error("Registration failed:", error);
+      setUser(null);
       throw error;
     }
   };
