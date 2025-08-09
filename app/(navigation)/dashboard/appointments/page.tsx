@@ -1,13 +1,12 @@
-import { ApptTable } from '@/components/ui/ApptTable'
-import React from 'react'
-
+import { ApptTable } from "@/components/ui/ApptTable";
+import React from "react";
 
 function page() {
   return (
     <>
-    <ApptTable />
+      <ApptTable />
     </>
-  )
+  );
 }
 
 export default page;
