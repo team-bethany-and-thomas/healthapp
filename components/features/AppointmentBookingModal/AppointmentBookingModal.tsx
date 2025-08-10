@@ -213,8 +213,15 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
       return providerList.filter((provider) => provider.$id === id);
     };
 
-    const modal = modalRef.current;
-    if (!modal) return;
+	// Helper function to get numeric IDs
+	const getNumericUserId = (user: {
+		userId?: string | number;
+		id?: string | number;
+		$id: string;
+	}): number => {
+		// If your user has a numeric ID field, use that
+		if (user.userId) return Number(user.userId);
+		if (user.id) return Number(user.id);
 
     if (isOpen) {
       if (!modal.open) {

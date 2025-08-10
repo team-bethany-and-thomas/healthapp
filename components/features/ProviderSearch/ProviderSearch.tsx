@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import {
   Search,
   Stethoscope,
@@ -26,64 +26,8 @@ export function ProviderSearch() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProviderId, setSelectedProviderId] = useState<string>("");
 
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) {
-      setFilteredProviders([]);
-      return;
-    }
-
-    setIsSearching(true);
-
-    try {
-      // Use the provider service to search with proper filters
-      const results = await providerService.fetchDoctors({
-        searchTerm: searchQuery.trim(),
-      });
-
-      // Transform the results to match the expected format
-      const transformedResults = results.map((doctor) => {
-        const transformed = providerService.transformDoctorData(doctor);
-        return {
-          ...transformed,
-          // Add imageUrl for display
-          imageUrl: providerService.getProfileImageUrl(
-            doctor.profile_picture_id
-          ),
-          // Generate realistic appointment slots based on doctor's availability
-          appointments: generateNextAvailableSlots(doctor),
-        };
-      });
-
-      setFilteredProviders(transformedResults);
-    } catch (error) {
-      console.error("Search error:", error);
-      setFilteredProviders([]);
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    handleSearch();
-  };
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
-  // Generate next available appointment times based on doctor's schedule
-  const generateNextAvailableSlots = (doctor: Doctor) => {
+  // Memoize the appointment slot generation
+  const generateNextAvailableSlots = useCallback((doctor: Doctor) => {
     const slots = [];
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -197,7 +141,97 @@ export function ProviderSearch() {
             length_minutes: 30,
           },
         ];
-  };
+  }, []);
+
+  // Memoize the search function to prevent unnecessary re-renders
+  const handleSearch = useCallback(async () => {
+    if (!searchQuery.trim()) {
+      setFilteredProviders([]);
+      return;
+    }
+
+    setIsSearching(true);
+
+    try {
+      // Get all doctors to search through
+      const allResults = await providerService.fetchDoctors({});
+      
+      const searchTerm = searchQuery.trim().toLowerCase();
+      
+      // Optimize search by using more efficient string operations
+      const matchingResults = allResults.filter((doctor) => {
+        const fullName = `${doctor.first_name || ''} ${doctor.last_name || ''}`.toLowerCase();
+        const specialty = (doctor.specialty || '').toLowerCase();
+        const city = (doctor.city || '').toLowerCase();
+        const state = (doctor.state || '').toLowerCase();
+        const practice = (doctor.practice_name || '').toLowerCase();
+        const language = (doctor.language_spoken || '').toLowerCase();
+        
+        return fullName.includes(searchTerm) ||
+               specialty.includes(searchTerm) ||
+               city.includes(searchTerm) ||
+               state.includes(searchTerm) ||
+               practice.includes(searchTerm) ||
+               language.includes(searchTerm);
+      });
+
+      // Transform the results to match the expected format
+      const transformedResults = matchingResults.map((doctor) => {
+        const transformed = providerService.transformDoctorData(doctor);
+        return {
+          ...transformed,
+          imageUrl: providerService.getProfileImageUrl(
+            doctor.profile_picture_id
+          ),
+          appointments: generateNextAvailableSlots(doctor),
+        };
+      });
+
+      setFilteredProviders(transformedResults);
+    } catch (error) {
+      console.error("Search error:", error);
+      setFilteredProviders([]);
+    } finally {
+      setIsSearching(false);
+    }
+  }, [searchQuery, generateNextAvailableSlots]);
+
+  const handleSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    handleSearch();
+  }, [handleSearch]);
+
+  const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  }, [handleSearch]);
+
+  // Memoize the date formatting function
+  const formatDate = useCallback((dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    });
+  }, []);
+
+  // Memoize the provider list for the modal
+  const providerListForModal = useMemo(() => 
+    filteredProviders.map(provider => ({
+      $id: provider.$id,
+      name: `${provider.first_name} ${provider.last_name}`.trim(),
+      gender: provider.gender,
+      specialty: provider.specialty,
+      location: `${provider.city}, ${provider.state}`,
+      phone: provider.phone,
+      availability: provider.availability,
+      weekend_available: provider.weekend_available,
+      bio: provider.bio,
+      profile_picture_id: provider.profile_picture_id,
+    })), [filteredProviders]
+  );
 
   return (
     <div className={styles["provider-search-container"]}>
@@ -210,7 +244,7 @@ export function ProviderSearch() {
         <Search className={styles["search-icon"]} />
         <input
           type="text"
-          placeholder="Search by name, specialty, or location..."
+          placeholder="Search by name, specialty, location, or language..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyPress={handleKeyPress}
@@ -320,9 +354,40 @@ export function ProviderSearch() {
           <Activity size={16} />
           <span>Available Today</span>
         </div>
-        <div className={styles.chip}>
+        <div
+          className={styles.chip}
+          onClick={async () => {
+            setIsSearching(true);
+            try {
+              // Get all doctors and filter by common languages
+              const allResults = await providerService.fetchDoctors({});
+              const multilingualResults = allResults.filter(
+                (doctor) =>
+                  doctor.language_spoken && 
+                  doctor.language_spoken.toLowerCase() !== 'english' &&
+                  doctor.language_spoken.toLowerCase() !== ''
+              );
+              const transformedResults = multilingualResults.map((doctor) => {
+                const transformed = providerService.transformDoctorData(doctor);
+                return {
+                  ...transformed,
+                  imageUrl: providerService.getProfileImageUrl(
+                    doctor.profile_picture_id
+                  ),
+                  appointments: generateNextAvailableSlots(doctor),
+                };
+              });
+              setFilteredProviders(transformedResults);
+            } catch (error) {
+              console.error("Search error:", error);
+              setFilteredProviders([]);
+            } finally {
+              setIsSearching(false);
+            }
+          }}
+        >
           <span>🌐</span>
-          <span>Language Search</span>
+          <span>Multilingual Providers</span>
         </div>
       </div>
 
@@ -371,11 +436,15 @@ export function ProviderSearch() {
                       available
                     </span>
                   </div>
-                  <div className={styles["languages"]}>
-                    <span className={styles["language-label"]}>Languages:</span>
-                    <span>
-                      {provider.languages_spoken?.join(", ") || "English"}
-                    </span>
+                  <div className={styles['languages']}>
+                    <span className={styles['language-label']}>Languages:</span>
+                    <div className={styles['language-tags']}>
+                      {provider.languages_spoken?.map((language, langIndex) => (
+                        <span key={langIndex} className={styles['language-tag']}>
+                          {language}
+                        </span>
+                      )) || <span className={styles['language-tag']}>English</span>}
+                    </div>
                   </div>
                 </div>
 
@@ -427,18 +496,7 @@ export function ProviderSearch() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         providerId={selectedProviderId}
-        providerList={filteredProviders.map(provider => ({
-          $id: provider.$id,
-          name: `${provider.first_name} ${provider.last_name}`.trim(),
-          gender: provider.gender,
-          specialty: provider.specialty,
-          location: `${provider.city}, ${provider.state}`,
-          phone: provider.phone,
-          availability: provider.availability,
-          weekend_available: provider.weekend_available,
-          bio: provider.bio,
-          profile_picture_id: provider.profile_picture_id,
-        }))}
+        providerList={providerListForModal}
       />
     </div>
   );
