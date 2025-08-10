@@ -1,4 +1,4 @@
-import SideBar from '@/components/ui/sideBar';
+import SideBar from '@/components/ui/SideBar';
 import React from 'react';
 
 interface DashboardLayoutProps {
