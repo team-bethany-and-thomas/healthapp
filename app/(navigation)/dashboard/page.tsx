@@ -1,4 +1,4 @@
-import SideBar from "@/components/ui/sideBar";
+import SideBar from "@/components/ui/SideBar";
 import { ApptTable } from "@/components/ui/ApptTable";
 import React from "react";
 
