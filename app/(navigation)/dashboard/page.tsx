@@ -1,13 +1,12 @@
-
-import SideBar from '@/components/ui/sideBar'
-import { ApptTable } from '@/components/ui/ApptTable'
-import React from 'react'
-
+import SideBar from "@/components/ui/sideBar";
+import { ApptTable } from "@/components/ui/ApptTable";
+import React from "react";
 
 function page() {
-  return (
-    <>
-    <SideBar />
-    <ApptTable />
-    </>
-  )
+	return (
+		<>
+			<SideBar />
+			<ApptTable />
+		</>
+	);
+}
