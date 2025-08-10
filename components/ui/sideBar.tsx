@@ -2,7 +2,7 @@
 
 import React, { useState} from 'react';
 import Link from 'next/link';
-import { Menu, PanelTop, CalendarCheck2, BookPlus, MessageSquareText} from 'lucide-react'
+import { Menu, PanelTop, CalendarCheck2, BookPlus, MessageSquareText, TestTube, UserPlus, ClipboardList} from 'lucide-react'
 import { usePathname } from 'next/navigation';
 
 
@@ -17,7 +17,10 @@ const sideItems: sideItem[] = [
 {name:'Overview', icon: <PanelTop className="h-4 w-4" />, path: '/overview'},
 {name:'Appointments', icon: <CalendarCheck2 className="h-4 w-4" />, path: '/appointments'},
 {name:'Forms', icon: <BookPlus className="h-4 w-4" />, path: '/forms'},
-{name:'Messages', icon: <MessageSquareText className="h-4 w-4" />, path: '/messages'}
+{name:'Messages', icon: <MessageSquareText className="h-4 w-4" />, path: '/messages'},
+{name:'Intake Form', icon: <UserPlus className="h-4 w-4" />, path: '/intake-form'},
+{name:'Complete Intake', icon: <ClipboardList className="h-4 w-4" />, path: '/complete-intake'},
+{name:'Test Intake', icon: <TestTube className="h-4 w-4" />, path: '/test-intake'}
 ];
 
 const SideBar: React.FC = () => {

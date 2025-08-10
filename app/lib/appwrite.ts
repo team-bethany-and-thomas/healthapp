@@ -1,5 +1,5 @@
 import {
-   Client, Account, Databases, Storage 
+   Client, Account, Databases, Storage, Query
 } from 'appwrite';
 
 export const client: Client = new Client();
@@ -12,4 +12,4 @@ export const account = new Account(client);
 export const databases = new Databases(client);
 export const storage = new Storage(client);
 export default client;
-export { ID } from 'appwrite';
+export { ID, Query } from 'appwrite';
