@@ -1,5 +1,5 @@
 import {
-   Client, Account, Databases, Storage, Query
+   Client, Account, Databases, Storage
 } from 'appwrite';
 
 
