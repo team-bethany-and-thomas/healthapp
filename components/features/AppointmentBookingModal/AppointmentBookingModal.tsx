@@ -90,6 +90,34 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
   const handleVisitReason = (e: React.ChangeEvent<HTMLTextAreaElement>) =>
     setReasonForVisit(e.target.value);
 
+<<<<<<< Updated upstream
+  const handleSubmit = () => {
+    const mockPostRequest = (dataSubmitted: Appointment) => {
+      setAppointmentIsSaving(true);
+      setTimeout(() => {
+        console.log("appointment booked", dataSubmitted);
+        setAppointmentIsSaving(false);
+        setAppointmentBooked(true);
+      }, 2500);
+    };
+
+    const dataSubmitted: Appointment = {
+      appointment_id: String(Math.floor(Math.random() * 10000 + 1)),
+      patient_id: user?.$id || "",
+      provider_id: selectedDoctor.$id,
+      appointment_type_id: appointmentType,
+      appointment_date: date || "",
+      appointment_time: appointmentTime,
+      status: "booked",
+      reason_for_visit: reasonForVisit || "",
+      notes: "",
+      created_at: new Date(),
+      updated_at: new Date(),
+    };
+    // console.log(dataSubmitted);
+    formatAppointment();
+    mockPostRequest(dataSubmitted);
+=======
   const handleNotes = (e: React.ChangeEvent<HTMLTextAreaElement>) =>
     setNotes(e.target.value);
 
@@ -170,6 +198,7 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
     } finally {
       setAppointmentIsSaving(false);
     }
+>>>>>>> Stashed changes
   };
 
   const handleCloseSuccess = () => {
@@ -213,9 +242,13 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
     if (isOpen) {
       if (!modal.open) {
         const selectedDoctor = fetchSelectedDoctor(providerId);
+<<<<<<< Updated upstream
+        setSelectedDoctor(selectedDoctor[0]);
+=======
         if (selectedDoctor.length > 0) {
           setSelectedDoctor(selectedDoctor[0]);
         }
+>>>>>>> Stashed changes
         modal.showModal();
       }
     } else {
@@ -223,9 +256,15 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
         modal.close();
       }
     }
+<<<<<<< Updated upstream
+  }, [isOpen, providerId]);
+  // returns Loading... if checking for user. this ensures unauthorized does not show automatically.
+  if (isLoading) {
+=======
   }, [isOpen, providerId, providerList]);
 
   if (isLoading || appointmentTypesLoading) {
+>>>>>>> Stashed changes
     return (
       <dialog
         ref={modalRef}
