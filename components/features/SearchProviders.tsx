@@ -52,6 +52,11 @@ const SearchProviders: React.FC = () => {
       name: doctor.name || `${doctor.first_name} ${doctor.last_name}`,
       location: doctor.location || `${doctor.city}, ${doctor.state}`,
       availability: doctor.availability || `${doctor.availability_start} - ${doctor.availability_end}`,
+      // Ensure all required fields for booking modal are present
+      provider_id: doctor.provider_id,
+      first_name: doctor.first_name,
+      last_name: doctor.last_name,
+      practice_name: doctor.practice_name,
     }));
   }, [filteredDoctors]);
 

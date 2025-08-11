@@ -17,17 +17,20 @@ interface AppointmentBookingModalProps {
 }
 
 interface Doctor {
-  $id: string;
-  name: string;
-  gender: string;
-  specialty: string;
-  location: string;
-  phone: string;
-  availability: string;
-  weekend_available: boolean;
-  bio: string;
-  profile_picture_id: string;
-  provider_id?: number; // Add this to match your schema
+	$id: string;
+	name: string;
+	gender: string;
+	specialty: string;
+	location: string;
+	phone: string;
+	availability: string;
+	weekend_available: boolean;
+	bio: string;
+	profile_picture_id: string;
+	provider_id: number; // Make this required to match the actual provider data
+	first_name: string;
+	last_name: string;
+	practice_name: string;
 }
 
 export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = ({ 
@@ -66,7 +69,26 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
   const [bookingError, setBookingError] = useState<string>("");
   const [bookedAppointmentData, setBookedAppointmentData] = useState<AppointmentWithIntakeForm | null>(null);
 
-  const modalRef = useRef<HTMLDialogElement>(null);
+	const [date, setDate] = useState<Date | undefined>(new Date());
+	const [appointmentTime, setAppointmentTime] = useState("");
+	const [reasonForVisit, setReasonForVisit] = useState("");
+	const [notes, setNotes] = useState(""); // Add separate notes field
+	const [selectedDoctor, setSelectedDoctor] = useState<Doctor>({
+		$id: "",
+		name: "",
+		gender: "",
+		specialty: "",
+		location: "",
+		phone: "",
+		availability: "",
+		weekend_available: false,
+		bio: "",
+		profile_picture_id: "",
+		provider_id: 0,
+		first_name: "",
+		last_name: "",
+		practice_name: "",
+	});
 
   const formattedDate = date?.toLocaleDateString("en-US", {
     weekday: "long",

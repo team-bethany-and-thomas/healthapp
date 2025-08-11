@@ -230,6 +230,10 @@ export function ProviderSearch() {
       weekend_available: provider.weekend_available,
       bio: provider.bio,
       profile_picture_id: provider.profile_picture_id,
+      provider_id: provider.provider_id, // Add the numeric provider_id
+      first_name: provider.first_name,   // Add first_name
+      last_name: provider.last_name,     // Add last_name
+      practice_name: provider.practice_name, // Add practice_name
     })), [filteredProviders]
   );
 
