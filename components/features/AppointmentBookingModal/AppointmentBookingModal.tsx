@@ -49,7 +49,7 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
   const [appointmentTime, setAppointmentTime] = useState("");
   const [reasonForVisit, setReasonForVisit] = useState("");
   const [notes, setNotes] = useState("");
-  const [preFillExistingData, setPreFillExistingData] = useState(true); // New option for pre-filling
+  const [preFillExistingData, setPreFillExistingData] = useState(true);
   
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor>({
     $id: "",
@@ -62,6 +62,10 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
     weekend_available: false,
     bio: "",
     profile_picture_id: "",
+    provider_id: 0,
+    first_name: "",
+    last_name: "",
+    practice_name: "",
   });
   
   const [appointmentBooked, setAppointmentBooked] = useState<boolean>(false);
@@ -69,26 +73,7 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
   const [bookingError, setBookingError] = useState<string>("");
   const [bookedAppointmentData, setBookedAppointmentData] = useState<AppointmentWithIntakeForm | null>(null);
 
-	const [date, setDate] = useState<Date | undefined>(new Date());
-	const [appointmentTime, setAppointmentTime] = useState("");
-	const [reasonForVisit, setReasonForVisit] = useState("");
-	const [notes, setNotes] = useState(""); // Add separate notes field
-	const [selectedDoctor, setSelectedDoctor] = useState<Doctor>({
-		$id: "",
-		name: "",
-		gender: "",
-		specialty: "",
-		location: "",
-		phone: "",
-		availability: "",
-		weekend_available: false,
-		bio: "",
-		profile_picture_id: "",
-		provider_id: 0,
-		first_name: "",
-		last_name: "",
-		practice_name: "",
-	});
+  const modalRef = useRef<HTMLDialogElement>(null);
 
   const formattedDate = date?.toLocaleDateString("en-US", {
     weekday: "long",
