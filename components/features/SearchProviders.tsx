@@ -157,7 +157,7 @@ const SearchProviders: React.FC = () => {
       </div>
 
       {/* Search Section */}
-      <div className="bg-base-200 p-6 rounded-lg mb-8">
+      <div className="bg-base-200 p-6 mb-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* Search by name/specialty */}
           <div className="form-control">
