@@ -30,13 +30,13 @@ class UploadService {
     try {
       console.log('Starting file upload for user:', userId);
       console.log('File details:', { name: data.file.name, size: data.file.size, type: data.file.type });
-
+      
       // Generate unique filename
       const fileExtension = data.file.name.split('.').pop();
       const uniqueFilename = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExtension}`;
-
+      
       console.log('Uploading to storage bucket:', STORAGE_BUCKET_ID);
-
+      
       // Upload to Appwrite Storage
       const uploadedFile = await storage.createFile(
         STORAGE_BUCKET_ID,
@@ -82,7 +82,7 @@ class UploadService {
       console.log('Fetching files for user:', userId);
       console.log('Database ID:', DATABASE_ID);
       console.log('Files collection ID:', FILES_COLLECTION_ID);
-
+      
       const response = await databases.listDocuments(
         DATABASE_ID,
         FILES_COLLECTION_ID,
@@ -128,7 +128,7 @@ class UploadService {
     try {
       // Delete from storage
       await storage.deleteFile(STORAGE_BUCKET_ID, storageFileId);
-
+      
       // Delete from database
       await databases.deleteDocument(
         DATABASE_ID,
@@ -208,11 +208,11 @@ class UploadService {
   // Format file size for display
   formatFileSize(bytes: number): string {
     if (bytes === 0) return '0 Bytes';
-
+    
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-
+    
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 

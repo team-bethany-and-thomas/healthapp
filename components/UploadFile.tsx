@@ -74,7 +74,7 @@ export default function UploadFile({
     const uploadPromises = selectedFiles.map(async (file) => {
       try {
         setUploadProgress(prev => ({ ...prev, [file.name]: 0 }));
-
+        
         const uploadData: FileUploadData = {
           file,
           category: category || uploadService.getFileCategory(file.type),
@@ -90,10 +90,10 @@ export default function UploadFile({
         }, 200);
 
         const uploadedFile = await uploadService.uploadFile(uploadData, user.$id);
-
+        
         clearInterval(progressInterval);
         setUploadProgress(prev => ({ ...prev, [file.name]: 100 }));
-
+        
         onUploadSuccess?.(uploadedFile.$id);
         return uploadedFile;
       } catch (error) {
@@ -149,7 +149,7 @@ export default function UploadFile({
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-
+    
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       handleFiles(e.dataTransfer.files);
     }
@@ -199,7 +199,7 @@ export default function UploadFile({
           onChange={handleFileInput}
           className="hidden"
         />
-
+        
         <div className="space-y-4">
           <div className="mx-auto w-12 h-12 text-gray-400">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -224,7 +224,7 @@ export default function UploadFile({
       {selectedFiles.length > 0 && (
         <div className="mt-6 space-y-4">
           <h3 className="text-lg font-medium text-gray-900">Selected Files</h3>
-
+          
           {selectedFiles.map((file, index) => (
             <div key={`${file.name}-${index}`} className="border rounded-lg p-4 bg-gray-50">
               <div className="flex items-center justify-between mb-2">

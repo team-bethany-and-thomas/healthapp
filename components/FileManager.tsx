@@ -70,7 +70,7 @@ export default function FileManagerPage() {
           <p className="mt-2 text-gray-600">
             Upload, manage, and organize your documents and images.
           </p>
-
+          
         </div>
 
         {/* Success/Error Messages */}
@@ -134,7 +134,7 @@ export default function FileManagerPage() {
             <h2 className="text-xl font-semibold text-gray-900">
               Upload Files
             </h2>
-
+            
           </div>
           <div className="p-6">
             <UploadFile
