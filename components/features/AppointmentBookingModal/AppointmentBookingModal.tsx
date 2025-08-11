@@ -27,7 +27,11 @@ interface Doctor {
 	location: string;
 	phone: string;
 	availability: string;
+	availability_start?: string;
+	availability_end?: string;
 	weekend_available: boolean;
+	weekend_start?: string;
+	weekend_end?: string;
 	bio: string;
 	profile_picture_id: string;
 	provider_id?: number; // Add this to match your schema
@@ -72,6 +76,8 @@ export const AppointmentBookingModal: React.FC<
 	const [bookedAppointmentData, setBookedAppointmentData] = useState<{
 		appointment_id: string | number;
 	} | null>(null);
+	const [availableTimeSlots, setAvailableTimeSlots] = useState<string[]>([]);
+	const [loadingTimeSlots, setLoadingTimeSlots] = useState<boolean>(false);
 
 	const modalRef = useRef<HTMLDialogElement>(null);
 
@@ -83,10 +89,23 @@ export const AppointmentBookingModal: React.FC<
 	});
 
 	const formatTime = (time: string) => {
-		const [hours, minutes] = time.split(":");
-		const hour12 = parseInt(hours) % 12 || 12;
-		const ampm = parseInt(hours) >= 12 ? "PM" : "AM";
-		return `${hour12}:${minutes} ${ampm}`;
+		// Handle format like "8am", "5pm", "12pm", "12am"
+		const amPmMatch = time.match(/(\d{1,2})(am|pm)/i);
+		if (amPmMatch) {
+			const hours = parseInt(amPmMatch[1]);
+			const period = amPmMatch[2].toUpperCase();
+			return `${hours}:00 ${period}`;
+		}
+		
+		// Handle format like "09:00", "17:30"
+		if (time.includes(':')) {
+			const [hours, minutes] = time.split(":");
+			const hour12 = parseInt(hours) % 12 || 12;
+			const ampm = parseInt(hours) >= 12 ? "PM" : "AM";
+			return `${hour12}:${minutes} ${ampm}`;
+		}
+		
+		return time; // Return as-is if format is unrecognized
 	};
 
 	const handleAppointmentType = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -128,6 +147,175 @@ export const AppointmentBookingModal: React.FC<
 
 	const handleNotes = (e: React.ChangeEvent<HTMLTextAreaElement>) =>
 		setNotes(e.target.value);
+
+	// Generate available time slots based on provider availability
+	const generateAvailableTimeSlots = async (selectedDate: Date, doctor: Doctor, appointmentDuration: number = 30) => {
+		console.log('=== generateAvailableTimeSlots ===');
+		console.log('selectedDate:', selectedDate);
+		console.log('doctor:', doctor);
+		console.log('appointmentDuration:', appointmentDuration);
+
+		if (!selectedDate || !doctor.$id) {
+			console.log('Missing selectedDate or doctor.$id');
+			return [];
+		}
+
+		const dayOfWeek = selectedDate.getDay(); // 0 = Sunday, 6 = Saturday
+		const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+		const dateStr = selectedDate.toISOString().split('T')[0];
+
+		console.log('dayOfWeek:', dayOfWeek, 'isWeekend:', isWeekend, 'dateStr:', dateStr);
+
+		// Determine provider availability hours
+		let startTime: string | undefined;
+		let endTime: string | undefined;
+
+		if (isWeekend && doctor.weekend_available) {
+			startTime = doctor.weekend_start;
+			endTime = doctor.weekend_end;
+			console.log('Using weekend hours:', startTime, '-', endTime);
+		} else if (!isWeekend) {
+			startTime = doctor.availability_start;
+			endTime = doctor.availability_end;
+			console.log('Using weekday hours:', startTime, '-', endTime);
+		}
+
+		if (!startTime || !endTime) {
+			console.log('No availability for this day - startTime:', startTime, 'endTime:', endTime);
+			return []; // Provider not available on this day
+		}
+
+		// Parse time strings to minutes since midnight
+		const parseTimeToMinutes = (timeStr: string): number => {
+			// Handle format like "8am", "5pm", "12pm", "12am"
+			const amPmMatch = timeStr.match(/(\d{1,2})(am|pm)/i);
+			if (amPmMatch) {
+				let hours = parseInt(amPmMatch[1]);
+				const period = amPmMatch[2].toLowerCase();
+				
+				// Convert to 24-hour format
+				if (period === 'pm' && hours !== 12) {
+					hours += 12;
+				} else if (period === 'am' && hours === 12) {
+					hours = 0;
+				}
+				
+				return hours * 60; // No minutes for am/pm format
+			}
+			
+			// Handle format like "09:00", "17:30"
+			if (timeStr.includes(':')) {
+				const [hours, minutes] = timeStr.split(':').map(Number);
+				return hours * 60 + minutes;
+			}
+			
+			return 0; // Default fallback
+		};
+
+		const startMinutes = parseTimeToMinutes(startTime);
+		const endMinutes = parseTimeToMinutes(endTime);
+
+		console.log('startMinutes:', startMinutes, 'endMinutes:', endMinutes);
+
+		// Generate all possible time slots
+		const timeSlots: string[] = [];
+		for (let minutes = startMinutes; minutes < endMinutes; minutes += appointmentDuration) {
+			const hours = Math.floor(minutes / 60);
+			const mins = minutes % 60;
+			const timeStr = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+			timeSlots.push(timeStr);
+		}
+
+		console.log('Generated time slots:', timeSlots);
+
+		// If it's today, filter out past time slots
+		const now = new Date();
+		const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+		
+		let availableSlots = timeSlots;
+		if (selectedDate.getTime() === today.getTime()) {
+			console.log('Filtering past times for today');
+			const currentMinutes = now.getHours() * 60 + now.getMinutes();
+			availableSlots = timeSlots.filter(slot => {
+				const slotMinutes = parseTimeToMinutes(slot);
+				return slotMinutes > currentMinutes + 60; // Must be at least 1 hour in the future
+			});
+			console.log('Available slots after filtering past times:', availableSlots);
+		}
+
+		// For now, skip conflict checking to debug the basic slot generation
+		console.log('Final available slots:', availableSlots);
+		return availableSlots;
+
+		// TODO: Re-enable conflict checking once basic slot generation works
+		// Check for existing appointments and filter out conflicting slots
+		// try {
+		// 	const numericProviderId = getNumericProviderId(doctor);
+		// 	const conflictingSlots: string[] = [];
+
+		// 	// Check each slot for conflicts
+		// 	for (const slot of availableSlots) {
+		// 		const hasConflict = await appointmentBookingService.checkAppointmentConflict(
+		// 			0, // We don't need patient ID for this check
+		// 			numericProviderId,
+		// 			dateStr,
+		// 			slot,
+		// 			appointmentDuration
+		// 		);
+		// 		if (hasConflict) {
+		// 			conflictingSlots.push(slot);
+		// 		}
+		// 	}
+
+		// 	// Remove conflicting slots
+		// 	return availableSlots.filter(slot => !conflictingSlots.includes(slot));
+		// } catch (error) {
+		// 	console.error('Error checking appointment conflicts:', error);
+		// 	return availableSlots; // Return all slots if conflict check fails
+		// }
+	};
+
+	// Load available time slots when date or doctor changes
+	useEffect(() => {
+		const loadTimeSlots = async () => {
+			console.log('loadTimeSlots useEffect triggered');
+			console.log('date:', date);
+			console.log('selectedDoctor.$id:', selectedDoctor.$id);
+			console.log('appointmentType:', appointmentType);
+
+			if (!date || !selectedDoctor.$id) {
+				console.log('Missing date or selectedDoctor.$id, clearing slots');
+				setAvailableTimeSlots([]);
+				return;
+			}
+
+			setLoadingTimeSlots(true);
+			setAppointmentTime(''); // Reset selected time
+
+			try {
+				// Get appointment duration from selected appointment type, or use default
+				let duration = 30; // Default duration
+				if (appointmentType) {
+					const selectedAppointmentType = appointmentTypes.find(
+						type => type.appointment_type_id.toString() === appointmentType
+					);
+					duration = selectedAppointmentType?.duration_minutes || 30;
+				}
+
+				console.log('Using duration:', duration);
+				const slots = await generateAvailableTimeSlots(date, selectedDoctor, duration);
+				console.log('Setting available time slots:', slots);
+				setAvailableTimeSlots(slots);
+			} catch (error) {
+				console.error('Error loading time slots:', error);
+				setAvailableTimeSlots([]);
+			} finally {
+				setLoadingTimeSlots(false);
+			}
+		};
+
+		loadTimeSlots();
+	}, [date, selectedDoctor, appointmentType, appointmentTypes]);
 
 	// Helper function to get numeric IDs
 	const getNumericUserId = (user: {
@@ -176,13 +364,20 @@ export const AppointmentBookingModal: React.FC<
 			const numericUserId = getNumericUserId(user);
 			const numericProviderId = getNumericProviderId(selectedDoctor);
 
+			// Get appointment duration from selected appointment type
+			const selectedAppointmentType = appointmentTypes.find(
+				type => type.appointment_type_id.toString() === appointmentType
+			);
+			const duration = selectedAppointmentType?.duration_minutes || 30;
+
 			// Check for appointment conflicts
 			const hasConflict =
 				await appointmentBookingService.checkAppointmentConflict(
 					numericUserId,
 					numericProviderId,
 					appointmentDateStr,
-					appointmentTime
+					appointmentTime,
+					duration
 				);
 
 			if (hasConflict) {
@@ -264,12 +459,13 @@ export const AppointmentBookingModal: React.FC<
 
 		if (isOpen) {
 			if (!modal.open) {
-				const selectedDoctor = fetchSelectedDoctor(providerId);
-
-				setSelectedDoctor(selectedDoctor[0]);
-
-				if (selectedDoctor.length > 0) {
-					setSelectedDoctor(selectedDoctor[0]);
+				const selectedDoctorArray = fetchSelectedDoctor(providerId);
+				
+				if (selectedDoctorArray.length > 0) {
+					console.log('Selected doctor data:', selectedDoctorArray[0]); // Debug log
+					setSelectedDoctor(selectedDoctorArray[0]);
+				} else {
+					console.log('No doctor found with ID:', providerId); // Debug log
 				}
 
 				modal.showModal();
@@ -279,7 +475,7 @@ export const AppointmentBookingModal: React.FC<
 				modal.close();
 			}
 		}
-	}, [isOpen, providerId]);
+	}, [isOpen, providerId, providerList]);
 	// returns Loading... if checking for user. this ensures unauthorized does not show automatically.
 	if (isLoading) {
 	}
@@ -454,30 +650,44 @@ export const AppointmentBookingModal: React.FC<
 							value={appointmentTime}
 							className="select bg-base-200 text-base-content select-bordered w-3/4"
 							onChange={handleTimeSelection}
-							disabled={appointmentIsSaving}
+							disabled={appointmentIsSaving || loadingTimeSlots}
 						>
 							<option value="" disabled>
-								Please Select an Appointment Time
+								{loadingTimeSlots 
+									? "Loading available times..." 
+									: availableTimeSlots.length === 0 
+										? "No available times for this date"
+										: "Please Select an Appointment Time"
+								}
 							</option>
-							<option value="09:00">09:00 AM</option>
-							<option value="09:30">09:30 AM</option>
-							<option value="10:00">10:00 AM</option>
-							<option value="10:30">10:30 AM</option>
-							<option value="11:00">11:00 AM</option>
-							<option value="11:30">11:30 AM</option>
-							<option value="12:00">12:00 PM</option>
-							<option value="12:30">12:30 PM</option>
-							<option value="13:00">01:00 PM</option>
-							<option value="13:30">01:30 PM</option>
-							<option value="14:00">02:00 PM</option>
-							<option value="14:30">02:30 PM</option>
-							<option value="15:00">03:00 PM</option>
-							<option value="15:30">03:30 PM</option>
-							<option value="16:00">04:00 PM</option>
-							<option value="16:30">04:30 PM</option>
-							<option value="17:00">05:00 PM</option>
+							{availableTimeSlots.map((timeSlot) => (
+								<option key={timeSlot} value={timeSlot}>
+									{formatTime(timeSlot)}
+								</option>
+							))}
 						</select>
 					</div>
+
+					{/* Show availability info */}
+					{date && selectedDoctor.$id && (
+						<div className="flex justify-center mt-2">
+							<div className="text-sm text-base-content/70 text-center">
+								{(() => {
+									const dayOfWeek = date.getDay();
+									const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+									const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+									
+									if (isWeekend && selectedDoctor.weekend_available && selectedDoctor.weekend_start && selectedDoctor.weekend_end) {
+										return `${dayName}: ${formatTime(selectedDoctor.weekend_start)} - ${formatTime(selectedDoctor.weekend_end)}`;
+									} else if (!isWeekend && selectedDoctor.availability_start && selectedDoctor.availability_end) {
+										return `${dayName}: ${formatTime(selectedDoctor.availability_start)} - ${formatTime(selectedDoctor.availability_end)}`;
+									} else {
+										return `${selectedDoctor.name} is not available on ${dayName}s`;
+									}
+								})()}
+							</div>
+						</div>
+					)}
 
 					<form className="py-4 flex justify-center">
 						<div className="flex flex-col w-3/4">

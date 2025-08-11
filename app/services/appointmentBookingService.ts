@@ -7,8 +7,14 @@ export interface AppointmentBooking {
   provider_id: number;
   appointment_type_id: number;
   appointment_date: string; // Datetime in your schema
-  appointment_time: string; // Datetime in your schema  
-  status: 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'rescheduled' | 'no_show';
+  appointment_time: string; // Datetime in your schema
+  status:
+    | "pending"
+    | "confirmed"
+    | "cancelled"
+    | "completed"
+    | "rescheduled"
+    | "no_show";
   reason_for_visit: string;
   notes?: string;
   created_at: string; // Datetime
@@ -45,7 +51,13 @@ export interface UpdateAppointmentData {
   appointment_type_id?: number;
   reason_for_visit?: string;
   notes?: string;
-  status?: 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'rescheduled' | 'no_show';
+  status?:
+    | "pending"
+    | "confirmed"
+    | "cancelled"
+    | "completed"
+    | "rescheduled"
+    | "no_show";
 }
 
 // Appwrite configuration using environment variables
@@ -57,16 +69,21 @@ const databases = new Databases(client);
 
 // Environment variables for Appwrite configuration
 const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!;
-const APPOINTMENTS_COLLECTION_ID = process.env.NEXT_PUBLIC_APPWRITE_APPOINTMENTS_COLLECTION_ID!;
+const APPOINTMENTS_COLLECTION_ID =
+  process.env.NEXT_PUBLIC_APPWRITE_APPOINTMENTS_COLLECTION_ID!;
 
 class AppointmentBookingService {
   // ===== CREATE APPOINTMENT =====
-  async createAppointment(appointmentData: CreateAppointmentData): Promise<AppointmentBooking> {
+  async createAppointment(
+    appointmentData: CreateAppointmentData
+  ): Promise<AppointmentBooking> {
     try {
       const now = new Date().toISOString();
-      
+
       // Combine date and time for the datetime fields
-      const appointmentDateTime = new Date(`${appointmentData.appointment_date}T${appointmentData.appointment_time}`).toISOString();
+      const appointmentDateTime = new Date(
+        `${appointmentData.appointment_date}T${appointmentData.appointment_time}`
+      ).toISOString();
 
       const documentData = {
         appointment_id: Date.now(), // Generate unique ID
@@ -75,9 +92,9 @@ class AppointmentBookingService {
         appointment_type_id: appointmentData.appointment_type_id,
         appointment_date: appointmentDateTime,
         appointment_time: appointmentDateTime,
-        status: 'pending', // Default status
+        status: "pending", // Default status
         reason_for_visit: appointmentData.reason_for_visit,
-        notes: appointmentData.notes || '',
+        notes: appointmentData.notes || "",
         created_at: now,
         updated_at: now,
       };
@@ -97,7 +114,9 @@ class AppointmentBookingService {
   }
 
   // ===== GET APPOINTMENTS =====
-  async getPatientAppointments(patientId: number): Promise<AppointmentBooking[]> {
+  async getPatientAppointments(
+    patientId: number
+  ): Promise<AppointmentBooking[]> {
     try {
       const response = await databases.listDocuments(
         DATABASE_ID,
@@ -105,7 +124,7 @@ class AppointmentBookingService {
         [
           Query.equal("patient_id", patientId),
           Query.orderDesc("appointment_date"),
-          Query.limit(100)
+          Query.limit(100),
         ]
       );
 
@@ -116,10 +135,12 @@ class AppointmentBookingService {
     }
   }
 
-  async getUpcomingAppointments(patientId: number): Promise<AppointmentBooking[]> {
+  async getUpcomingAppointments(
+    patientId: number
+  ): Promise<AppointmentBooking[]> {
     try {
       const now = new Date().toISOString();
-      
+
       const response = await databases.listDocuments(
         DATABASE_ID,
         APPOINTMENTS_COLLECTION_ID,
@@ -129,24 +150,26 @@ class AppointmentBookingService {
           Query.or([
             Query.equal("status", "pending"),
             Query.equal("status", "confirmed"),
-            Query.equal("status", "rescheduled")
+            Query.equal("status", "rescheduled"),
           ]),
           Query.orderAsc("appointment_date"),
-          Query.limit(50)
+          Query.limit(50),
         ]
       );
 
       return response.documents as unknown as AppointmentBooking[];
     } catch (error) {
       console.error("Error fetching upcoming appointments:", error);
-      throw new Error("Failed to fetch upcoming appointments. Please try again.");
+      throw new Error(
+        "Failed to fetch upcoming appointments. Please try again."
+      );
     }
   }
 
   async getPastAppointments(patientId: number): Promise<AppointmentBooking[]> {
     try {
       const now = new Date().toISOString();
-      
+
       const response = await databases.listDocuments(
         DATABASE_ID,
         APPOINTMENTS_COLLECTION_ID,
@@ -154,7 +177,7 @@ class AppointmentBookingService {
           Query.equal("patient_id", patientId),
           Query.lessThan("appointment_date", now),
           Query.orderDesc("appointment_date"),
-          Query.limit(50)
+          Query.limit(50),
         ]
       );
 
@@ -165,7 +188,9 @@ class AppointmentBookingService {
     }
   }
 
-  async getAppointmentById(appointmentId: string): Promise<AppointmentBooking | null> {
+  async getAppointmentById(
+    appointmentId: string
+  ): Promise<AppointmentBooking | null> {
     try {
       const response = await databases.getDocument(
         DATABASE_ID,
@@ -182,7 +207,7 @@ class AppointmentBookingService {
 
   // ===== UPDATE APPOINTMENT =====
   async updateAppointment(
-    appointmentId: string, 
+    appointmentId: string,
     updateData: UpdateAppointmentData
   ): Promise<AppointmentBooking> {
     try {
@@ -193,14 +218,22 @@ class AppointmentBookingService {
         appointment_type_id?: number;
         reason_for_visit?: string;
         notes?: string;
-        status?: 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'rescheduled' | 'no_show';
+        status?:
+          | "pending"
+          | "confirmed"
+          | "cancelled"
+          | "completed"
+          | "rescheduled"
+          | "no_show";
       } = {
         updated_at: new Date().toISOString(),
       };
 
       // Handle datetime fields
       if (updateData.appointment_date && updateData.appointment_time) {
-        const appointmentDateTime = new Date(`${updateData.appointment_date}T${updateData.appointment_time}`).toISOString();
+        const appointmentDateTime = new Date(
+          `${updateData.appointment_date}T${updateData.appointment_time}`
+        ).toISOString();
         documentData.appointment_date = appointmentDateTime;
         documentData.appointment_time = appointmentDateTime;
       }
@@ -244,7 +277,7 @@ class AppointmentBookingService {
       const updateData: UpdateAppointmentData = {
         appointment_date: newDate,
         appointment_time: newTime,
-        status: 'rescheduled', // Mark as rescheduled
+        status: "rescheduled", // Mark as rescheduled
       };
 
       if (newAppointmentTypeId) {
@@ -259,10 +292,13 @@ class AppointmentBookingService {
   }
 
   // ===== CANCEL APPOINTMENT =====
-  async cancelAppointment(appointmentId: string, reason?: string): Promise<AppointmentBooking> {
+  async cancelAppointment(
+    appointmentId: string,
+    reason?: string
+  ): Promise<AppointmentBooking> {
     try {
       const updateData: UpdateAppointmentData = {
-        status: 'cancelled',
+        status: "cancelled",
       };
 
       if (reason) {
@@ -277,18 +313,20 @@ class AppointmentBookingService {
   }
 
   // ===== UTILITY METHODS =====
-  
+
   // Check if appointment can be cancelled (e.g., not within 24 hours)
   canCancelAppointment(appointment: AppointmentBooking): boolean {
     const appointmentDateTime = new Date(appointment.appointment_date);
     const now = new Date();
     const timeDifference = appointmentDateTime.getTime() - now.getTime();
     const hoursDifference = timeDifference / (1000 * 3600);
-    
-    return hoursDifference > 24 && 
-           (appointment.status === 'pending' || 
-            appointment.status === 'confirmed' || 
-            appointment.status === 'rescheduled');
+
+    return (
+      hoursDifference > 24 &&
+      (appointment.status === "pending" ||
+        appointment.status === "confirmed" ||
+        appointment.status === "rescheduled")
+    );
   }
 
   // Check if appointment can be rescheduled
@@ -297,10 +335,11 @@ class AppointmentBookingService {
     const now = new Date();
     const timeDifference = appointmentDateTime.getTime() - now.getTime();
     const hoursDifference = timeDifference / (1000 * 3600);
-    
-    return hoursDifference > 24 && 
-           (appointment.status === 'pending' || 
-            appointment.status === 'confirmed');
+
+    return (
+      hoursDifference > 24 &&
+      (appointment.status === "pending" || appointment.status === "confirmed")
+    );
   }
 
   // Format appointment for display
@@ -320,38 +359,50 @@ class AppointmentBookingService {
   // Get appointment status badge color
   getStatusBadgeColor(status: string): string {
     switch (status.toLowerCase()) {
-      case 'pending':
-        return 'badge-warning';
-      case 'confirmed':
-        return 'badge-success';
-      case 'cancelled':
-        return 'badge-error';
-      case 'completed':
-        return 'badge-info';
-      case 'rescheduled':
-        return 'badge-secondary';
-      case 'no_show':
-        return 'badge-ghost';
+      case "pending":
+        return "badge-warning";
+      case "confirmed":
+        return "badge-success";
+      case "cancelled":
+        return "badge-error";
+      case "completed":
+        return "badge-info";
+      case "rescheduled":
+        return "badge-secondary";
+      case "no_show":
+        return "badge-ghost";
       default:
-        return 'badge-neutral';
+        return "badge-neutral";
     }
   }
 
-  // Check for appointment conflicts
+  // Check for appointment conflicts with duration overlap
   async checkAppointmentConflict(
     patientId: number,
     providerId: number,
     appointmentDate: string,
     appointmentTime: string,
+    appointmentDuration: number = 30,
     excludeAppointmentId?: string
   ): Promise<boolean> {
     try {
-      const appointmentDateTime = new Date(`${appointmentDate}T${appointmentTime}`).toISOString();
-      
+      const appointmentDateTime = new Date(
+        `${appointmentDate}T${appointmentTime}`
+      );
+      const appointmentEndTime = new Date(
+        appointmentDateTime.getTime() + appointmentDuration * 60000
+      );
+
+      // Get all appointments for this provider on this date
       const queries = [
         Query.equal("provider_id", providerId),
-        Query.equal("appointment_date", appointmentDateTime),
+        Query.greaterThanEqual(
+          "appointment_date",
+          `${appointmentDate}T00:00:00.000Z`
+        ),
+        Query.lessThan("appointment_date", `${appointmentDate}T23:59:59.999Z`),
         Query.notEqual("status", "cancelled"),
+        Query.notEqual("status", "no_show"),
       ];
 
       if (excludeAppointmentId) {
@@ -364,7 +415,30 @@ class AppointmentBookingService {
         queries
       );
 
-      return response.documents.length > 0;
+      // Check for time overlaps
+      for (const existingAppointment of response.documents) {
+        const existingStart = new Date(existingAppointment.appointment_date);
+        // Assume 30 minutes if duration not specified
+        const existingDuration = 30; // You might want to get this from appointment type
+        const existingEnd = new Date(
+          existingStart.getTime() + existingDuration * 60000
+        );
+
+        // Check if appointments overlap
+        const hasOverlap =
+          (appointmentDateTime >= existingStart &&
+            appointmentDateTime < existingEnd) ||
+          (appointmentEndTime > existingStart &&
+            appointmentEndTime <= existingEnd) ||
+          (appointmentDateTime <= existingStart &&
+            appointmentEndTime >= existingEnd);
+
+        if (hasOverlap) {
+          return true;
+        }
+      }
+
+      return false;
     } catch (error) {
       console.error("Error checking appointment conflict:", error);
       return false;
@@ -380,16 +454,19 @@ class AppointmentBookingService {
   }> {
     try {
       const allAppointments = await this.getPatientAppointments(patientId);
-      
+
       return {
         total: allAppointments.length,
-        upcoming: allAppointments.filter(apt => 
-          apt.status === 'pending' || 
-          apt.status === 'confirmed' || 
-          apt.status === 'rescheduled'
+        upcoming: allAppointments.filter(
+          (apt) =>
+            apt.status === "pending" ||
+            apt.status === "confirmed" ||
+            apt.status === "rescheduled"
         ).length,
-        completed: allAppointments.filter(apt => apt.status === 'completed').length,
-        cancelled: allAppointments.filter(apt => apt.status === 'cancelled').length,
+        completed: allAppointments.filter((apt) => apt.status === "completed")
+          .length,
+        cancelled: allAppointments.filter((apt) => apt.status === "cancelled")
+          .length,
       };
     } catch (error) {
       console.error("Error getting appointment stats:", error);
@@ -401,7 +478,7 @@ class AppointmentBookingService {
   extractDateTime(datetimeString: string): { date: string; time: string } {
     const datetime = new Date(datetimeString);
     return {
-      date: datetime.toISOString().split('T')[0], // YYYY-MM-DD
+      date: datetime.toISOString().split("T")[0], // YYYY-MM-DD
       time: datetime.toTimeString().slice(0, 5), // HH:MM
     };
   }
@@ -411,7 +488,7 @@ class AppointmentBookingService {
 export const appointmentBookingService = new AppointmentBookingService();
 
 // Custom hooks for React components
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 export const usePatientAppointments = (patientId: number | null) => {
   const [appointments, setAppointments] = useState<AppointmentBooking[]>([]);
@@ -429,10 +506,12 @@ export const usePatientAppointments = (patientId: number | null) => {
       try {
         setLoading(true);
         setError(null);
-        const result = await appointmentBookingService.getPatientAppointments(patientId);
+        const result = await appointmentBookingService.getPatientAppointments(
+          patientId
+        );
         setAppointments(result);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
         setLoading(false);
       }
@@ -443,13 +522,15 @@ export const usePatientAppointments = (patientId: number | null) => {
 
   const refreshAppointments = async () => {
     if (!patientId) return;
-    
+
     try {
       setError(null);
-      const result = await appointmentBookingService.getPatientAppointments(patientId);
+      const result = await appointmentBookingService.getPatientAppointments(
+        patientId
+      );
       setAppointments(result);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : "An error occurred");
     }
   };
 
@@ -472,10 +553,12 @@ export const useUpcomingAppointments = (patientId: number | null) => {
       try {
         setLoading(true);
         setError(null);
-        const result = await appointmentBookingService.getUpcomingAppointments(patientId);
+        const result = await appointmentBookingService.getUpcomingAppointments(
+          patientId
+        );
         setAppointments(result);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
         setLoading(false);
       }
@@ -488,7 +571,12 @@ export const useUpcomingAppointments = (patientId: number | null) => {
 };
 
 export const useAppointmentStats = (patientId: number | null) => {
-  const [stats, setStats] = useState({ total: 0, upcoming: 0, completed: 0, cancelled: 0 });
+  const [stats, setStats] = useState({
+    total: 0,
+    upcoming: 0,
+    completed: 0,
+    cancelled: 0,
+  });
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -503,10 +591,12 @@ export const useAppointmentStats = (patientId: number | null) => {
       try {
         setLoading(true);
         setError(null);
-        const result = await appointmentBookingService.getAppointmentStats(patientId);
+        const result = await appointmentBookingService.getAppointmentStats(
+          patientId
+        );
         setStats(result);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
         setLoading(false);
       }
