@@ -1,5 +1,8 @@
 "use client";
 
+import React, { useState, useEffect } from "react";
+import { PatientInformation } from "./PatientInformation";
+import { useAuth } from "@/app/providers/AuthProvider";
 import {
   ContactRound,
   ShieldAlert,
@@ -7,141 +10,86 @@ import {
   TriangleAlert,
   Pill,
 } from "lucide-react";
-
-const PatientInformation: React.FC = () => {
-  return (
-    <div className="card bg-base-100 shadow-xl ">
-      <div className="card-body">
-        <h2 className="card-title text-xl  mb-4">Patient Information</h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">First Name</span>
-            </label>
-            <input
-              type="text"
-              required
-              className="input  input-bordered w-full"
-              placeholder="Enter first name"
-            />
-          </div>
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">Last Name </span>
-            </label>
-            <input
-              type="text"
-              required
-              className="input  input-bordered w-full "
-              placeholder="Enter last name"
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">Email </span>
-            </label>
-            <input
-              type="text"
-              required
-              className="input  input-bordered w-full "
-              placeholder="Enter email"
-            />
-          </div>
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">Phone Number</span>
-            </label>
-            <input
-              type="text"
-              required
-              className="input  input-bordered w-full  bg-base-200 text-base-content"
-              placeholder="Name"
-            />
-          </div>
-        </div>
-
-        <div className="form-control mb-4">
-          <label className="label">
-            <span className="label-text">Address</span>
-          </label>
-          <input
-            type="text"
-            required
-            className="input  input-bordered w-full  bg-base-200 text-base-content"
-            placeholder="Name"
-          />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">City</span>
-            </label>
-            <input
-              type="text"
-              required
-              className="input  input-bordered w-full  bg-base-200 text-base-content"
-              placeholder="Name"
-            />
-          </div>
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">State</span>
-            </label>
-            <select
-              required
-              className="select select-bordered w-full  bg-base-200 text-base-content"
-            >
-              <option disabled={true}>Select Your State</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="form=control mb-4">
-          <label className="label">Zip Code</label>
-          <input
-            type="text"
-            required
-            className="input input-bordered w-full  bg-base-200 text-base-content "
-            placeholder="Name"
-          />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div className="form-control">
-            <input
-              type="text"
-              required
-              className="input input-bordered w-full  bg-base-200 text-base-content"
-              placeholder="Which browser do you use"
-              list="browsers"
-            />
-            <datalist id="Genders">
-              <option value="Chrome"></option>
-              <option value="Firefox"></option>
-              <option value="Safari"></option>
-              <option value="Opera"></option>
-              <option value="Edge"></option>
-            </datalist>
-          </div>
-          <div className="form-control">
-            <input
-              type="date"
-              required
-              className="input input-bordered w-full bg-base-200 text-base-content"
-              placeholder="Date of Birth"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
+interface PatientFormData {
+  patient_id: string;
+  user_id: string;
+  first_name: string;
+  last_name: string;
+  phone: string;
+  email: string;
+  date_of_birth: string | undefined;
+  gender: string;
+  address: string;
+  city: string;
+  state: string;
+  zip_code: string;
+  created_at: Date;
+  updated_at: Date;
+  is_active: boolean;
+}
 export const IntakeForm: React.FC = () => {
+  // TODO: Implement Emergency Contacts step
+  // TODO: Implmement Insurance Information
+  // TODO: Implement Allergies
+  // TODO implement medications section
+  // TODO: Add navigation between steps using the progress bar
+  // TODO: Integrate API for form submission
+  const { user } = useAuth();
+  const [currentStep, setCurrentStep] = useState<number>(0);
+  const [formData, setFormData] = useState({
+    patientInformation: {
+      patient_id: user?.$id || "",
+      user_id: user?.$id || "",
+      first_name: "",
+      last_name: "",
+      phone: "",
+      email: "",
+      date_of_birth: "",
+      gender: "",
+      address: "",
+      city: "",
+      state: "",
+      zip_code: "",
+      created_at: new Date(),
+      updated_at: new Date(),
+      is_active: true,
+    },
+  });
+
+  useEffect(() => {
+    if (user) {
+      setFormData((prev) => ({
+        ...prev,
+        patientInformation: {
+          ...prev.patientInformation,
+          patient_id: user.$id,
+          user_id: user.$id,
+        },
+      }));
+    }
+  }, [user]);
+
+  const steps = [
+    { step: 0, stepTitle: "patientInformation" },
+    { step: 1, stepTitle: "emergencyContacts" },
+    { step: 2, stepTitle: "insuranceInformation" },
+    { step: 3, stepTitle: "allergies" },
+    { step: 4, stepTitle: "medications" },
+  ];
+
+  const handleStepSubmit = (data: PatientFormData) => {
+    setFormData((prev) => ({
+      ...prev,
+      patientInformation: {
+        ...data,
+        patient_id: user?.$id || "",
+        user_id: user?.$id || "",
+        date_of_birth: data.date_of_birth || "",
+      },
+    }));
+    console.log(data);
+  };
+
   return (
     // functionality
     // one card showing at a time based on current step
@@ -191,7 +139,12 @@ export const IntakeForm: React.FC = () => {
       </div>
       <main className=" flex justify-center items-start min-h-screen px-4">
         <div className="w-full max-w-3xl">
-          <PatientInformation />
+          {currentStep == steps[0].step && (
+            <PatientInformation
+              onSubmit={handleStepSubmit}
+              defaultValues={formData.patientInformation}
+            />
+          )}
         </div>
       </main>
     </>
