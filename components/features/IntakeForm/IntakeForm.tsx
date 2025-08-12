@@ -77,16 +77,21 @@ export const IntakeForm: React.FC = () => {
     { step: 4, stepTitle: "medications" },
   ];
 
-  const handleStepSubmit = (data: PatientFormData) => {
+  const handleStepSubmit = (data: PatientFormData, field) => {
     setFormData((prev) => ({
       ...prev,
-      patientInformation: {
+      [field]: {
         ...data,
-        patient_id: user?.$id || "",
-        user_id: user?.$id || "",
-        date_of_birth: data.date_of_birth || "",
+        ...(field == "patientInformation"
+          ? {
+              patient_id: user?.$id || "",
+              user_id: user?.$id || "",
+              date_of_birth: data.date_of_birth || "",
+            }
+          : {}),
       },
     }));
+
     console.log(data);
   };
 
@@ -100,14 +105,22 @@ export const IntakeForm: React.FC = () => {
     <>
       <div className="flex justify-center z-10 border-b border-base-300  border-t py-4">
         <ul className="steps w-full max-w-4xl">
-          <li className="step step-secondary flex-1">
+          <li
+            className={`step ${
+              currentStep >= 0 ? "step-secondary" : ""
+            } flex-1`}
+          >
             <span className="step-icon">
               <ContactRound />
             </span>
             Patient <br />
             Information
           </li>
-          <li className="step step-secondary flex-1">
+          <li
+            className={`step ${
+              currentStep >= 1 ? "step-secondary" : ""
+            }  flex-1`}
+          >
             <span className="step-icon">
               <ShieldAlert />
             </span>
@@ -115,7 +128,11 @@ export const IntakeForm: React.FC = () => {
             <br />
             Contact
           </li>
-          <li className="step step-accent flex-1">
+          <li
+            className={`step ${
+              currentStep >= 2 ? "step-secondary" : ""
+            }  flex-1`}
+          >
             <span className="step-icon">
               <ShieldCheck />
             </span>
@@ -123,13 +140,21 @@ export const IntakeForm: React.FC = () => {
             <br />
             Information
           </li>
-          <li className="step flex-1">
+          <li
+            className={`step ${
+              currentStep >= 3 ? "step-secondary" : ""
+            }  flex-1`}
+          >
             <span className="step-icon">
               <TriangleAlert />
             </span>
             Allergies
           </li>
-          <li className="step flex-1">
+          <li
+            className={`step ${
+              currentStep >= 4 ? "step-secondary" : ""
+            }  flex-1`}
+          >
             <span className="step-icon">
               <Pill />
             </span>
@@ -141,7 +166,7 @@ export const IntakeForm: React.FC = () => {
         <div className="w-full max-w-3xl">
           {currentStep == steps[0].step && (
             <PatientInformation
-              onSubmit={handleStepSubmit}
+              onSubmit={(data) => handleStepSubmit(data, "patientInformation")}
               defaultValues={formData.patientInformation}
             />
           )}
