@@ -10,6 +10,7 @@ import {
   TriangleAlert,
   Pill,
 } from "lucide-react";
+import { EmergencyContact } from "./EmergencyContact";
 interface PatientFormData {
   patient_id: string;
   user_id: string;
@@ -23,6 +24,21 @@ interface PatientFormData {
   city: string;
   state: string;
   zip_code: string;
+  created_at: Date;
+  updated_at: Date;
+  is_active: boolean;
+}
+
+interface EmergencyContactFormData {
+  contact_id: string;
+  patient_id: string;
+  first_name: string;
+  last_name: string;
+  relationship: string;
+  phone_primary: string;
+  phone_secondary: string;
+  email: string;
+  priority_order: string;
   created_at: Date;
   updated_at: Date;
   is_active: boolean;
@@ -54,6 +70,20 @@ export const IntakeForm: React.FC = () => {
       updated_at: new Date(),
       is_active: true,
     },
+    emergencyContact: {
+      contact_id: "43",
+      patient_id: user?.$id || "",
+      first_name: "",
+      last_name: "",
+      relationship: "",
+      phone_primary: "",
+      phone_secondary: "",
+      email: "",
+      priority_order: "1",
+      created_at: new Date(),
+      updated_at: new Date(),
+      is_active: true,
+    },
   });
 
   useEffect(() => {
@@ -65,19 +95,23 @@ export const IntakeForm: React.FC = () => {
           patient_id: user.$id,
           user_id: user.$id,
         },
+        emergencyContact: {
+          ...prev.emergencyContact,
+          patient_id: user.$id,
+        },
       }));
     }
   }, [user]);
 
   const steps = [
     { step: 0, stepTitle: "patientInformation" },
-    { step: 1, stepTitle: "emergencyContacts" },
+    { step: 1, stepTitle: "emergencyContact" },
     { step: 2, stepTitle: "insuranceInformation" },
     { step: 3, stepTitle: "allergies" },
     { step: 4, stepTitle: "medications" },
   ];
-
-  const handleStepSubmit = (data: PatientFormData, field) => {
+  type FormData = PatientFormData | EmergencyContactFormData;
+  const handleStepSubmit = (data: FormData, field: string) => {
     setFormData((prev) => ({
       ...prev,
       [field]: {
@@ -89,8 +123,14 @@ export const IntakeForm: React.FC = () => {
               date_of_birth: data.date_of_birth || "",
             }
           : {}),
+        ...(field == "emergencyContact"
+          ? {
+              patient_id: user?.$id || "",
+            }
+          : {}),
       },
     }));
+
     if (currentStep === 4) {
       const completeData = {
         ...formData,
@@ -184,6 +224,12 @@ export const IntakeForm: React.FC = () => {
             <PatientInformation
               onSubmit={(data) => handleStepSubmit(data, "patientInformation")}
               defaultValues={formData.patientInformation}
+            />
+          )}
+          {currentStep == steps[1].step && (
+            <EmergencyContact
+              onSubmit={(data) => handleStepSubmit(data, "emergencyContact")}
+              defaultValues={formData.emergencyContact}
             />
           )}
         </div>
