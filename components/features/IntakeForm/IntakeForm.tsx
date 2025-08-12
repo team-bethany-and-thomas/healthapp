@@ -84,6 +84,44 @@ export const IntakeForm: React.FC = () => {
       updated_at: new Date(),
       is_active: true,
     },
+    patientInsurance: {
+      insurance_id: "",
+      patient_id: user?.$id || "",
+      provider_name: "",
+      policy_number: "",
+      group_number: "",
+      subscriber_name: "",
+      is_primary: true,
+      front_card_url: "",
+      back_card_url: "",
+      created_at: new Date(),
+      updated_at: new Date(),
+      is_active: true,
+    },
+    patientAllergies: [
+      {
+        allergy_id: "",
+        patient_id: user?.$id || "",
+        allergen_name: "",
+        severity: "",
+        reaction_description: "",
+        created__at: new Date(),
+        updated_at: new Date(),
+      },
+    ],
+    patientMedications: [
+      {
+        medication_id: "",
+        patient_id: user?.$id || "",
+        medication_name: "",
+        dosage: "",
+        frequency: "",
+        status: "",
+        created_at: new Date(),
+        updated_at: new Date(),
+        is_active: true,
+      },
+    ],
   });
 
   useEffect(() => {
