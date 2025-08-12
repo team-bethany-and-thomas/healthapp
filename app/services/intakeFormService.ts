@@ -114,28 +114,96 @@ export async function createIntakeDraftWithExistingData(
   patient_id: number,
   appointment_id: number
 ): Promise<PatientForm> {
+  // For new appointments, always start with a fresh form
+  // The user can choose to import data from previous forms if needed
   const emptyFormData = createEmptyIntakeForm();
-  const existingData = await loadExistingPatientData(patient_id);
-  
-  // Merge existing data with empty form
-  const mergedFormData: FormData = {
-    ...emptyFormData,
-    ...existingData,
-    medicalHistory: {
-      ...emptyFormData.medicalHistory,
-      ...existingData.medicalHistory
-    }
-  };
-
-  const completionPercentage = calculateCompletionPercentage(mergedFormData);
 
   return createFormDraft({
     form_template_id: INTAKE_TEMPLATE_ID,
     appointment_id,
-    form_data: mergedFormData,
-    completion_percentage: completionPercentage,
+    form_data: emptyFormData,
+    completion_percentage: 0,
     patient_id,
     auth_user_id,
+  });
+}
+
+// Import data from previous intake forms (optional user action)
+export async function importDataFromPreviousIntake(
+  form_id: string,
+  auth_user_id: string,
+  patient_id: number,
+  importOptions: {
+    importAllergies?: boolean;
+    importMedications?: boolean;
+    importDemographics?: boolean;
+    importAddress?: boolean;
+    importInsurance?: boolean;
+    importEmergencyContact?: boolean;
+  } = {}
+): Promise<PatientForm> {
+  const currentForm = await getFormById(form_id, patient_id);
+  const currentFormData = parseFormData(currentForm.form_data);
+  
+  // Load existing patient data
+  const existingData = await loadExistingPatientData(patient_id);
+  
+  // Get the most recent completed intake form for demographics/address/insurance
+  const { documents } = await getMyIntakes(patient_id);
+  const completedForms = documents.filter(
+    (form: unknown) => {
+      const typedForm = form as PatientForm;
+      return (typedForm.status === 'submitted' || typedForm.status === 'completed') && 
+             typedForm.appointment_id !== currentForm.appointment_id;
+    }
+  );
+  
+  let previousFormData: FormData | null = null;
+  if (completedForms.length > 0) {
+    const mostRecentForm = completedForms[0] as unknown as PatientForm;
+    previousFormData = parseFormData(mostRecentForm.form_data);
+  }
+
+  // Build the updated form data based on import options
+  const updatedFormData: FormData = { ...currentFormData };
+
+  // Import medical data (allergies and medications)
+  if (importOptions.importAllergies && existingData.medicalHistory?.allergies) {
+    updatedFormData.medicalHistory.allergies = existingData.medicalHistory.allergies;
+  }
+
+  if (importOptions.importMedications && existingData.medicalHistory?.medications) {
+    updatedFormData.medicalHistory.medications = existingData.medicalHistory.medications;
+  }
+
+  // Import other data from previous forms if available
+  if (previousFormData) {
+    if (importOptions.importDemographics) {
+      updatedFormData.demographics = { ...previousFormData.demographics };
+    }
+
+    if (importOptions.importAddress) {
+      updatedFormData.address = { ...previousFormData.address };
+    }
+
+    if (importOptions.importInsurance) {
+      updatedFormData.insurance = { ...previousFormData.insurance };
+    }
+
+    if (importOptions.importEmergencyContact) {
+      updatedFormData.medicalHistory.emergencyContact = { ...previousFormData.medicalHistory.emergencyContact };
+    }
+  }
+
+  const completionPercentage = calculateCompletionPercentage(updatedFormData);
+
+  return updateForm({
+    form_id,
+    patient_id,
+    auth_user_id,
+    form_data: updatedFormData,
+    completion_percentage: completionPercentage,
+    status: 'in_progress',
   });
 }
 

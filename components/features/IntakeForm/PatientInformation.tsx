@@ -10,7 +10,7 @@ interface PatientFormData {
   last_name: string;
   phone: string;
   email: string;
-  date_of_birth: string | undefined;
+  date_of_birth?: string;
   gender: string;
   address: string;
   city: string;
@@ -124,7 +124,7 @@ export const PatientInformation: React.FC<PatientFormProps> = ({
   const handleNextClick = handleSubmit((data) => onSubmit(data));
 
   return (
-    <form className="card bg-base-100 shadow-xl ">
+    <form className="card bg-base-100 shadow-xl rounded-2xl">
       <div className="card-body">
         <h2 className="card-title text-xl  mb-4">Patient Information</h2>
 
@@ -136,7 +136,7 @@ export const PatientInformation: React.FC<PatientFormProps> = ({
             <input
               type="text"
               {...register("first_name")}
-              className={`input  input-bordered w-full bg-base-200 text-base-content ${
+              className={`input input-bordered w-full bg-base-200 text-base-content rounded-lg ${
                 errors.first_name ? "input-error" : ""
               }`}
               placeholder="Enter first name"
@@ -152,7 +152,7 @@ export const PatientInformation: React.FC<PatientFormProps> = ({
             <input
               type="text"
               {...register("last_name")}
-              className="input  input-bordered w-full bg-base-200 text-base-content "
+              className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
               placeholder="Enter last name"
             />
             {errors.last_name && (
@@ -169,7 +169,7 @@ export const PatientInformation: React.FC<PatientFormProps> = ({
             <input
               type="text"
               {...register("email")}
-              className="input  input-bordered w-full bg-base-200 text-base-content "
+              className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
               placeholder="Enter email"
             />
             {errors.email && (
@@ -183,7 +183,7 @@ export const PatientInformation: React.FC<PatientFormProps> = ({
             <input
               type="text"
               {...register("phone")}
-              className="input  input-bordered w-full  bg-base-200 text-base-content"
+              className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
               placeholder="Enter phone number"
             />
             {errors.phone && (
@@ -199,7 +199,7 @@ export const PatientInformation: React.FC<PatientFormProps> = ({
           <input
             type="text"
             {...register("address")}
-            className="input  input-bordered w-full  bg-base-200 text-base-content"
+            className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
             placeholder="Enter address"
           />
           {errors.address && (
@@ -215,7 +215,7 @@ export const PatientInformation: React.FC<PatientFormProps> = ({
             <input
               type="text"
               {...register("city")}
-              className="input  input-bordered w-full  bg-base-200 text-base-content"
+              className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
               placeholder="Enter city"
             />
             {errors.city && (
@@ -228,7 +228,7 @@ export const PatientInformation: React.FC<PatientFormProps> = ({
             </label>
             <select
               {...register("state")}
-              className="select select-bordered w-full  bg-base-200 text-base-content"
+              className="select select-bordered w-full bg-base-200 text-base-content rounded-lg"
               defaultValue={""}
             >
               <option value={""} disabled>
@@ -252,7 +252,7 @@ export const PatientInformation: React.FC<PatientFormProps> = ({
           <input
             type="text"
             {...register("zip_code")}
-            className="input input-bordered w-full  bg-base-200 text-base-content "
+            className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
             placeholder="Enter Zip code"
           />
           {errors.zip_code && (
@@ -264,7 +264,7 @@ export const PatientInformation: React.FC<PatientFormProps> = ({
             <input
               type="text"
               {...register("gender")}
-              className="input input-bordered w-full  bg-base-200 text-base-content"
+              className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
               placeholder="Type or select your gender"
               list="Genders"
             />
@@ -283,7 +283,7 @@ export const PatientInformation: React.FC<PatientFormProps> = ({
             <input
               type="date"
               {...register("date_of_birth")}
-              className="input input-bordered w-full bg-base-200 text-base-content"
+              className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
               placeholder="Date of Birth"
             />
             {errors.date_of_birth && (
@@ -294,7 +294,7 @@ export const PatientInformation: React.FC<PatientFormProps> = ({
         <button
           type="button"
           onClick={handleNextClick}
-          className="btn btn-primary mt-4"
+          className="bg-[rgba(102,232,219,0.9)] hover:bg-[rgba(72,212,199,0.9)] text-white border-none rounded-lg px-6 py-3 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg mt-4"
         >
           Next
         </button>

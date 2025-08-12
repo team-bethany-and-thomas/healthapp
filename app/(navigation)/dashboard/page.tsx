@@ -1,15 +1,24 @@
 
-import React from "react";
+'use client';
+
+import React from 'react';
+import DashboardOverview from '../../../components/ui/DashboardOverview';
 
 function page() {
 	return (
-		<>
-			<h1 className="text-2xl font-bold mb-6">Dashboard Overview</h1>
-      <p>
-        Welcome to your dashboard. Use the sidebar to navigate to different
-        sections.
-      </p>
-		</>
+		<div className="p-6">
+			<div className="mb-8">
+				<h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard Overview</h1>
+				<p className="text-gray-600">
+					Welcome back! Here&apos;s an overview of your health information.
+				</p>
+			</div>
+			
+			{/* Overview Cards Section */}
+			<section className="mb-8">
+				<DashboardOverview />
+			</section>
+		</div>
 	);
 }
 

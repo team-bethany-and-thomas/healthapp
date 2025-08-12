@@ -53,7 +53,7 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
   const [appointmentTime, setAppointmentTime] = useState("");
   const [reasonForVisit, setReasonForVisit] = useState("");
   const [notes, setNotes] = useState("");
-  const [preFillExistingData, setPreFillExistingData] = useState(true);
+  const [preFillExistingData, setPreFillExistingData] = useState(false);
   
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor>({
     $id: "",
@@ -382,7 +382,7 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
       setNotes("");
       setBookingError("");
       setBookedAppointmentData(null);
-      setPreFillExistingData(true);
+      setPreFillExistingData(false);
     }, 300);
   };
 
@@ -395,7 +395,7 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
     setBookingError("");
     setAppointmentBooked(false);
     setBookedAppointmentData(null);
-    setPreFillExistingData(true);
+    setPreFillExistingData(false);
   };
 
   const handleClose = () => {

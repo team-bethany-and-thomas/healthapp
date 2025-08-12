@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { databases } from "../../app/lib/appwrite";
 import { Query, Models } from "appwrite";
 import { useAuth } from "../../app/providers/AuthProvider";
+import styles from "./ApptTable.module.css";
 
 // ---- ENV ----
 const DB_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!;
@@ -43,10 +44,13 @@ interface PatientFormDocument extends Models.Document {
   appointment_id: number;
   patient_id: number;
   intake_form_id: string;
+  status: string;
+  completion_percentage: number;
 }
 
 type MergedAppointment = {
   appointmentId: string;
+  intakeFormId?: string;
   intakeFormNumber: string;
   date: string;
   time: string;
@@ -56,6 +60,8 @@ type MergedAppointment = {
   reason: string;
   cost: string;
   hasIntakeForm: boolean;
+  intakeStatus: string;
+  completionPercentage: number;
 };
 
 export const ApptTable = () => {
@@ -200,13 +206,20 @@ export const ApptTable = () => {
 
           const cost = appointmentType?.base_cost ? `$${appointmentType.base_cost}` : "";
 
-          // Generate a user-friendly intake form number
+          // Generate intake form number and status
           const intakeFormNumber = patientForm 
             ? `IF-${appointment.appointment_id.toString().slice(-6)}` 
-            : "N/A";
+            : "Not Started";
+
+          const intakeStatus = patientForm 
+            ? (patientForm.status === 'submitted' || patientForm.status === 'completed' ? 'Completed' : 'In Progress')
+            : 'Not Started';
+
+          const completionPercentage = patientForm?.completion_percentage || 0;
 
           return {
             appointmentId: appointment.$id,
+            intakeFormId: patientForm?.$id,
             intakeFormNumber,
             date: fmtDate(appointment.appointment_date),
             time: fmtTime(appointment.appointment_time),
@@ -216,6 +229,8 @@ export const ApptTable = () => {
             reason: appointment.reason_for_visit || "",
             cost,
             hasIntakeForm: !!patientForm,
+            intakeStatus,
+            completionPercentage,
           };
         });
 
@@ -257,82 +272,216 @@ export const ApptTable = () => {
     );
   }
 
+  const renderMobileCards = () => {
+    if (loading) {
+      return (
+        <div className={styles.loadingContainer}>
+          <span className="loading loading-spinner loading-md"></span>
+          <span className="ml-2">Loading appointments...</span>
+        </div>
+      );
+    }
+
+    if (appointments.length === 0) {
+      return (
+        <div className={styles.emptyState}>
+          <p className="mb-2">No appointments found.</p>
+          <button onClick={handleBookAppointment} className={styles.viewAllButton}>
+            Schedule Your First Appointment
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <div className={styles.mobileCards}>
+        {appointments.map((appt) => (
+          <div key={appt.appointmentId} className={styles.appointmentCard}>
+            <div className={styles.cardHeader}>
+              <div className={styles.intakeFormBadge}>
+                {appt.intakeFormNumber}
+              </div>
+              <div className="text-sm font-semibold text-gray-600">
+                {appt.date} at {appt.time}
+              </div>
+            </div>
+            
+            <div className={styles.cardContent}>
+              <div className={styles.cardRow}>
+                <span className={styles.cardLabel}>Doctor:</span>
+                <span className={styles.cardValue}>{appt.doctor}</span>
+              </div>
+              
+              <div className={styles.cardRow}>
+                <span className={styles.cardLabel}>Facility:</span>
+                <span className={styles.cardValue}>{appt.facility}</span>
+              </div>
+              
+              <div className={styles.cardRow}>
+                <span className={styles.cardLabel}>Type:</span>
+                <span className={styles.cardValue}>{appt.appointmentType}</span>
+              </div>
+              
+              <div className={styles.cardRow}>
+                <span className={styles.cardLabel}>Intake Status:</span>
+                <span className={`${styles.cardValue} ${
+                  appt.intakeStatus === 'Completed' ? 'text-green-600 font-semibold' :
+                  appt.intakeStatus === 'In Progress' ? 'text-yellow-600 font-semibold' :
+                  'text-red-600 font-semibold'
+                }`}>
+                  {appt.intakeStatus}
+                  {appt.intakeStatus === 'In Progress' && (
+                    <span className="text-sm text-gray-500 ml-1">
+                      ({appt.completionPercentage}%)
+                    </span>
+                  )}
+                </span>
+              </div>
+              
+              {appt.reason && (
+                <div className={styles.cardRow}>
+                  <span className={styles.cardLabel}>Reason:</span>
+                  <span className={styles.cardValue}>{appt.reason}</span>
+                </div>
+              )}
+              
+              {appt.cost && (
+                <div className={styles.cardRow}>
+                  <span className={styles.cardLabel}>Cost:</span>
+                  <span className={styles.cardValue}>{appt.cost}</span>
+                </div>
+              )}
+            </div>
+            
+            <div className={styles.cardActions}>
+              <button
+                onClick={() => handleIntakeForm(appt.appointmentId, appt.hasIntakeForm)}
+                className={`${styles.tableButton} ${
+                  appt.intakeStatus === 'Completed'
+                    ? styles.tableButtonOutline
+                    : styles.tableButtonPrimary
+                } w-full`}
+              >
+                {appt.intakeStatus === 'Completed' ? 'View Intake Form' : 
+                 appt.intakeStatus === 'In Progress' ? 'Continue Intake Form' : 
+                 'Start Intake Form'}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderDesktopTable = () => (
+    <div className={`${styles.tableContainer} rounded-box border border-base-content/5 bg-base-100 rounded-xl`}>
+      <table className="table table-lg w-full">
+        <thead>
+          <tr>
+            <th>Intake Form #</th>
+            <td>Date</td>
+            <td>Time</td>
+            <td>Doctor</td>
+            <td>Facility</td>
+            <td>Appointment Type</td>
+            <td>Reason For Visit</td>
+            <td>Cost</td>
+            <td>Actions</td>
+          </tr>
+        </thead>
+        <tbody>
+          {loading ? (
+            <tr>
+              <td colSpan={9} className="text-center p-4">
+                <span className="loading loading-spinner loading-md"></span>
+                <span className="ml-2">Loading appointments...</span>
+              </td>
+            </tr>
+          ) : appointments.length === 0 ? (
+            <tr>
+              <td colSpan={9} className="text-center p-4">
+                <div>
+                  <p className="mb-2">No appointments found.</p>
+                  <button onClick={handleBookAppointment} className={styles.viewAllButton}>
+                    Schedule Your First Appointment
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ) : (
+            appointments.map((appt) => (
+              <tr key={appt.appointmentId} className="hover:bg-base-50">
+                <th>{appt.intakeFormNumber}</th>
+                <td>{appt.date}</td>
+                <td>{appt.time}</td>
+                <td title={appt.doctor}>{appt.doctor}</td>
+                <td title={appt.facility}>{appt.facility}</td>
+                <td title={appt.appointmentType}>{appt.appointmentType}</td>
+                <td title={appt.reason}>{appt.reason}</td>
+                <td className="font-semibold">{appt.cost}</td>
+                <td>
+                  <button
+                    onClick={() => handleIntakeForm(appt.appointmentId, appt.hasIntakeForm)}
+                    className={`${styles.tableButton} ${
+                      appt.intakeStatus === 'Completed'
+                        ? styles.tableButtonOutline
+                        : styles.tableButtonPrimary
+                    }`}
+                    title={
+                      appt.intakeStatus === 'Completed' ? 'View Form' : 
+                      appt.intakeStatus === 'In Progress' ? 'Continue Intake Form' : 
+                      'Start Intake Form'
+                    }
+                  >
+                    {appt.intakeStatus === 'Completed' ? 'View Form' : 
+                     appt.intakeStatus === 'In Progress' ? 'Continue' : 
+                     'Start Intake'}
+                  </button>
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+
   return (
-    <>
-      <h3 className="text-xl font-semibold mb-4 mt-4">Appointments</h3>
-      <button onClick={handleBookAppointment} className="btn btn-primary rounded-md mb-4">
-        Schedule Appointment
-      </button>
-      
+    <div className={styles.apptContainer}>
+      {/* Responsive header section */}
+      <div className={styles.headerSection}>
+        <div className={styles.headerContent}>
+          <div className={styles.headerText}>
+            <h1 className={styles.headerTitle}>Appointments</h1>
+            <p className={styles.headerDescription}>
+              View and manage your upcoming and past medical appointments. You can track your intake forms, 
+              see appointment details, and schedule new appointments with healthcare providers.
+            </p>
+          </div>
+          <button
+            onClick={handleBookAppointment}
+            className={styles.headerButton}
+          >
+            Schedule Appointment
+          </button>
+        </div>
+      </div>
+
       {error && (
-        <div className="alert alert-error mb-4">
+        <div className={styles.errorAlert}>
           <span>{error}</span>
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 rounded-xl">
-        <table className="table table-lg table-pin-rows table-pin-cols">
-          <thead>
-            <tr>
-              <th>Intake Form #</th>
-              <td>Date</td>
-              <td>Time</td>
-              <td>Doctor</td>
-              <td>Facility</td>
-              <td>Appointment Type</td>
-              <td>Reason For Visit</td>
-              <td>Cost</td>
-              <td>Actions</td>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan={9} className="text-center p-4">
-                  <span className="loading loading-spinner loading-md"></span>
-                  <span className="ml-2">Loading appointments...</span>
-                </td>
-              </tr>
-            ) : appointments.length === 0 ? (
-              <tr>
-                <td colSpan={9} className="text-center p-4">
-                  <div>
-                    <p className="mb-2">No appointments found.</p>
-                    <button onClick={handleBookAppointment} className="btn btn-primary btn-sm">
-                      Schedule Your First Appointment
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ) : (
-              appointments.map((appt) => (
-                <tr key={appt.appointmentId}>
-                  <th>{appt.intakeFormNumber}</th>
-                  <td>{appt.date}</td>
-                  <td>{appt.time}</td>
-                  <td>{appt.doctor}</td>
-                  <td>{appt.facility}</td>
-                  <td>{appt.appointmentType}</td>
-                  <td>{appt.reason}</td>
-                  <td>{appt.cost}</td>
-                  <td>
-                    <button
-                      onClick={() => handleIntakeForm(appt.appointmentId, appt.hasIntakeForm)}
-                      className={`btn btn-sm ${
-                        appt.hasIntakeForm 
-                          ? 'btn-outline btn-info' 
-                          : 'btn-primary'
-                      }`}
-                    >
-                      {appt.hasIntakeForm ? 'View Intake' : 'Intake'}
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+      {/* Mobile Card View */}
+      <div className={styles.mobileCards}>
+        {renderMobileCards()}
       </div>
-    </>
+
+      {/* Desktop Table View */}
+      <div className={styles.desktopTable}>
+        {renderDesktopTable()}
+      </div>
+    </div>
   );
 };
