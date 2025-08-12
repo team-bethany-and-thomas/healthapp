@@ -83,17 +83,6 @@ const SideBar: React.FC = () => {
               >
                 <span>{item.icon}</span>
                 {!collapsed && <span>{item.name}</span>}
-<<<<<<< HEAD:components/ui/SideBar.tsx
-            </Link>
-          );
-        })}
-      </nav>
-    </div>
-   
-        </>
-    )
-}
-=======
               </Link>
             );
           })}
@@ -102,5 +91,5 @@ const SideBar: React.FC = () => {
     </>
   );
 };
->>>>>>> BE-upload-files-minor-fixes:components/ui/sideBar.tsx
+
 export default SideBar;
