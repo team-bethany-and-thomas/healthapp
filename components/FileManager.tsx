@@ -4,6 +4,7 @@ import React, { useState, useCallback } from "react";
 import { useAuth } from "../app/hooks/useAuth";
 import UploadFile from "../components/UploadFile";
 import UploadTable from "../components/UploadTable";
+import styles from "./ui/DashboardOverview.module.css";
 
 export default function FileManagerPage() {
   const { user } = useAuth();
@@ -65,12 +66,11 @@ export default function FileManagerPage() {
     <div className=" -m-6 p-6 min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
+        <div className={styles.headerSection}>
           <h1 className="text-3xl font-bold text-gray-900">File Manager</h1>
           <p className="mt-2 text-gray-600">
             Upload, manage, and organize your documents and images.
           </p>
-          
         </div>
 
         {/* Success/Error Messages */}
