@@ -1,0 +1,28 @@
+/* Dashboard Overview Specific Styles */
+
+.headerSection {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: linear-gradient(to right, #f0fdfa, #ccfbf1);
+  border-radius: 0.5rem;
+}
+
+/* Mobile-first approach */
+@media (min-width: 640px) {
+  .headerSection {
+    padding: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .headerSection {
+    padding: 2rem;
+  }
+}
+
+/* Extra small mobile adjustments */
+@media (max-width: 480px) {
+  .headerSection {
+    padding: 0.75rem;
+  }
+}

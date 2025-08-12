@@ -516,107 +516,107 @@ const DashboardOverview: React.FC = () => {
   return (
     <>
       <div className="flex flex-col mt-24 lg:flex-row gap-6 mb-8">
-        {/* Main cards grid */}
-        <div className="lg:w-2/3">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Next Appointment Card */}
-            <OverviewCards
-              title="Next Appointment"
-              value={nextAppointment ? formatDate(nextAppointment.date) : 'None scheduled'}
-              description={nextAppointment ? `${formatTime(nextAppointment.time)} - ${nextAppointment.type}\n${nextAppointment.providerName}` : 'Schedule your next appointment'}
-              actionText={nextAppointment ? 'View Details' : 'Book Now'}
-              onAction={() => router.push('/dashboard/appointments')}
-              status={nextAppointment ? 'primary' : 'warning'}
-              icon={
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              }
-            />
+          {/* Main cards grid */}
+          <div className="lg:w-2/3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Next Appointment Card */}
+              <OverviewCards
+                title="Next Appointment"
+                value={nextAppointment ? formatDate(nextAppointment.date) : 'None scheduled'}
+                description={nextAppointment ? `${formatTime(nextAppointment.time)} - ${nextAppointment.type}\n${nextAppointment.providerName}` : 'Schedule your next appointment'}
+                actionText={nextAppointment ? 'View Details' : 'Book Now'}
+                onAction={() => router.push('/dashboard/appointments')}
+                status={nextAppointment ? 'primary' : 'warning'}
+                icon={
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                }
+              />
 
-            {/* Recent File Upload Card */}
-            <OverviewCards
-              title="Recent Upload"
-              value={recentUpload ? recentUpload.fileName : 'No files'}
-              description={recentUpload ? `${formatUploadDate(recentUpload.uploadedAt)} • ${uploadService.formatFileSize(recentUpload.fileSize)}` : 'Upload your first file'}
-              actionText={recentUpload ? 'View Files' : 'Upload Now'}
-              onAction={() => router.push('/dashboard/fileManager')}
-              status="default"
-              icon={
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              }
-            />
+              {/* Recent File Upload Card */}
+              <OverviewCards
+                title="Recent Upload"
+                value={recentUpload ? recentUpload.fileName : 'No files'}
+                description={recentUpload ? `${formatUploadDate(recentUpload.uploadedAt)} • ${uploadService.formatFileSize(recentUpload.fileSize)}` : 'Upload your first file'}
+                actionText={recentUpload ? 'View Files' : 'Upload Now'}
+                onAction={() => router.push('/dashboard/fileManager')}
+                status="default"
+                icon={
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                }
+              />
 
-            {/* Total Appointments Card */}
-            <OverviewCards
-              title="Total Appointments"
-              value={totalAppointments}
-              description="All time appointments"
-              actionText="View All"
-              onAction={() => router.push('/dashboard/appointments')}
-              status="default"
-              icon={
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              }
-            />
+              {/* Total Appointments Card */}
+              <OverviewCards
+                title="Total Appointments"
+                value={totalAppointments}
+                description="All time appointments"
+                actionText="View All"
+                onAction={() => router.push('/dashboard/appointments')}
+                status="default"
+                icon={
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                }
+              />
 
-            {/* Total Files Card */}
+              {/* Total Files Card */}
+              <OverviewCards
+                title="Files Stored"
+                value={totalFiles}
+                description="Documents & records"
+                actionText="Manage Files"
+                onAction={() => router.push('/dashboard/fileManager')}
+                status="default"
+                icon={
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                }
+              />
+            </div>
+          </div>
+
+          {/* Recommended Doctor Card - Separate on the right */}
+          <div className="lg:w-1/3">
             <OverviewCards
-              title="Files Stored"
-              value={totalFiles}
-              description="Documents & records"
-              actionText="Manage Files"
-              onAction={() => router.push('/dashboard/fileManager')}
+              title="Recommended Doctor"
+              value={recommendedDoctor ? `${recommendedDoctor.first_name} ${recommendedDoctor.last_name}` : 'No recommendations'}
+              description={
+                recommendedDoctor 
+                  ? `${recommendedDoctor.specialty}\n${recommendedDoctor.practice_name}${
+                      recommendedDoctor.bio ? `\n\n${recommendedDoctor.bio}` : ''
+                    }`
+                  : 'Complete an appointment to get recommendations'
+              }
+              actionText={recommendedDoctor ? 'Book Appointment' : 'Find Doctors'}
+              onAction={recommendedDoctor ? handleBookRecommendedDoctor : () => router.push('/search')}
               status="default"
+              image={recommendedDoctor ? getDoctorImageUrl(recommendedDoctor) : undefined}
+              isRecommendedDoctor={true}
               icon={
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
+                !recommendedDoctor ? (
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                ) : undefined
               }
             />
           </div>
         </div>
 
-        {/* Recommended Doctor Card - Separate on the right */}
-        <div className="lg:w-1/3">
-          <OverviewCards
-            title="Recommended Doctor"
-            value={recommendedDoctor ? `${recommendedDoctor.first_name} ${recommendedDoctor.last_name}` : 'No recommendations'}
-            description={
-              recommendedDoctor 
-                ? `${recommendedDoctor.specialty}\n${recommendedDoctor.practice_name}${
-                    recommendedDoctor.bio ? `\n\n${recommendedDoctor.bio}` : ''
-                  }`
-                : 'Complete an appointment to get recommendations'
-            }
-            actionText={recommendedDoctor ? 'Book Appointment' : 'Find Doctors'}
-            onAction={recommendedDoctor ? handleBookRecommendedDoctor : () => router.push('/search')}
-            status="default"
-            image={recommendedDoctor ? getDoctorImageUrl(recommendedDoctor) : undefined}
-            isRecommendedDoctor={true}
-            icon={
-              !recommendedDoctor ? (
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-              ) : undefined
-            }
-          />
-        </div>
-
-        {/* Appointment Booking Modal */}
-        <AppointmentBookingModal
-          isOpen={isBookingModalOpen}
-          onClose={() => setIsBookingModalOpen(false)}
-          providerId={selectedProviderId}
-          providerList={providerList}
-          onAppointmentBooked={handleAppointmentBooked}
-        />
-      </div>
+      {/* Appointment Booking Modal */}
+      <AppointmentBookingModal
+        isOpen={isBookingModalOpen}
+        onClose={() => setIsBookingModalOpen(false)}
+        providerId={selectedProviderId}
+        providerList={providerList}
+        onAppointmentBooked={handleAppointmentBooked}
+      />
 
       {/* Health Education Card - Full Width at Bottom */}
       {healthTip && (
@@ -631,12 +631,12 @@ const DashboardOverview: React.FC = () => {
             icon={
               <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-              </svg>
-            }
-          />
-        </div>
-      )}
-    </>
+            </svg>
+          }
+        />
+      </div>
+    )}
+  </>
   );
 };
 
