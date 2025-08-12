@@ -91,7 +91,23 @@ export const IntakeForm: React.FC = () => {
           : {}),
       },
     }));
-
+    if (currentStep === 4) {
+      const completeData = {
+        ...formData,
+        [field]: {
+          ...data,
+          ...(field == "patientInformation"
+            ? {
+                patient_id: user?.$id || "",
+                user_id: user?.$id || "",
+                date_of_birth: data.date_of_birth || "",
+              }
+            : {}),
+        },
+      };
+      console.log("complete form:", completeData);
+    }
+    setCurrentStep(currentStep + 1);
     console.log(data);
   };
 
