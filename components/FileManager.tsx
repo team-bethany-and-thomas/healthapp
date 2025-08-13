@@ -179,15 +179,13 @@ export default function FileManagerPage() {
               View, download, and manage your uploaded files.
             </p>
           </div>
-          <div className="p-6">
-            <UploadTable
-              key={refreshTable}
-              onFileSelect={handleFileSelection}
-              allowMultipleSelection={true}
-              showSelectionColumn={true}
-              className="w-full"
-            />
-          </div>
+          <UploadTable
+            key={refreshTable}
+            onFileSelect={handleFileSelection}
+            allowMultipleSelection={true}
+            showSelectionColumn={true}
+            className="w-full"
+          />
         </div>
 
         {/* Usage Instructions */}

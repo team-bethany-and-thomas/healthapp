@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { uploadService, type UploadedFile } from '../app/services/uploadService';
 import { useAuth } from '../app/hooks/useAuth';
+import styles from './UploadTable.module.css';
 
 interface UploadTableProps {
   onFileSelect?: (fileIds: string[]) => void;
@@ -27,6 +28,23 @@ export default function UploadTable({
   const [deletingFiles, setDeletingFiles] = useState<Set<string>>(new Set());
   const [sortBy, setSortBy] = useState<'uploadedAt' | 'filename' | 'fileSize'>('uploadedAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check for mobile screen size
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 480);
+    };
+    
+    // Initial check
+    checkMobile();
+    
+    // Add resize listener
+    window.addEventListener('resize', checkMobile);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -258,21 +276,21 @@ export default function UploadTable({
   }
 
   return (
-    <div className={`w-full ${className}`}>
+    <div className={`${styles.uploadTableContainer} ${className} ${isMobile ? styles.mobileCardView : ''}`}>
       {/* Header */}
-      <div className="mb-4 flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-gray-900">
+      <div className={styles.headerSection}>
+        <h2 className={styles.headerTitle}>
           Your Files {category && `(${category})`}
         </h2>
-        <div className="flex items-center space-x-2">
+        <div className={styles.headerActions}>
           {showSelectionColumn && selectedFiles.size > 0 && (
-            <span className="text-sm text-gray-600">
+            <span className={styles.selectedCount}>
               {selectedFiles.size} selected
             </span>
           )}
           <button
             onClick={loadFiles}
-            className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+            className={styles.refreshButton}
             title="Refresh files"
           >
             Refresh
@@ -280,140 +298,208 @@ export default function UploadTable({
         </div>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto bg-white rounded-lg shadow">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              {showSelectionColumn && (
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {allowMultipleSelection && (
-                    <input
-                      type="checkbox"
-                      checked={files.length > 0 && selectedFiles.size === files.length}
-                      onChange={handleSelectAll}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      title="Select all files"
-                    />
-                  )}
-                </th>
-              )}
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Type
-              </th>
-              <th 
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort('filename')}
-              >
-                <div className="flex items-center">
-                  Name
-                  {sortBy === 'filename' && (
-                    <svg className={`ml-1 w-4 h-4 ${sortOrder === 'asc' ? 'transform rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  )}
-                </div>
-              </th>
-              <th 
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort('fileSize')}
-              >
-                <div className="flex items-center">
-                  Size
-                  {sortBy === 'fileSize' && (
-                    <svg className={`ml-1 w-4 h-4 ${sortOrder === 'asc' ? 'transform rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  )}
-                </div>
-              </th>
-              <th 
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort('uploadedAt')}
-              >
-                <div className="flex items-center">
-                  Uploaded
-                  {sortBy === 'uploadedAt' && (
-                    <svg className={`ml-1 w-4 h-4 ${sortOrder === 'asc' ? 'transform rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  )}
-                </div>
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Description
-              </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {sortedFiles.map((file) => (
-              <tr key={file.$id} className="hover:bg-gray-50">
+      {/* Mobile Card View */}
+      {isMobile ? (
+        <div>
+          {sortedFiles.map((file) => (
+            <div key={file.$id} className={styles.fileCard}>
+              <div className={styles.fileCardHeader}>
                 {showSelectionColumn && (
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <input
-                      type="checkbox"
-                      checked={selectedFiles.has(file.$id)}
-                      onChange={() => handleFileSelection(file.$id)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      title={`Select ${file.originalName}`}
-                    />
-                  </td>
+                  <input
+                    type="checkbox"
+                    checked={selectedFiles.has(file.$id)}
+                    onChange={() => handleFileSelection(file.$id)}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    title={`Select ${file.originalName}`}
+                  />
                 )}
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {getFileIcon(file.fileType)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900 truncate max-w-xs">
-                    {file.originalName}
+                {getFileIcon(file.fileType)}
+                <div className={styles.fileCardTitle}>
+                  {file.originalName}
+                </div>
+              </div>
+              <div className={styles.fileCardMeta}>
+                <div>
+                  <strong>Type:</strong> {uploadService.getFileCategory(file.fileType)}
+                </div>
+                <div>
+                  <strong>Size:</strong> {uploadService.formatFileSize(file.fileSize)}
+                </div>
+                <div>
+                  <strong>Uploaded:</strong> {new Date(file.uploadedAt).toLocaleDateString()}
+                </div>
+                {file.description && (
+                  <div>
+                    <strong>Description:</strong> {file.description}
                   </div>
-                  <div className="text-xs text-gray-500">
-                    {uploadService.getFileCategory(file.fileType)}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {uploadService.formatFileSize(file.fileSize)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {new Date(file.uploadedAt).toLocaleDateString()}
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
-                  {file.description || '-'}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <div className="flex justify-end space-x-2">
-                    <button
-                      onClick={() => handleDownload(file)}
-                      className="text-blue-600 hover:text-blue-900"
-                      title={`Download ${file.originalName}`}
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                )}
+              </div>
+              <div className={styles.fileCardActions}>
+                <button
+                  onClick={() => handleDownload(file)}
+                  className={`${styles.actionButton} ${styles.downloadButton}`}
+                  title={`Download ${file.originalName}`}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => handleDelete(file)}
+                  disabled={deletingFiles.has(file.$id)}
+                  className={`${styles.actionButton} ${styles.deleteButton}`}
+                  title={`Delete ${file.originalName}`}
+                >
+                  {deletingFiles.has(file.$id) ? (
+                    <div className="w-4 h-4 animate-spin rounded-full border-2 border-red-600 border-t-transparent"></div>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        /* Desktop Table View */
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
+            <thead className={styles.tableHeader}>
+              <tr>
+                {showSelectionColumn && (
+                  <th className={styles.tableHeaderCell}>
+                    {allowMultipleSelection && (
+                      <input
+                        type="checkbox"
+                        checked={files.length > 0 && selectedFiles.size === files.length}
+                        onChange={handleSelectAll}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        title="Select all files"
+                      />
+                    )}
+                  </th>
+                )}
+                <th className={styles.tableHeaderCell}>
+                  Type
+                </th>
+                <th 
+                  className={`${styles.tableHeaderCell} ${styles.sortableHeader}`}
+                  onClick={() => handleSort('filename')}
+                >
+                  <div className="flex items-center">
+                    Name
+                    {sortBy === 'filename' && (
+                      <svg className={`ml-1 w-4 h-4 ${sortOrder === 'asc' ? 'transform rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
-                    </button>
-                    <button
-                      onClick={() => handleDelete(file)}
-                      disabled={deletingFiles.has(file.$id)}
-                      className="text-red-600 hover:text-red-900 disabled:opacity-50"
-                      title={`Delete ${file.originalName}`}
-                    >
-                      {deletingFiles.has(file.$id) ? (
-                        <div className="w-4 h-4 animate-spin rounded-full border-2 border-red-600 border-t-transparent"></div>
-                      ) : (
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      )}
-                    </button>
+                    )}
                   </div>
-                </td>
+                </th>
+                <th 
+                  className={`${styles.tableHeaderCell} ${styles.sortableHeader} ${styles.hiddenOnMobile}`}
+                  onClick={() => handleSort('fileSize')}
+                >
+                  <div className="flex items-center">
+                    Size
+                    {sortBy === 'fileSize' && (
+                      <svg className={`ml-1 w-4 h-4 ${sortOrder === 'asc' ? 'transform rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    )}
+                  </div>
+                </th>
+                <th 
+                  className={`${styles.tableHeaderCell} ${styles.sortableHeader} ${styles.hiddenOnMobile}`}
+                  onClick={() => handleSort('uploadedAt')}
+                >
+                  <div className="flex items-center">
+                    Uploaded
+                    {sortBy === 'uploadedAt' && (
+                      <svg className={`ml-1 w-4 h-4 ${sortOrder === 'asc' ? 'transform rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    )}
+                  </div>
+                </th>
+                <th className={`${styles.tableHeaderCell} ${styles.hiddenOnTablet}`}>
+                  Description
+                </th>
+                <th className={styles.tableHeaderCell}>
+                  Actions
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {sortedFiles.map((file) => (
+                <tr key={file.$id} className={styles.tableRow}>
+                  {showSelectionColumn && (
+                    <td className={styles.tableCell}>
+                      <input
+                        type="checkbox"
+                        checked={selectedFiles.has(file.$id)}
+                        onChange={() => handleFileSelection(file.$id)}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        title={`Select ${file.originalName}`}
+                      />
+                    </td>
+                  )}
+                  <td className={styles.tableCell}>
+                    <div className={styles.typeIcon}>
+                      {getFileIcon(file.fileType)}
+                    </div>
+                  </td>
+                  <td className={styles.tableCell}>
+                    <div className={`${styles.fileName} ${styles.tableCellTruncate}`}>
+                      {file.originalName}
+                    </div>
+                    <div className={styles.fileCategory}>
+                      {uploadService.getFileCategory(file.fileType)}
+                    </div>
+                  </td>
+                  <td className={`${styles.tableCell} ${styles.hiddenOnMobile}`}>
+                    {uploadService.formatFileSize(file.fileSize)}
+                  </td>
+                  <td className={`${styles.tableCell} ${styles.hiddenOnMobile}`}>
+                    {new Date(file.uploadedAt).toLocaleDateString()}
+                  </td>
+                  <td className={`${styles.tableCell} ${styles.tableCellTruncate} ${styles.hiddenOnTablet}`}>
+                    {file.description || '-'}
+                  </td>
+                  <td className={styles.tableCell}>
+                    <div className={styles.actionButtons}>
+                      <button
+                        onClick={() => handleDownload(file)}
+                        className={`${styles.actionButton} ${styles.downloadButton}`}
+                        title={`Download ${file.originalName}`}
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => handleDelete(file)}
+                        disabled={deletingFiles.has(file.$id)}
+                        className={`${styles.actionButton} ${styles.deleteButton}`}
+                        title={`Delete ${file.originalName}`}
+                      >
+                        {deletingFiles.has(file.$id) ? (
+                          <div className="w-5 h-5 animate-spin rounded-full border-2 border-red-600 border-t-transparent"></div>
+                        ) : (
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
