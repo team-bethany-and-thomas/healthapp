@@ -740,6 +740,166 @@ export function updateAttachedFiles(
   };
 }
 
+// Save intake form progress (without submitting)
+export async function saveIntakeFormProgress(
+  formData: CompleteIntakeForm,
+  userId: string,
+  appointmentDocId?: string
+): Promise<{ success: boolean; message: string; completionPercentage?: number }> {
+  try {
+    const now = new Date().toISOString();
+
+    // Calculate completion percentage based on filled fields
+    const completionPercentage = calculateCompletionPercentage(formData);
+
+    if (appointmentDocId) {
+      // Get appointment details
+      const appointment = await getAppointmentById(appointmentDocId);
+      if (!appointment) {
+        return {
+          success: false,
+          message: "Appointment not found"
+        };
+      }
+
+      // Get or create form record
+      const existingForm = await getExistingIntakeForAppointment(appointment.appointment_id, appointment.patient_id);
+      
+      if (!existingForm) {
+        // Create new form record
+        const patientFormData = {
+          patient_form_id: Math.floor(Math.random() * 1000000),
+          patient_id: appointment.patient_id,
+          form_template_id: 1, // Intake form template
+          appointment_id: appointment.appointment_id,
+          form_data: JSON.stringify({
+            patient_info: formData.patient_info,
+            insurance: formData.insurance,
+            medical_conditions: formData.medical_conditions,
+            allergies: formData.allergies,
+            medications: formData.medications,
+            emergency_contacts: formData.emergency_contacts,
+            consent: {
+              hipaa: formData.hipaa_consent,
+              treatment: formData.treatment_consent,
+              financial: formData.financial_consent,
+            },
+            attached_files: formData.attached_files,
+          }),
+          status: completionPercentage > 0 ? "in_progress" : "not_started",
+          completion_percentage: completionPercentage,
+          created_at: now,
+          updated_at: now,
+        };
+
+        await databases.createDocument(
+          DATABASE_ID,
+          PATIENT_FORMS_COLLECTION_ID,
+          ID.unique(),
+          patientFormData,
+          [
+            Permission.read(Role.user(userId)),
+            Permission.update(Role.user(userId)),
+            Permission.delete(Role.user(userId)),
+          ]
+        );
+      } else {
+        // Update existing form record
+        const formResponse = await databases.listDocuments(
+          DATABASE_ID,
+          PATIENT_FORMS_COLLECTION_ID,
+          [
+            Query.equal("patient_form_id", existingForm.patient_form_id),
+            Query.limit(1)
+          ]
+        );
+
+        if (formResponse.documents.length > 0) {
+          const formDoc = formResponse.documents[0];
+          const formUpdateData = {
+            form_data: JSON.stringify({
+              patient_info: formData.patient_info,
+              insurance: formData.insurance,
+              medical_conditions: formData.medical_conditions,
+              allergies: formData.allergies,
+              medications: formData.medications,
+              emergency_contacts: formData.emergency_contacts,
+              consent: {
+                hipaa: formData.hipaa_consent,
+                treatment: formData.treatment_consent,
+                financial: formData.financial_consent,
+              },
+              attached_files: formData.attached_files,
+            }),
+            status: completionPercentage > 0 ? "in_progress" : "not_started",
+            completion_percentage: completionPercentage,
+            updated_at: now,
+          };
+
+          await databases.updateDocument(
+            DATABASE_ID,
+            PATIENT_FORMS_COLLECTION_ID,
+            formDoc.$id,
+            formUpdateData
+          );
+        }
+      }
+    }
+
+    return {
+      success: true,
+      message: `Progress saved successfully! (${completionPercentage}% complete)`,
+      completionPercentage
+    };
+
+  } catch (error) {
+    console.error("Error saving intake form progress:", error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Failed to save progress. Please try again."
+    };
+  }
+}
+
+// Calculate completion percentage based on filled fields
+function calculateCompletionPercentage(formData: CompleteIntakeForm): number {
+  let totalFields = 0;
+  let filledFields = 0;
+
+  // Patient info (8 fields)
+  totalFields += 8;
+  if (formData.patient_info.first_name.trim()) filledFields++;
+  if (formData.patient_info.last_name.trim()) filledFields++;
+  if (formData.patient_info.phone.trim()) filledFields++;
+  if (formData.patient_info.email.trim()) filledFields++;
+  if (formData.patient_info.gender.trim()) filledFields++;
+  if (formData.patient_info.address.trim()) filledFields++;
+  if (formData.patient_info.city.trim()) filledFields++;
+  if (formData.patient_info.state.trim()) filledFields++;
+
+  // Insurance info (2 required fields)
+  totalFields += 2;
+  if (formData.insurance.provider.trim()) filledFields++;
+  if (formData.insurance.policy_number.trim()) filledFields++;
+
+  // Emergency contacts (at least 1 with 3 required fields)
+  totalFields += 3;
+  if (formData.emergency_contacts.length > 0) {
+    const firstContact = formData.emergency_contacts[0];
+    if (firstContact.first_name.trim()) filledFields++;
+    if (firstContact.last_name.trim()) filledFields++;
+    if (firstContact.phone_primary.trim()) filledFields++;
+  }
+
+  // Consent (3 fields)
+  totalFields += 3;
+  if (formData.hipaa_consent) filledFields++;
+  if (formData.treatment_consent) filledFields++;
+  if (formData.financial_consent) filledFields++;
+
+  return Math.round((filledFields / totalFields) * 100);
+}
+
 // Get appointment details by appointment document ID
 export async function getAppointmentById(appointmentDocId: string): Promise<Appointment | null> {
   try {

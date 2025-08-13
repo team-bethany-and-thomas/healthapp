@@ -45,11 +45,17 @@ const patientSchema = z.object({
 interface PatientFormProps {
   onSubmit: (data: PatientFormData) => void;
   defaultValues: PatientFormData;
+  onClearFields?: () => void;
+  onSaveProgress?: () => void;
+  isLoading?: boolean;
 }
 
 export const PatientInformation: React.FC<PatientFormProps> = ({
   onSubmit,
   defaultValues,
+  onClearFields,
+  onSaveProgress,
+  isLoading = false,
 }) => {
   const {
     register,
@@ -291,13 +297,52 @@ export const PatientInformation: React.FC<PatientFormProps> = ({
             )}
           </div>
         </div>
-        <button
-          type="button"
-          onClick={handleNextClick}
-          className="bg-[rgba(102,232,219,0.9)] hover:bg-[rgba(72,212,199,0.9)] text-white border-none rounded-lg px-6 py-3 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg mt-4"
-        >
-          Next
-        </button>
+        {/* Action Buttons Row */}
+        <div className="flex flex-col gap-4 mt-6">
+          {/* Clear Fields and Save Progress Buttons */}
+          {(onClearFields || onSaveProgress) && (
+            <div className="flex justify-center gap-4">
+              {onClearFields && (
+                <button
+                  type="button"
+                  onClick={onClearFields}
+                  disabled={isLoading}
+                  className="bg-red-500 hover:bg-red-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
+                  Clear Fields
+                </button>
+              )}
+              {onSaveProgress && (
+                <button
+                  type="button"
+                  onClick={onSaveProgress}
+                  disabled={isLoading}
+                  className="bg-blue-500 hover:bg-blue-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? (
+                    <>
+                      <span className="loading loading-spinner loading-sm"></span>
+                      Saving...
+                    </>
+                  ) : (
+                    "Save Progress"
+                  )}
+                </button>
+              )}
+            </div>
+          )}
+          
+          {/* Next Button */}
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={handleNextClick}
+              className="bg-[rgba(102,232,219,0.9)] hover:bg-[rgba(72,212,199,0.9)] text-white border-none rounded-lg px-6 py-3 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg"
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </div>
     </form>
   );

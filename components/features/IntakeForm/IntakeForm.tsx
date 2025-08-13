@@ -21,6 +21,7 @@ import {
   validateCompleteIntakeForm,
   createIntakeFormForAppointment,
   loadExistingIntakeFormData,
+  saveIntakeFormProgress,
   updatePatientInfo,
   updateInsuranceInfo,
   updateConsent,
@@ -429,6 +430,84 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
     }
   };
 
+  // Save progress function
+  const handleSaveProgress = async () => {
+    if (!user) {
+      setErrors({ general: "You must be logged in to save progress" });
+      return;
+    }
+
+    setIsLoading(true);
+    setSuccessMessage("");
+    setErrors({});
+
+    try {
+      const result = await saveIntakeFormProgress(
+        completeFormData,
+        user.$id,
+        appointmentId || undefined
+      );
+
+      if (result.success) {
+        setSuccessMessage(result.message);
+      } else {
+        setErrors({ general: result.message });
+      }
+    } catch (error) {
+      console.error("Error saving intake form progress:", error);
+      setErrors({
+        general:
+          error instanceof Error
+            ? error.message
+            : "Failed to save progress. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Clear fields function
+  const handleClearFields = () => {
+    if (window.confirm("Are you sure you want to clear all fields? This action cannot be undone.")) {
+      const emptyForm = createEmptyCompleteIntakeForm();
+      
+      // Preserve the form linking information
+      setCompleteFormData({
+        ...emptyForm,
+        patient_form_id: completeFormData.patient_form_id,
+        appointment_id: completeFormData.appointment_id,
+        patient_id: completeFormData.patient_id,
+      });
+
+      // Also clear the legacy form data for step 0
+      setFormData({
+        patientInformation: {
+          patient_id: user?.$id || "",
+          user_id: user?.$id || "",
+          first_name: "",
+          last_name: "",
+          phone: "",
+          email: "",
+          date_of_birth: "",
+          gender: "",
+          address: "",
+          city: "",
+          state: "",
+          zip_code: "",
+          created_at: new Date(),
+          updated_at: new Date(),
+          is_active: true,
+        },
+      });
+
+      setSuccessMessage("All fields have been cleared.");
+      setErrors({});
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(""), 3000);
+    }
+  };
+
   // Submit complete form
   const handleCompleteFormSubmit = async () => {
     if (!user) {
@@ -656,6 +735,9 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
               <PatientInformation
                 onSubmit={handleStepSubmit}
                 defaultValues={formData.patientInformation}
+                onClearFields={handleClearFields}
+                onSaveProgress={handleSaveProgress}
+                isLoading={isLoading}
               />
             </div>
           )}
@@ -870,21 +952,52 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                   </button>
                 </div>
 
-                <div className="flex justify-between mt-6">
-                  <button
-                    type="button"
-                    onClick={prevStep}
-                    className="bg-gray-500 hover:bg-gray-600 text-white border-none rounded-lg px-6 py-3 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    type="button"
-                    onClick={nextStep}
-                    className="bg-[rgba(102,232,219,0.9)] hover:bg-[rgba(72,212,199,0.9)] text-white border-none rounded-lg px-6 py-3 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg"
-                  >
-                    Next
-                  </button>
+                {/* Action Buttons Row */}
+                <div className="flex flex-col gap-4 mt-6">
+                  {/* Clear Fields and Save Progress Buttons */}
+                  <div className="flex justify-center gap-4">
+                    <button
+                      type="button"
+                      onClick={handleClearFields}
+                      disabled={isLoading}
+                      className="bg-red-500 hover:bg-red-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    >
+                      Clear Fields
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSaveProgress}
+                      disabled={isLoading}
+                      className="bg-blue-500 hover:bg-blue-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    >
+                      {isLoading ? (
+                        <>
+                          <span className="loading loading-spinner loading-sm"></span>
+                          Saving...
+                        </>
+                      ) : (
+                        "Save Progress"
+                      )}
+                    </button>
+                  </div>
+                  
+                  {/* Navigation Buttons */}
+                  <div className="flex justify-between">
+                    <button
+                      type="button"
+                      onClick={prevStep}
+                      className="bg-gray-500 hover:bg-gray-600 text-white border-none rounded-lg px-6 py-3 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg"
+                    >
+                      Previous
+                    </button>
+                    <button
+                      type="button"
+                      onClick={nextStep}
+                      className="bg-[rgba(102,232,219,0.9)] hover:bg-[rgba(72,212,199,0.9)] text-white border-none rounded-lg px-6 py-3 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg"
+                    >
+                      Next
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1031,21 +1144,52 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                   </div>
                 </div>
 
-                <div className="flex justify-between mt-6">
-                  <button
-                    type="button"
-                    onClick={prevStep}
-                    className="bg-gray-500 hover:bg-gray-600 text-white border-none rounded-lg px-6 py-3 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    type="button"
-                    onClick={nextStep}
-                    className="bg-[rgba(102,232,219,0.9)] hover:bg-[rgba(72,212,199,0.9)] text-white border-none rounded-lg px-6 py-3 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg"
-                  >
-                    Next
-                  </button>
+                {/* Action Buttons Row */}
+                <div className="flex flex-col gap-4 mt-6">
+                  {/* Clear Fields and Save Progress Buttons */}
+                  <div className="flex justify-center gap-4">
+                    <button
+                      type="button"
+                      onClick={handleClearFields}
+                      disabled={isLoading}
+                      className="bg-red-500 hover:bg-red-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    >
+                      Clear Fields
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSaveProgress}
+                      disabled={isLoading}
+                      className="bg-blue-500 hover:bg-blue-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    >
+                      {isLoading ? (
+                        <>
+                          <span className="loading loading-spinner loading-sm"></span>
+                          Saving...
+                        </>
+                      ) : (
+                        "Save Progress"
+                      )}
+                    </button>
+                  </div>
+                  
+                  {/* Navigation Buttons */}
+                  <div className="flex justify-between">
+                    <button
+                      type="button"
+                      onClick={prevStep}
+                      className="bg-gray-500 hover:bg-gray-600 text-white border-none rounded-lg px-6 py-3 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg"
+                    >
+                      Previous
+                    </button>
+                    <button
+                      type="button"
+                      onClick={nextStep}
+                      className="bg-[rgba(102,232,219,0.9)] hover:bg-[rgba(72,212,199,0.9)] text-white border-none rounded-lg px-6 py-3 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg"
+                    >
+                      Next
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1147,21 +1291,52 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                   </button>
                 </div>
 
-                <div className="flex justify-between mt-6">
-                  <button
-                    type="button"
-                    onClick={prevStep}
-                    className="bg-gray-500 hover:bg-gray-600 text-white border-none rounded-lg px-6 py-3 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    type="button"
-                    onClick={nextStep}
-                    className="bg-[rgba(102,232,219,0.9)] hover:bg-[rgba(72,212,199,0.9)] text-white border-none rounded-lg px-6 py-3 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg"
-                  >
-                    Next
-                  </button>
+                {/* Action Buttons Row */}
+                <div className="flex flex-col gap-4 mt-6">
+                  {/* Clear Fields and Save Progress Buttons */}
+                  <div className="flex justify-center gap-4">
+                    <button
+                      type="button"
+                      onClick={handleClearFields}
+                      disabled={isLoading}
+                      className="bg-red-500 hover:bg-red-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    >
+                      Clear Fields
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSaveProgress}
+                      disabled={isLoading}
+                      className="bg-blue-500 hover:bg-blue-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    >
+                      {isLoading ? (
+                        <>
+                          <span className="loading loading-spinner loading-sm"></span>
+                          Saving...
+                        </>
+                      ) : (
+                        "Save Progress"
+                      )}
+                    </button>
+                  </div>
+                  
+                  {/* Navigation Buttons */}
+                  <div className="flex justify-between">
+                    <button
+                      type="button"
+                      onClick={prevStep}
+                      className="bg-gray-500 hover:bg-gray-600 text-white border-none rounded-lg px-6 py-3 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg"
+                    >
+                      Previous
+                    </button>
+                    <button
+                      type="button"
+                      onClick={nextStep}
+                      className="bg-[rgba(102,232,219,0.9)] hover:bg-[rgba(72,212,199,0.9)] text-white border-none rounded-lg px-6 py-3 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg"
+                    >
+                      Next
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1299,21 +1474,52 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                   />
                 </div>
 
-                <div className="flex justify-between mt-6">
-                  <button
-                    type="button"
-                    onClick={prevStep}
-                    className="bg-gray-500 hover:bg-gray-600 text-white border-none rounded-lg px-6 py-3 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    type="button"
-                    onClick={nextStep}
-                    className="bg-[rgba(102,232,219,0.9)] hover:bg-[rgba(72,212,199,0.9)] text-white border-none rounded-lg px-6 py-3 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg"
-                  >
-                    Next
-                  </button>
+                {/* Action Buttons Row */}
+                <div className="flex flex-col gap-4 mt-6">
+                  {/* Clear Fields and Save Progress Buttons */}
+                  <div className="flex justify-center gap-4">
+                    <button
+                      type="button"
+                      onClick={handleClearFields}
+                      disabled={isLoading}
+                      className="bg-red-500 hover:bg-red-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    >
+                      Clear Fields
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSaveProgress}
+                      disabled={isLoading}
+                      className="bg-blue-500 hover:bg-blue-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    >
+                      {isLoading ? (
+                        <>
+                          <span className="loading loading-spinner loading-sm"></span>
+                          Saving...
+                        </>
+                      ) : (
+                        "Save Progress"
+                      )}
+                    </button>
+                  </div>
+                  
+                  {/* Navigation Buttons */}
+                  <div className="flex justify-between">
+                    <button
+                      type="button"
+                      onClick={prevStep}
+                      className="bg-gray-500 hover:bg-gray-600 text-white border-none rounded-lg px-6 py-3 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg"
+                    >
+                      Previous
+                    </button>
+                    <button
+                      type="button"
+                      onClick={nextStep}
+                      className="bg-[rgba(102,232,219,0.9)] hover:bg-[rgba(72,212,199,0.9)] text-white border-none rounded-lg px-6 py-3 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg"
+                    >
+                      Next
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1476,33 +1682,64 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                   </div>
                 </div>
 
-                <div className="flex justify-between mt-6">
-                  <button
-                    type="button"
-                    onClick={prevStep}
-                    className="bg-gray-500 hover:bg-gray-600 text-white border-none rounded-lg px-6 py-3 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleCompleteFormSubmit}
-                    disabled={isLoading}
-                    className={`${
-                      isLoading
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-[rgba(102,232,219,0.9)] hover:bg-[rgba(72,212,199,0.9)] hover:transform hover:-translate-y-0.5 hover:shadow-lg"
-                    } text-white border-none rounded-lg px-6 py-3 flex items-center justify-center gap-2 transition-all duration-200 font-semibold min-w-[180px]`}
-                  >
-                    {isLoading ? (
-                      <>
-                        <span className="loading loading-spinner loading-sm"></span>
-                        Submitting...
-                      </>
-                    ) : (
-                      "Submit Complete Intake Form"
-                    )}
-                  </button>
+                {/* Action Buttons Row */}
+                <div className="flex flex-col gap-4 mt-6">
+                  {/* Clear Fields and Save Progress Buttons */}
+                  <div className="flex justify-center gap-4">
+                    <button
+                      type="button"
+                      onClick={handleClearFields}
+                      disabled={isLoading}
+                      className="bg-red-500 hover:bg-red-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    >
+                      Clear Fields
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSaveProgress}
+                      disabled={isLoading}
+                      className="bg-blue-500 hover:bg-blue-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    >
+                      {isLoading ? (
+                        <>
+                          <span className="loading loading-spinner loading-sm"></span>
+                          Saving...
+                        </>
+                      ) : (
+                        "Save Progress"
+                      )}
+                    </button>
+                  </div>
+                  
+                  {/* Navigation and Submit Buttons */}
+                  <div className="flex justify-between">
+                    <button
+                      type="button"
+                      onClick={prevStep}
+                      className="bg-gray-500 hover:bg-gray-600 text-white border-none rounded-lg px-6 py-3 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg"
+                    >
+                      Previous
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCompleteFormSubmit}
+                      disabled={isLoading}
+                      className={`${
+                        isLoading
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-[rgba(102,232,219,0.9)] hover:bg-[rgba(72,212,199,0.9)] hover:transform hover:-translate-y-0.5 hover:shadow-lg"
+                      } text-white border-none rounded-lg px-6 py-3 flex items-center justify-center gap-2 transition-all duration-200 font-semibold min-w-[180px]`}
+                    >
+                      {isLoading ? (
+                        <>
+                          <span className="loading loading-spinner loading-sm"></span>
+                          Submitting...
+                        </>
+                      ) : (
+                        "Submit Complete Intake Form"
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
