@@ -185,12 +185,19 @@ export async function loadPendingIntakeForms(): Promise<PatientFormForCompletion
 export function validateCompleteIntakeForm(formData: CompleteIntakeForm): { isValid: boolean; errors: { [key: string]: string } } {
   const errors: { [key: string]: string } = {};
 
-  // Required fields
-  if (!formData.appointment_id) errors.appointment_id = "Please select an appointment";
-  if (!formData.patient_id) errors.patient_id = "Please select a patient";
+  // Patient info validation
+  if (!formData.patient_info.first_name.trim()) errors["patient_info.first_name"] = "First name is required";
+  if (!formData.patient_info.last_name.trim()) errors["patient_info.last_name"] = "Last name is required";
+  if (!formData.patient_info.phone.trim()) errors["patient_info.phone"] = "Phone number is required";
+  if (!formData.patient_info.email.trim()) errors["patient_info.email"] = "Email is required";
 
   // Insurance validation
   if (!formData.insurance.provider.trim()) errors["insurance.provider"] = "Insurance provider is required";
+  
+  // If "Other" is selected, validate custom provider
+  if (formData.insurance.provider === "Other" && !formData.insurance.custom_provider?.trim()) {
+    errors["insurance.custom_provider"] = "Please specify your insurance provider or type 'none'";
+  }
 
   // Emergency contact validation
   if (formData.emergency_contacts.length === 0) {

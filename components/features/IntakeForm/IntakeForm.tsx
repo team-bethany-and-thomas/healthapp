@@ -130,9 +130,11 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
           user_id: user.$id,
         },
       }));
+      // Generate a numeric patient ID for the complete form data
+      const numericPatientId = Math.floor(Math.random() * 1000000);
       setCompleteFormData((prev) => ({
         ...prev,
-        patient_id: parseInt(user.$id) || 0,
+        patient_id: numericPatientId,
       }));
     }
   }, [user]);
@@ -527,9 +529,28 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
       return;
     }
 
+    console.log("🚀 Starting form submission...");
+    console.log("📋 Form data:", JSON.stringify(completeFormData, null, 2));
+
     const validation = validateCompleteIntakeForm(completeFormData);
+    console.log("✅ Validation result:", validation);
+    
     if (!validation.isValid) {
+      console.log("❌ Validation failed:", validation.errors);
       setErrors(validation.errors);
+      
+      // Scroll to the first error or show which step has errors
+      const errorKeys = Object.keys(validation.errors);
+      if (errorKeys.some(key => key.startsWith('patient_info'))) {
+        setCurrentStep(0);
+      } else if (errorKeys.some(key => key.startsWith('emergency_contact'))) {
+        setCurrentStep(1);
+      } else if (errorKeys.some(key => key.startsWith('insurance'))) {
+        setCurrentStep(2);
+      } else if (errorKeys.some(key => key.includes('consent'))) {
+        setCurrentStep(5);
+      }
+      
       return;
     }
 
@@ -540,19 +561,28 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
     try {
       let result;
 
+      console.log("🎯 Submission type:", isAppointmentSpecific ? "appointment-specific" : "general");
+      console.log("📅 Appointment ID:", appointmentId);
+
       // Use appointment-specific submission if we have an appointmentId
       if (isAppointmentSpecific && appointmentId) {
+        console.log("📤 Submitting for specific appointment...");
         result = await submitCompleteIntakeFormForAppointment(
           completeFormData,
           user.$id,
           appointmentId
         );
       } else {
+        console.log("📤 Submitting general form...");
         result = await submitCompleteIntakeForm(completeFormData, user.$id);
       }
 
+      console.log("📨 Submission result:", result);
+
       if (result.success) {
         setSuccessMessage(result.message);
+        console.log("✅ Form submitted successfully!");
+        
         // Reset form
         setCompleteFormData(createEmptyCompleteIntakeForm());
         setCurrentStep(0);
@@ -564,10 +594,11 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
           }, 3000);
         }
       } else {
+        console.log("❌ Submission failed:", result.message);
         setErrors({ general: result.message });
       }
     } catch (error) {
-      console.error("Error submitting complete intake form:", error);
+      console.error("💥 Error submitting complete intake form:", error);
       setErrors({
         general:
           error instanceof Error
