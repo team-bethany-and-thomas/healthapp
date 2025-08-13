@@ -49,6 +49,23 @@
   white-space: nowrap;
 }
 
+.tableHeaderCell:first-child {
+  width: 60px;
+  padding-left: 1.5rem;
+  text-align: center;
+}
+
+.tableHeaderCell:nth-child(2) {
+  width: 80px;
+  text-align: center;
+}
+
+.tableHeaderCell:last-child {
+  width: 120px;
+  text-align: center;
+  padding-right: 1.5rem;
+}
+
 .sortableHeader {
   cursor: pointer;
   transition: background-color 0.15s ease-in-out;
@@ -74,6 +91,22 @@
   color: #374151;
 }
 
+.tableCell:first-child {
+  width: 60px;
+  padding-left: 1.5rem;
+  text-align: center;
+}
+
+.tableCell:nth-child(2) {
+  width: 80px;
+  text-align: center;
+}
+
+.tableCell:last-child {
+  width: 120px;
+  padding-right: 1.5rem;
+}
+
 .tableCellTruncate {
   max-width: 200px;
   overflow: hidden;
@@ -91,9 +124,16 @@
   color: #6b7280;
 }
 
+.typeIcon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
 .actionButtons {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 0.5rem;
 }
 
