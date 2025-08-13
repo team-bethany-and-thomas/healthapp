@@ -56,6 +56,7 @@ const SearchProviders: React.FC = () => {
       first_name: doctor.first_name,
       last_name: doctor.last_name,
       practice_name: doctor.practice_name,
+      availability_day: doctor.availability_day, // Preserve availability_day field
     }));
   }, [filteredDoctors]);
 
