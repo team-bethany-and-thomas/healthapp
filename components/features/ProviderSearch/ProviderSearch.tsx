@@ -542,7 +542,7 @@ export function ProviderSearch() {
                   </div>
                   <div className={styles["provider-rating"]}>
                     <Star size={16} className={styles["star-icon"]} />
-                    <span>{provider.rating?.toFixed(1) || "4.5"}</span>
+               
                   </div>
                 </div>
 

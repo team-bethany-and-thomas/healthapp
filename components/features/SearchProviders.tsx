@@ -319,7 +319,7 @@ const SearchProviders: React.FC = () => {
                         />
                       ))}
                     </div>
-                    <span className="text-sm font-medium">{doctor.rating || 4.5}</span>
+                    
                   </div>
                 </div>
 

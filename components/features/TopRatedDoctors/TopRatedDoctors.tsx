@@ -16,7 +16,7 @@ export function TopRatedDoctors() {
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-primary mb-2">Top Rated</h2>
           <h2 className="text-3xl font-bold text-secondary mb-4">Doctors Near You</h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-full"></div>
+          <div className="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-2xl"></div>
         </div>
         <div className="flex justify-center items-center py-12">
           <div className="loading loading-spinner loading-lg"></div>
@@ -31,7 +31,7 @@ export function TopRatedDoctors() {
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-primary mb-2">Top Rated</h2>
           <h2 className="text-3xl font-bold text-secondary mb-4">Doctors Near You</h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-full"></div>
+          <div className="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-2xl"></div>
         </div>
         <div className="alert alert-error max-w-md mx-auto">
           <svg
@@ -61,7 +61,7 @@ export function TopRatedDoctors() {
         <h2 className="text-3xl font-bold text-secondary mb-4">
           Doctors Near You
         </h2>
-        <div className="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-full"></div>
+        <div className="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-2xl"></div>
       </div>
 
       {/* Doctors Grid */}
@@ -115,12 +115,11 @@ export function TopRatedDoctors() {
                             checked={i < Math.floor(doctor.rating || 4.5)}
                             readOnly
                             title={`Doctor rating star ${i + 1}`}
+                            disabled
                           />
                         ))}
                       </div>
-                      <span className="text-sm font-medium text-base-content/80">
-                        {(doctor.rating || 4.5).toFixed(1)}
-                      </span>
+                      
                     </div>
                     <p className="doctor-location text-xs text-base-content/60">
                       {doctor.city || 'Local'}, {doctor.state || 'TX'}
