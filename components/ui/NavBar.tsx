@@ -116,7 +116,7 @@ const NavBar = () => {
               className="menu menu-sm dropdown-content bg-white rounded-box z-[1] mt-3 w-52 p-2 shadow"
             >
               <li>
-                <a className="text-black">Contact</a>
+                  <Link href="/contact" className="text-black">Contact</Link>
               </li>
               <li>
                 <a 
@@ -127,7 +127,7 @@ const NavBar = () => {
                 </a>
               </li>
               <li>
-                <a className="text-black">About Us</a>
+                  <Link href="/about" className="text-black">About Us</Link>
               </li>
               <li>
                 <Link href={"/search"} className="text-black">
@@ -153,7 +153,7 @@ const NavBar = () => {
         <div className="navbar-center hidden lg:flex">
           <ul className="menu menu-horizontal px-1">
             <li>
-              <a className="text-black">Contact</a>
+                <Link href="/contact" className="text-black">Contact</Link>
             </li>
             <li>
               <a 
@@ -164,7 +164,7 @@ const NavBar = () => {
               </a>
             </li>
             <li>
-              <a className="text-black">About Us</a>
+                <Link href="/about" className="text-black">About Us</Link>
             </li>
             <li>
               <Link href={"/search"} className="text-black">
