@@ -1112,6 +1112,7 @@ export async function loadExistingIntakeFormData(
       patient_info?: PatientInfo;
       insurance?: InsuranceInfo;
       medical_conditions?: string;
+      emergency_contacts?: EmergencyContact[];
       consent?: {
         hipaa?: boolean;
         treatment?: boolean;
@@ -1162,7 +1163,7 @@ export async function loadExistingIntakeFormData(
       allergies: [], // Start fresh for each appointment
       medications: [], // Start fresh for each appointment
       medical_conditions: formDataFromThisForm.medical_conditions || "",
-      emergency_contacts: [{
+      emergency_contacts: formDataFromThisForm.emergency_contacts || [{
         first_name: "",
         last_name: "",
         relationship: "",
@@ -1170,7 +1171,7 @@ export async function loadExistingIntakeFormData(
         phone_secondary: "",
         email: "",
         priority_order: 1,
-      }], // Start fresh for each appointment
+      }],
       attached_files: attachedFiles,
       hipaa_consent: formDataFromThisForm.consent?.hipaa || false,
       treatment_consent: formDataFromThisForm.consent?.treatment || false,
@@ -1316,6 +1317,7 @@ export async function updateCompleteIntakeForm(
             patient_info: formData.patient_info,
             insurance: formData.insurance,
             medical_conditions: formData.medical_conditions,
+            emergency_contacts: formData.emergency_contacts,
             consent: {
               hipaa: formData.hipaa_consent,
               treatment: formData.treatment_consent,
