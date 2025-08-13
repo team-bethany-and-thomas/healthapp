@@ -68,6 +68,7 @@ type AppointmentWithIntakeStatus = {
   hasIntakeForm: boolean;
   intakeStatus: string;
   completionPercentage: number;
+  appointmentStatus?: string;
 };
 
 function FormsPage() {
@@ -109,6 +110,22 @@ function FormsPage() {
     return isNaN(d.getTime())
       ? String(val)
       : d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  };
+
+  // Helper function to check if appointment is in the past or should be treated as past
+  const isAppointmentPast = (appointment: AppointmentWithIntakeStatus): boolean => {
+    // Canceled/completed appointments should be treated as past appointments
+    if (appointment.appointmentStatus === "cancelled" || 
+        appointment.appointmentStatus === "canceled" || 
+        appointment.appointmentStatus === "completed") {
+      return true;
+    }
+    
+    const appointmentDateTime = new Date(
+      `${appointment.date} ${appointment.time}`
+    );
+    const now = new Date();
+    return appointmentDateTime.getTime() < now.getTime();
   };
 
   useEffect(() => {
@@ -234,17 +251,27 @@ function FormsPage() {
           ? `$${appointmentType.base_cost}`
           : "";
 
+        // Check if appointment is canceled
+        const isAppointmentCanceled = appointment.status?.toLowerCase() === "cancelled" || 
+                                     appointment.status?.toLowerCase() === "canceled";
+
         // Generate intake form number and status
         const intakeFormNumber = patientForm
           ? `IF-${appointment.appointment_id.toString().slice(-6)}`
           : "Not Started";
 
-        const intakeStatus = patientForm
-          ? patientForm.status === "submitted" ||
+        // Determine intake status based on appointment status
+        let intakeStatus: string;
+        if (isAppointmentCanceled) {
+          intakeStatus = "Canceled";
+        } else if (patientForm) {
+          intakeStatus = patientForm.status === "submitted" ||
             patientForm.status === "completed"
             ? "Completed"
-            : "In Progress"
-          : "Not Started";
+            : "In Progress";
+        } else {
+          intakeStatus = "Not Started";
+        }
 
         const completionPercentage = patientForm?.completion_percentage || 0;
 
@@ -262,10 +289,18 @@ function FormsPage() {
           hasIntakeForm: !!patientForm,
           intakeStatus,
           completionPercentage,
+          appointmentStatus: appointment.status, // Add appointment status to the row data
         };
       });
 
-      setAppointments(rows);
+      // Sort appointments by date (earliest first)
+      const sortedRows = rows.sort((a, b) => {
+        const dateA = new Date(`${a.date} ${a.time}`);
+        const dateB = new Date(`${b.date} ${b.time}`);
+        return dateA.getTime() - dateB.getTime();
+      });
+
+      setAppointments(sortedRows);
     } catch (err) {
       console.error("fetchAppointmentsWithIntakeStatus error:", err);
       setError(
@@ -326,6 +361,24 @@ function FormsPage() {
     );
   }
 
+  const getStatusBadge = (status: string) => {
+    const baseClasses = "px-3 py-1 text-xs font-medium rounded-full";
+    
+    switch (status.toLowerCase()) {
+      case 'completed':
+        return <span className={`${baseClasses} bg-green-100 text-green-800`}>Completed</span>;
+      case 'in progress':
+        return <span className={`${baseClasses} bg-yellow-100 text-yellow-800`}>In Progress</span>;
+      case 'not started':
+        return <span className={`${baseClasses} bg-red-100 text-red-800`}>Not Started</span>;
+      case 'canceled':
+      case 'cancelled':
+        return <span className={`${baseClasses} bg-gray-100 text-gray-600`}>Canceled</span>;
+      default:
+        return <span className={`${baseClasses} bg-gray-100 text-gray-800`}>{status}</span>;
+    }
+  };
+
   const renderMobileCards = () => {
     if (loading) {
       return (
@@ -358,206 +411,281 @@ function FormsPage() {
       );
     }
 
-    return (
-      <div className={styles.mobileCards}>
-        {appointments.map((appt) => (
-          <div key={appt.appointmentId} className={styles.appointmentCard}>
-            <div className={styles.cardHeader}>
+    // Separate appointments into current and past
+    const currentAppointments = appointments.filter(appt => !isAppointmentPast(appt));
+    const pastAppointments = appointments.filter(appt => isAppointmentPast(appt));
+
+    const renderAppointmentCard = (appt: AppointmentWithIntakeStatus, isPast: boolean = false) => (
+      <div key={appt.appointmentId} className={`${styles.appointmentCard} ${isPast ? 'opacity-75 bg-gray-50' : ''}`}>
+        {/* Card Header with Date/Time and Status */}
+        <div className={styles.cardHeader}>
+          <div className="flex flex-col">
+            <div className={`text-lg font-bold mb-1 ${isPast ? 'text-gray-700' : 'text-gray-900'}`}>
+              {appt.date} at {appt.time}
+            </div>
+            <div className="flex items-center gap-2">
               <div className={styles.intakeFormBadge}>
                 {appt.intakeFormNumber}
               </div>
-              <div className="text-sm font-semibold text-gray-600">
-                {appt.date} at {appt.time}
-              </div>
-            </div>
-
-            <div className={styles.cardContent}>
-              <div className={styles.cardRow}>
-                <span className={styles.cardLabel}>Doctor:</span>
-                <span className={styles.cardValue}>{appt.doctor}</span>
-              </div>
-
-              <div className={styles.cardRow}>
-                <span className={styles.cardLabel}>Facility:</span>
-                <span className={styles.cardValue}>{appt.facility}</span>
-              </div>
-
-              <div className={styles.cardRow}>
-                <span className={styles.cardLabel}>Type:</span>
-                <span className={styles.cardValue}>{appt.appointmentType}</span>
-              </div>
-
-              <div className={styles.cardRow}>
-                <span className={styles.cardLabel}>Intake Status:</span>
-                <span
-                  className={`${styles.cardValue} ${
-                    appt.intakeStatus === "Completed"
-                      ? "text-green-600 font-semibold"
-                      : appt.intakeStatus === "In Progress"
-                      ? "text-yellow-600 font-semibold"
-                      : "text-red-600 font-semibold"
-                  }`}
-                >
-                  {appt.intakeStatus}
-                  {appt.intakeStatus === "In Progress" && (
-                    <span className="text-sm text-gray-500 ml-1">
-                      ({appt.completionPercentage}%)
-                    </span>
-                  )}
-                </span>
-              </div>
-
-              {appt.reason && (
-                <div className={styles.cardRow}>
-                  <span className={styles.cardLabel}>Reason:</span>
-                  <span className={styles.cardValue}>{appt.reason}</span>
-                </div>
-              )}
-            </div>
-
-            <div className={styles.cardActions}>
-              <button
-                onClick={() => handleIntakeForm(appt.appointmentId)}
-                className={`${styles.tableButton} ${
-                  appt.intakeStatus === "Completed"
-                    ? styles.tableButtonOutline
-                    : styles.tableButtonPrimary
-                } w-full`}
-              >
-                {appt.intakeStatus === "Completed"
-                  ? "View Intake Form"
-                  : appt.intakeStatus === "In Progress"
-                  ? "Continue Intake Form"
-                  : "Start Intake Form"}
-              </button>
+              {getStatusBadge(appt.intakeStatus)}
             </div>
           </div>
-        ))}
+        </div>
+        
+        {/* Doctor and Facility Info */}
+        <div className="mb-4">
+          <div className={`text-lg font-semibold mb-1 ${isPast ? 'text-gray-700' : 'text-gray-800'}`}>
+            {appt.doctor}
+          </div>
+          <div className={`text-sm ${isPast ? 'text-gray-500' : 'text-gray-600'}`}>
+            {appt.facility}
+          </div>
+        </div>
+        
+        {/* Appointment Details Grid */}
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className={`p-3 rounded-lg ${isPast ? 'bg-white' : 'bg-gray-50'}`}>
+            <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+              Appointment Type
+            </div>
+            <div className={`text-sm font-medium ${isPast ? 'text-gray-700' : 'text-gray-900'}`}>
+              {appt.appointmentType}
+            </div>
+          </div>
+          
+          <div className={`p-3 rounded-lg col-span-2 ${isPast ? 'bg-white' : 'bg-gray-50'}`}>
+            <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+              Progress
+            </div>
+            <div className="flex items-center gap-2">
+              {appt.intakeStatus === "In Progress" ? (
+                <>
+                  <progress
+                    className="progress progress-primary flex-1"
+                    value={appt.completionPercentage}
+                    max="100"
+                  ></progress>
+                  <span className={`text-sm font-medium ${isPast ? 'text-gray-700' : 'text-gray-900'}`}>
+                    {appt.completionPercentage}%
+                  </span>
+                </>
+              ) : appt.intakeStatus === "Completed" ? (
+                <span className="text-green-600 font-semibold">100% Complete</span>
+              ) : appt.intakeStatus === "Canceled" ? (
+                <span className="text-gray-500">Appointment Canceled</span>
+              ) : (
+                <span className="text-gray-500">Not Started</span>
+              )}
+            </div>
+          </div>
+        </div>
+        
+        {/* Action Button */}
+        <div className={styles.cardActions}>
+          {appt.intakeStatus === "Canceled" ? (
+            <button
+              disabled
+              className={`${styles.tableButton} bg-gray-300 text-gray-500 cursor-not-allowed w-full`}
+            >
+              Appointment Canceled
+            </button>
+          ) : (
+            <button
+              onClick={() => handleIntakeForm(appt.appointmentId)}
+              className={`${styles.tableButton} ${
+                appt.intakeStatus === "Completed" || isPast
+                  ? styles.tableButtonOutline
+                  : styles.tableButtonPrimary
+              } w-full`}
+            >
+              {appt.intakeStatus === "Completed" || isPast
+                ? "View Intake Form"
+                : appt.intakeStatus === "In Progress"
+                ? "Continue Intake Form"
+                : "Start Intake Form"}
+            </button>
+          )}
+        </div>
+      </div>
+    );
+
+    return (
+      <div className={styles.mobileCards}>
+        {/* Current/Future Intake Forms Section */}
+        {currentAppointments.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4 px-4">
+              Current Intake Forms
+            </h2>
+            {currentAppointments.map((appt) => renderAppointmentCard(appt, false))}
+          </div>
+        )}
+
+        {/* Past Intake Forms Section */}
+        {pastAppointments.length > 0 && (
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4 px-4">
+              Past Intake Forms
+            </h2>
+            {pastAppointments.map((appt) => renderAppointmentCard(appt, true))}
+          </div>
+        )}
       </div>
     );
   };
 
-  const renderDesktopTable = () => (
-    <div
-      className={`${styles.tableContainer} rounded-box border border-base-content/5 bg-base-100 rounded-xl`}
-    >
-      <table className="table table-lg w-full">
-        <thead>
-          <tr>
-            <th>Intake Form #</th>
-            <td>Date</td>
-            <td>Time</td>
-            <td>Doctor</td>
-            <td>Facility</td>
-            <td>Appointment Type</td>
-            <td>Status</td>
-            <td>Progress</td>
-            <td>Actions</td>
-          </tr>
-        </thead>
-        <tbody>
-          {loading ? (
-            <tr>
-              <td colSpan={9} className="text-center p-4">
-                <span className="loading loading-spinner loading-md"></span>
-                <span className="ml-2">Loading intake forms...</span>
-              </td>
-            </tr>
-          ) : appointments.length === 0 ? (
-            <tr>
-              <td colSpan={9} className="text-center p-4">
-                <div>
-                  <h3 className="text-lg font-semibold mb-4">
-                    No Appointments Found
-                  </h3>
-                  <p className="text-gray-600 mb-6">
-                    You need to schedule an appointment before you can complete
-                    an intake form.
-                  </p>
-                  <button
-                    onClick={handleBookAppointment}
-                    className={styles.viewAllButton}
-                  >
-                    Schedule Your First Appointment
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ) : (
-            appointments.map((appt) => (
-              <tr key={appt.appointmentId} className="hover:bg-base-50">
-                <th>{appt.intakeFormNumber}</th>
-                <td>{appt.date}</td>
-                <td>{appt.time}</td>
-                <td title={appt.doctor}>{appt.doctor}</td>
-                <td title={appt.facility}>{appt.facility}</td>
-                <td title={appt.appointmentType}>{appt.appointmentType}</td>
-                <td>
-                  <span
-                    className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                      appt.intakeStatus === "Completed"
-                        ? "bg-green-100 text-green-800"
-                        : appt.intakeStatus === "In Progress"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {appt.intakeStatus}
-                  </span>
-                </td>
-                <td>
-                  {appt.intakeStatus === "In Progress" ? (
-                    <div className="flex items-center gap-2">
-                      <progress
-                        className="progress progress-primary w-16"
-                        value={appt.completionPercentage}
-                        max="100"
-                      ></progress>
-                      <span className="text-sm">
-                        {appt.completionPercentage}%
-                      </span>
-                    </div>
-                  ) : appt.intakeStatus === "Completed" ? (
-                    <span className="text-green-600 font-semibold">100%</span>
-                  ) : (
-                    <span className="text-gray-400">0%</span>
-                  )}
-                </td>
-                <td>
-                  <button
-                    onClick={() => handleIntakeForm(appt.appointmentId)}
-                    className={`${styles.tableButton} ${
-                      appt.intakeStatus === "Completed"
-                        ? styles.tableButtonOutline
-                        : styles.tableButtonPrimary
-                    }`}
-                    style={{
-                      width: "90px",
-                      minWidth: "90px",
-                      maxWidth: "90px",
-                    }}
-                    title={
-                      appt.intakeStatus === "Completed"
-                        ? "View Intake Form"
-                        : appt.intakeStatus === "In Progress"
-                        ? "Continue Intake Form"
-                        : "Start Intake Form"
-                    }
-                  >
-                    {appt.intakeStatus === "Completed"
-                      ? "View Form"
-                      : appt.intakeStatus === "In Progress"
-                      ? "Continue"
-                      : "Start"}
-                  </button>
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-    </div>
-  );
+  const renderDesktopTable = () => {
+    if (loading) {
+      return (
+        <div className="text-center p-8">
+          <span className="loading loading-spinner loading-md"></span>
+          <span className="ml-2">Loading intake forms...</span>
+        </div>
+      );
+    }
+
+    if (appointments.length === 0) {
+      return (
+        <div className="text-center p-8">
+          <h3 className="text-lg font-semibold mb-4">
+            No Appointments Found
+          </h3>
+          <p className="text-gray-600 mb-6">
+            You need to schedule an appointment before you can complete an
+            intake form.
+          </p>
+          <button
+            onClick={handleBookAppointment}
+            className={styles.viewAllButton}
+          >
+            Schedule Your First Appointment
+          </button>
+        </div>
+      );
+    }
+
+    // Separate appointments into current and past
+    const currentAppointments = appointments.filter(appt => !isAppointmentPast(appt));
+    const pastAppointments = appointments.filter(appt => isAppointmentPast(appt));
+
+    const renderAppointmentDesktopCard = (appt: AppointmentWithIntakeStatus, isPast: boolean = false) => (
+      <div key={appt.appointmentId} className={`border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 ${isPast ? 'bg-gray-50 opacity-75' : 'bg-white'}`}>
+        {/* Card Header */}
+        <div className={`px-6 py-4 border-b rounded-t-xl ${isPast ? 'border-gray-200 bg-gray-100' : 'border-gray-100 bg-gray-50'}`}>
+          <div className="flex items-center gap-4">
+            <div className={`text-lg font-bold ${isPast ? 'text-gray-700' : 'text-gray-900'}`}>
+              {appt.date} at {appt.time}
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                {appt.intakeFormNumber}
+              </span>
+              {getStatusBadge(appt.intakeStatus)}
+            </div>
+          </div>
+        </div>
+
+        {/* Card Content */}
+        <div className="px-6 py-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Doctor and Facility */}
+            <div className="lg:col-span-1">
+              <div className={`text-lg font-semibold mb-1 ${isPast ? 'text-gray-700' : 'text-gray-900'}`}>
+                {appt.doctor}
+              </div>
+              <div className={`text-sm mb-3 ${isPast ? 'text-gray-500' : 'text-gray-600'}`}>
+                {appt.facility}
+              </div>
+              <div className="text-sm">
+                <span className={`font-medium ${isPast ? 'text-gray-600' : 'text-gray-700'}`}>Appointment Type: </span>
+                <span className={isPast ? 'text-gray-500' : 'text-gray-600'}>{appt.appointmentType}</span>
+              </div>
+            </div>
+
+            {/* Progress */}
+            <div className="lg:col-span-1">
+              <div className={`text-sm font-medium mb-1 ${isPast ? 'text-gray-600' : 'text-gray-700'}`}>Progress</div>
+              <div className="flex items-center gap-2">
+                {appt.intakeStatus === "In Progress" ? (
+                  <>
+                    <progress
+                      className="progress progress-primary flex-1"
+                      value={appt.completionPercentage}
+                      max="100"
+                    ></progress>
+                    <span className={`text-sm font-medium ${isPast ? 'text-gray-700' : 'text-gray-900'}`}>
+                      {appt.completionPercentage}%
+                    </span>
+                  </>
+                ) : appt.intakeStatus === "Completed" ? (
+                  <span className="text-green-600 font-semibold">100% Complete</span>
+                ) : appt.intakeStatus === "Canceled" ? (
+                  <span className="text-gray-500">Appointment Canceled</span>
+                ) : (
+                  <span className="text-gray-500">Not Started</span>
+                )}
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="lg:col-span-1 flex flex-col gap-3">
+              {appt.intakeStatus === "Canceled" ? (
+                <button
+                  disabled
+                  className={`${styles.tableButton} bg-gray-300 text-gray-500 cursor-not-allowed w-full justify-center`}
+                >
+                  Appointment Canceled
+                </button>
+              ) : (
+                <button
+                  onClick={() => handleIntakeForm(appt.appointmentId)}
+                  className={`${styles.tableButton} ${
+                    appt.intakeStatus === "Completed" || isPast
+                      ? styles.tableButtonOutline
+                      : styles.tableButtonPrimary
+                  } w-full justify-center`}
+                >
+                  {appt.intakeStatus === "Completed" || isPast
+                    ? "View Intake Form"
+                    : appt.intakeStatus === "In Progress"
+                    ? "Continue Intake Form"
+                    : "Start Intake Form"}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+
+    return (
+      <div className="space-y-8">
+        {/* Current/Future Intake Forms Section */}
+        {currentAppointments.length > 0 && (
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+              Current Intake Forms
+            </h2>
+            <div className="space-y-4">
+              {currentAppointments.map((appt) => renderAppointmentDesktopCard(appt, false))}
+            </div>
+          </div>
+        )}
+
+        {/* Past Intake Forms Section */}
+        {pastAppointments.length > 0 && (
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+              Past Intake Forms
+            </h2>
+            <div className="space-y-4">
+              {pastAppointments.map((appt) => renderAppointmentDesktopCard(appt, true))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className={formsStyles.formsContainer}>

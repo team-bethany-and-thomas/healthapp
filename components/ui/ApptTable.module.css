@@ -426,6 +426,17 @@
   color: white;
 }
 
+.tableButtonOutlineRed {
+  background-color: transparent;
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+.tableButtonOutlineRed:hover {
+  background-color: #ef4444;
+  color: white;
+}
+
 /* Continue large desktop styles */
 @media (min-width: 1200px) {
   /* Set specific column widths */

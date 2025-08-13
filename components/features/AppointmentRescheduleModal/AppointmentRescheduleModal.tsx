@@ -335,7 +335,7 @@ export const AppointmentRescheduleModal: React.FC<AppointmentRescheduleModalProp
       className="modal modal-bottom sm:modal-middle"
       onClose={handleClose}
     >
-      <div className="modal-box bg-primary">
+      <div className="modal-box bg-primary rounded-lg">
         <h3 className="font-bold text-lg text-base-content text-center">
           Reschedule Appointment
         </h3>
@@ -370,7 +370,7 @@ export const AppointmentRescheduleModal: React.FC<AppointmentRescheduleModalProp
         <div className="flex justify-center mt-4">
           <select
             value={appointmentType}
-            className="select select-bordered w-3/4 mt-2 bg-base-200 text-base-content"
+            className="select select-bordered w-3/4 mt-2 bg-base-200 text-base-content rounded-lg"
             onChange={handleAppointmentType}
             disabled={appointmentIsSaving}
           >
@@ -408,7 +408,7 @@ export const AppointmentRescheduleModal: React.FC<AppointmentRescheduleModalProp
         <div className="flex justify-center mt-2">
           <select
             value={appointmentTime}
-            className="select bg-base-200 text-base-content select-bordered w-3/4"
+            className="select bg-base-200 text-base-content select-bordered w-3/4 rounded-lg"
             onChange={handleTimeSelection}
             disabled={appointmentIsSaving || loadingTimeSlots}
           >
@@ -428,12 +428,12 @@ export const AppointmentRescheduleModal: React.FC<AppointmentRescheduleModalProp
           </select>
         </div>
 
-        <div className="bg-info/10 border border-info/20 p-3 rounded-lg mb-4 mx-4 mt-4">
-          <div className="flex items-center gap-2 mb-2">
+        <div className="bg-primary-content border border-info/20 p-3 rounded-lg mb-4 mx-4 mt-4">
+          <div className="flex items-center justify-center gap-2 mb-2">
             <span className="text-info">ℹ️</span>
             <span className="font-semibold text-sm">About Rescheduling</span>
           </div>
-          <p className="text-xs text-base-content/80">
+          <p className="text-xs text-base-content/80 text-center">
             Your existing intake form will remain connected to this appointment after rescheduling. 
             You won&apos;t need to fill it out again.
           </p>
@@ -441,12 +441,12 @@ export const AppointmentRescheduleModal: React.FC<AppointmentRescheduleModalProp
 
         <div className="modal-action flex gap-4 justify-center">
           <button
-            className="btn btn-primary btn-sm"
+            className="w-full bg-gradient-to-r from-teal-400 to-teal-500 hover:from-teal-500 hover:to-teal-600 text-white border-none rounded-lg px-4 py-3 font-semibold cursor-pointer transition-all duration-200 ease-in-out hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             disabled={appointmentIsSaving || !date || !appointmentTime}
             onClick={handleSubmit}
           >
             {appointmentIsSaving && (
-              <span className="loading loading-spinner loading-xs"></span>
+              <span className="loading loading-spinner loading-xs mr-2"></span>
             )}
             {appointmentIsSaving
               ? "Rescheduling..."
@@ -454,7 +454,7 @@ export const AppointmentRescheduleModal: React.FC<AppointmentRescheduleModalProp
           </button>
           <button
             type="button"
-            className="btn btn-ghost btn-sm"
+            className="bg-gray-200 hover:bg-gray-300 text-gray-700 border-none rounded-lg px-4 py-3 font-semibold cursor-pointer transition-all duration-200 ease-in-out hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             onClick={handleClose}
             disabled={appointmentIsSaving}
           >
