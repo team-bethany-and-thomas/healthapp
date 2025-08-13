@@ -342,6 +342,9 @@ export function ProviderSearch() {
         bio: provider.bio,
         profile_picture_id: provider.profile_picture_id,
         provider_id: provider.provider_id,
+        first_name: provider.first_name,
+        last_name: provider.last_name,
+        practice_name: provider.practice_name,
       })),
     [filteredProviders]
   );

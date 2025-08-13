@@ -1,0 +1,549 @@
+/* Appointments Page Specific Styles */
+
+.apptContainer {
+  width: 100%;
+  padding: 0.5rem;
+}
+
+.headerSection {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: linear-gradient(to right, #f0fdfa, #ccfbf1);
+  border-radius: 0.5rem;
+}
+
+/* Mobile-first approach */
+.headerContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.headerText {
+  flex: 1;
+}
+
+.headerTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.25;
+  margin: 0 0 0.5rem 0;
+}
+
+.headerDescription {
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.headerButton {
+  width: 100%;
+  background-color: #0d9488;
+  color: white;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.headerButton:hover {
+  background-color: #0f766e;
+}
+
+/* Error alert styles */
+.errorAlert {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.viewAllButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 200px;
+  height: 48px;
+  padding: 0.75rem 1rem;
+  background: #0d9488;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  text-decoration: none;
+  text-align: center;
+  white-space: nowrap;
+  gap: 0.5rem;
+}
+
+.viewAllButton:hover {
+  background: #0f766e;
+}
+
+.viewAllButton svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* Mobile-first responsive design */
+.tableContainer {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.tableContainer::-webkit-scrollbar {
+  height: 8px;
+}
+
+.tableContainer::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.tableContainer::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.tableContainer::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.desktopTable {
+  display: none;
+}
+
+.mobileCards {
+  display: block;
+  gap: 1rem;
+}
+
+.appointmentCard {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.intakeFormBadge {
+  background: #f3f4f6;
+  color: #374151;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.cardContent {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.cardRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid #f3f4f6;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.cardRow:last-child {
+  border-bottom: none;
+}
+
+.cardLabel {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.875rem;
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.cardValue {
+  color: #6b7280;
+  font-size: 0.875rem;
+  text-align: right;
+  flex: 1;
+  word-break: break-word;
+}
+
+.cardActions {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+.loadingContainer {
+  text-align: center;
+  padding: 2rem;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 2rem;
+}
+
+/* Tablet styles */
+@media (min-width: 640px) {
+  .apptContainer {
+    padding: 0;
+  }
+  
+  .headerSection {
+    padding: 1.5rem;
+  }
+  
+  .headerContent {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+  
+  .headerTitle {
+    font-size: 1.5rem;
+  }
+  
+  .headerDescription {
+    font-size: 1rem;
+  }
+  
+  .headerButton {
+    width: auto;
+    min-width: 180px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .appointmentCard {
+    padding: 1.25rem;
+  }
+
+  .cardHeader {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .cardRow {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .cardValue {
+    text-align: right;
+  }
+}
+
+/* Medium tablet styles - use cards instead of table */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .viewAllButton {
+    width: 200px;
+  }
+
+  .desktopTable {
+    display: none;
+  }
+
+  .mobileCards {
+    display: block;
+  }
+
+  /* Enhanced card layout for tablets */
+  .appointmentCard {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .cardHeader {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f3f4f6;
+  }
+
+  .cardContent {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .cardRow {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+    background: #f9fafb;
+    border-radius: 8px;
+    border-bottom: none;
+    text-align: center;
+    align-items: center;
+  }
+
+  .cardLabel {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+    color: #6b7280;
+    text-align: center;
+  }
+
+  .cardValue {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    text-align: center;
+  }
+
+  .cardActions {
+    grid-column: 1 / -1;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 2px solid #f3f4f6;
+  }
+}
+
+/* Large desktop styles - full table */
+@media (min-width: 1200px) {
+  .viewAllButton {
+    width: 200px;
+  }
+
+  .desktopTable {
+    display: block;
+  }
+
+  .mobileCards {
+    display: none;
+  }
+
+  .tableContainer {
+    overflow-x: visible;
+  }
+
+  .tableContainer table {
+    font-size: 0.95rem;
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  .tableContainer th,
+  .tableContainer td {
+    padding: 0.75rem 0.75rem;
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  .tableContainer th:first-child,
+  .tableContainer td:first-child {
+    padding-left: 1.5rem;
+  }
+
+  .tableContainer th:last-child,
+  .tableContainer td:last-child {
+    padding-right: 1.5rem;
+  }
+
+  /* Custom button styling for table */
+  .tableContainer .btn {
+    padding: 0.75rem 1rem !important;
+    min-height: auto !important;
+    height: auto !important;
+  }
+}
+
+.tableButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.tableButtonPrimary {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.tableButtonPrimary:hover {
+  background-color: #2563eb;
+}
+
+.tableButtonOutline {
+  background-color: transparent;
+  color: #0ea5e9;
+  border-color: #0ea5e9;
+}
+
+.tableButtonOutline:hover {
+  background-color: #0ea5e9;
+  color: white;
+}
+
+/* Continue large desktop styles */
+@media (min-width: 1200px) {
+  /* Set specific column widths */
+  .tableContainer th:nth-child(1),
+  .tableContainer td:nth-child(1) {
+    width: 12%;
+  }
+
+  .tableContainer th:nth-child(2),
+  .tableContainer td:nth-child(2) {
+    width: 10%;
+  }
+
+  .tableContainer th:nth-child(3),
+  .tableContainer td:nth-child(3) {
+    width: 8%;
+  }
+
+  .tableContainer th:nth-child(4),
+  .tableContainer td:nth-child(4) {
+    width: 13%;
+  }
+
+  .tableContainer th:nth-child(5),
+  .tableContainer td:nth-child(5) {
+    width: 13%;
+  }
+
+  .tableContainer th:nth-child(6),
+  .tableContainer td:nth-child(6) {
+    width: 15%;
+  }
+
+  .tableContainer th:nth-child(7),
+  .tableContainer td:nth-child(7) {
+    width: 15%;
+  }
+
+  .tableContainer th:nth-child(8),
+  .tableContainer td:nth-child(8) {
+    width: 9%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .tableContainer th:nth-child(9),
+  .tableContainer td:nth-child(9) {
+    width: 11%;
+    padding-left: 0.5rem;
+  }
+
+  /* Remove truncation for large screens */
+  .tableContainer .max-w-\[150px\],
+  .tableContainer .max-w-\[120px\] {
+    max-width: none;
+  }
+
+  .tableContainer .truncate {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+}
+
+/* Extra large desktop styles */
+@media (min-width: 1400px) {
+  .tableContainer table {
+    font-size: 1rem;
+  }
+
+  .tableContainer th,
+  .tableContainer td {
+    padding: 1rem 0.75rem;
+  }
+}
+
+/* Desktop styles */
+@media (min-width: 1024px) {
+  .headerTitle {
+    font-size: 1.875rem;
+  }
+}
+
+/* Extra small mobile adjustments */
+@media (max-width: 480px) {
+  .apptContainer {
+    padding: 0.25rem;
+  }
+  
+  .headerSection {
+    padding: 0.75rem;
+  }
+  
+  .headerTitle {
+    font-size: 1.125rem;
+  }
+  
+  .headerDescription {
+    font-size: 0.8125rem;
+  }
+  
+  .headerButton {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.8125rem;
+  }
+
+  .cardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cardRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cardValue {
+    text-align: left;
+    margin-top: 0.25rem;
+  }
+}
