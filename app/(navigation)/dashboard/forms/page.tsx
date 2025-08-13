@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import React, { useState, useEffect, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { IntakeForm } from "@/components/features/IntakeForm/IntakeForm";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { databases } from "@/app/lib/appwrite";
@@ -9,14 +9,12 @@ import { Query, Models } from "appwrite";
 import styles from "@/components/ui/ApptTable.module.css";
 import formsStyles from "./FormsPage.module.css";
 
-// Environment variables
-const DB_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!;
-const APPTS_COL = process.env.NEXT_PUBLIC_APPWRITE_APPOINTMENTS_COLLECTION_ID!;
-const PROVIDERS_COL = process.env.NEXT_PUBLIC_APPWRITE_PROVIDERS_COLLECTION_ID!;
-const PATIENT_FORMS_COL =
-  process.env.NEXT_PUBLIC_APPWRITE_PATIENT_FORMS_COLLECTION_ID!;
-const APPT_TYPES_COL =
-  process.env.NEXT_PUBLIC_APPWRITE_APPOINTMENT_TYPES_COLLECTION_ID!;
+// Environment variables with fallbacks
+const DB_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || '';
+const APPTS_COL = process.env.NEXT_PUBLIC_APPWRITE_APPOINTMENTS_COLLECTION_ID || '';
+const PROVIDERS_COL = process.env.NEXT_PUBLIC_APPWRITE_PROVIDERS_COLLECTION_ID || '';
+const PATIENT_FORMS_COL = process.env.NEXT_PUBLIC_APPWRITE_PATIENT_FORMS_COLLECTION_ID || '';
+const APPT_TYPES_COL = process.env.NEXT_PUBLIC_APPWRITE_APPOINTMENT_TYPES_COLLECTION_ID || '';
 
 // Types
 interface AppointmentDocument extends Models.Document {
@@ -70,9 +68,10 @@ type AppointmentWithIntakeStatus = {
   completionPercentage: number;
 };
 
-function FormsPage() {
+function FormsPageContent() {
   const searchParams = useSearchParams();
-  const appointmentId = searchParams.get("appointment_id");
+  const router = useRouter();
+  const appointmentId = searchParams?.get("appointment_id") || null;
   const { user } = useAuth();
 
   const [appointments, setAppointments] = useState<
@@ -133,6 +132,12 @@ function FormsPage() {
       if (!user) {
         setAppointments([]);
         setError("Please log in to view your intake forms.");
+        return;
+      }
+
+      // Check if required environment variables are available
+      if (!DB_ID || !APPTS_COL || !PROVIDERS_COL || !PATIENT_FORMS_COL || !APPT_TYPES_COL) {
+        setError("Application configuration error. Please contact support.");
         return;
       }
 
@@ -291,7 +296,7 @@ function FormsPage() {
   };
 
   const handleBookAppointment = () => {
-    window.location.href = "/search";
+    router.push("/search");
   };
 
   // If showing intake form, render it
@@ -591,6 +596,27 @@ function FormsPage() {
       {/* Desktop Table View */}
       <div className={styles.desktopTable}>{renderDesktopTable()}</div>
     </div>
+  );
+}
+
+// Loading component for Suspense fallback
+function LoadingFallback() {
+  return (
+    <div className="flex items-center justify-center py-12">
+      <div className="flex items-center gap-2">
+        <span className="loading loading-spinner loading-md"></span>
+        <span>Loading intake forms...</span>
+      </div>
+    </div>
+  );
+}
+
+// Main wrapper component with Suspense
+function FormsPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <FormsPageContent />
+    </Suspense>
   );
 }
 
