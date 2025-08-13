@@ -477,9 +477,6 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
                   {formatTime(appointmentTime)}
                 </span>
               </p>
-              <p className="text-sm text-base-content/70">
-                Appointment ID: {bookedAppointmentData.appointment.appointment_id}
-              </p>
             </div>
 
             <div className="bg-info/10 border border-info/20 p-4 rounded-lg mb-6">
@@ -489,20 +486,20 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
                 Please complete it before your visit to help us prepare for your care.
               </p>
               <p className="text-xs text-base-content/70">
-                Intake Form ID: {bookedAppointmentData.intake_form.$id}
+                Intake Form #: IF-{bookedAppointmentData.appointment.appointment_id.toString().slice(-6)}
               </p>
             </div>
 
             <div className="flex gap-4 justify-center">
               <Link
-                href={bookedAppointmentData.intake_form_url || `/appointments/${bookedAppointmentData.appointment.$id}/intake`}
+                href="/dashboard/forms"
                 className="btn btn-primary flex-1"
                 onClick={handleCloseSuccess}
               >
                 Complete Intake Form
               </Link>
               <Link
-                href="/dashboard"
+                href="/dashboard/appointments"
                 className="btn btn-outline flex-1"
                 onClick={handleCloseSuccess}
               >

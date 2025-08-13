@@ -299,7 +299,10 @@ function FormsPage() {
     return (
       <div className="h-full">
         <div className="mb-4">
-          <button onClick={handleBackToList} className="btn btn-outline btn-sm">
+          <button 
+            onClick={handleBackToList} 
+            className="bg-gray-500 hover:bg-gray-600 text-white border-none rounded-lg px-6 py-3 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg"
+          >
             ← Back to Intake Forms List
           </button>
         </div>

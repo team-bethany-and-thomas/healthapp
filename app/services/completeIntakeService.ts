@@ -886,194 +886,80 @@ export async function loadExistingIntakeFormData(
       };
     }
 
-    // Load patient information
-    let patientInfo: PatientInfo = {
-      first_name: "",
-      last_name: "",
-      phone: "",
-      email: "",
-      gender: "",
-      address: "",
-      city: "",
-      state: "",
-      zipcode: "",
-      date_of_birth: "",
-    };
+    // For new intake forms (not_started status), return empty form data
+    // Each appointment should have its own fresh intake form
+    if (existingForm.status === "not_started" || existingForm.completion_percentage === 0) {
+      const emptyFormData: CompleteIntakeForm = {
+        patient_form_id: existingForm.$id,
+        appointment_id: appointment.appointment_id,
+        patient_id: appointment.patient_id,
+        patient_info: {
+          first_name: "",
+          last_name: "",
+          phone: "",
+          email: "",
+          gender: "",
+          address: "",
+          city: "",
+          state: "",
+          zipcode: "",
+          date_of_birth: "",
+        },
+        insurance: {
+          provider: "",
+          policy_number: "",
+          group_number: "",
+          subscriber_name: "",
+          relationship_to_subscriber: "self",
+        },
+        allergies: [],
+        medications: [],
+        medical_conditions: "",
+        emergency_contacts: [{
+          first_name: "",
+          last_name: "",
+          relationship: "",
+          phone_primary: "",
+          phone_secondary: "",
+          email: "",
+          priority_order: 1,
+        }],
+        attached_files: [],
+        hipaa_consent: false,
+        treatment_consent: false,
+        financial_consent: false,
+      };
 
-    // Load medical conditions from patient record
-    let medicalConditionsFromPatient = "";
-
-    try {
-      const patientResponse = await databases.listDocuments(
-        DATABASE_ID,
-        PATIENTS_COLLECTION_ID,
-        [Query.equal("patient_id", appointment.patient_id)]
-      );
-
-      if (patientResponse.documents.length > 0) {
-        const patient = patientResponse.documents[0];
-        patientInfo = {
-          first_name: patient.first_name || "",
-          last_name: patient.last_name || "",
-          phone: patient.phone || "",
-          email: patient.email || "",
-          gender: patient.gender || "",
-          address: patient.address || "",
-          city: patient.city || "",
-          state: patient.state || "",
-          zipcode: patient.zipcode || "",
-          date_of_birth: patient.date_of_birth || "",
-        };
-        
-        // Load medical conditions from patient record
-        medicalConditionsFromPatient = patient.medical_conditions || "";
-      }
-    } catch (error) {
-      console.error("Error loading patient info:", error);
+      return {
+        success: true,
+        data: emptyFormData,
+        message: "New intake form ready for completion"
+      };
     }
 
-    // Load insurance information
-    let insuranceInfo: InsuranceInfo = {
-      provider: "",
-      policy_number: "",
-      group_number: "",
-      subscriber_name: "",
-      relationship_to_subscriber: "self",
-    };
+    // Only load existing data for forms that are actually in progress or completed
+    // This ensures we only pre-fill when the user has already started entering data for THIS specific appointment
 
-    try {
-      const insuranceResponse = await databases.listDocuments(
-        DATABASE_ID,
-        PATIENT_INSURANCE_COLLECTION_ID,
-        [
-          Query.equal("patient_id", appointment.patient_id),
-          Query.equal("is_active", true),
-          Query.limit(1)
-        ]
-      );
-
-      if (insuranceResponse.documents.length > 0) {
-        const insurance = insuranceResponse.documents[0];
-        insuranceInfo = {
-          provider: insurance.provider_name || "",
-          policy_number: insurance.policy_number || "",
-          group_number: insurance.group_number || "",
-          subscriber_name: insurance.subscriber_name || "",
-          relationship_to_subscriber: "self", // Default value
-        };
-      }
-    } catch (error) {
-      console.error("Error loading insurance info:", error);
-    }
-
-    // Load allergies
-    let allergies: Allergy[] = [];
-    try {
-      const allergiesResponse = await databases.listDocuments(
-        DATABASE_ID,
-        PATIENT_ALLERGIES_COLLECTION_ID,
-        [
-          Query.equal("patient_id", appointment.patient_id),
-          Query.equal("is_active", true)
-        ]
-      );
-
-      allergies = allergiesResponse.documents.map(allergy => ({
-        allergen_name: allergy.allergen_name || "",
-        severity: (allergy.severity as "mild" | "moderate" | "severe") || "mild",
-        reaction_description: allergy.reaction_description || "",
-      }));
-    } catch (error) {
-      console.error("Error loading allergies:", error);
-    }
-
-    // Load medications
-    let medications: Medication[] = [];
-    try {
-      const medicationsResponse = await databases.listDocuments(
-        DATABASE_ID,
-        PATIENT_MEDICATIONS_COLLECTION_ID,
-        [
-          Query.equal("patient_id", appointment.patient_id),
-          Query.equal("is_active", true)
-        ]
-      );
-
-      medications = medicationsResponse.documents.map(medication => ({
-        medication_name: medication.medication_name || "",
-        dosage: medication.dosage || "",
-        frequency: medication.frequency || "",
-        status: (medication.status as "prescribed" | "as_needed" | "completed" | "discontinued") || "prescribed",
-      }));
-    } catch (error) {
-      console.error("Error loading medications:", error);
-    }
-
-    // Load emergency contacts
-    let emergencyContacts: EmergencyContact[] = [];
-    try {
-      const contactsResponse = await databases.listDocuments(
-        DATABASE_ID,
-        EMERGENCY_CONTACT_COLLECTION_ID,
-        [
-          Query.equal("patient_id", appointment.patient_id.toString()),
-          Query.equal("is_active", true),
-          Query.orderAsc("priority_order")
-        ]
-      );
-
-      emergencyContacts = contactsResponse.documents.map((contact, index) => ({
-        first_name: contact.first_name || "",
-        last_name: contact.last_name || "",
-        relationship: contact.relationship || "",
-        phone_primary: contact.phone_primary || "",
-        phone_secondary: contact.phone_secondary || "",
-        email: contact.email || "",
-        priority_order: contact.priority_order || (index + 1),
-      }));
-    } catch (error) {
-      console.error("Error loading emergency contacts:", error);
-    }
-
-    // Ensure at least one emergency contact exists
-    if (emergencyContacts.length === 0) {
-      emergencyContacts = [{
-        first_name: "",
-        last_name: "",
-        relationship: "",
-        phone_primary: "",
-        phone_secondary: "",
-        email: "",
-        priority_order: 1,
-      }];
-    }
-
-    // Parse form data for medical conditions and consent
-    let medicalConditions = "";
-    let hipaaConsent = false;
-    let treatmentConsent = false;
-    let financialConsent = false;
-
+    // Parse form data to get what was actually saved for this form
+    let formDataFromThisForm: {
+      patient_info?: PatientInfo;
+      insurance?: InsuranceInfo;
+      medical_conditions?: string;
+      consent?: {
+        hipaa?: boolean;
+        treatment?: boolean;
+        financial?: boolean;
+      };
+    } = {};
     try {
       if (existingForm.form_data) {
-        const parsedFormData = JSON.parse(existingForm.form_data);
-        medicalConditions = parsedFormData.medical_conditions || "";
-        if (parsedFormData.consent) {
-          hipaaConsent = parsedFormData.consent.hipaa || false;
-          treatmentConsent = parsedFormData.consent.treatment || false;
-          financialConsent = parsedFormData.consent.financial || false;
-        }
+        formDataFromThisForm = JSON.parse(existingForm.form_data);
       }
     } catch (error) {
       console.error("Error parsing form data:", error);
     }
 
-    // Use medical conditions from patient record if available (prioritize patient record over form data)
-    if (medicalConditionsFromPatient) {
-      medicalConditions = medicalConditionsFromPatient;
-    }
-
-    // Load attached files (form attachments)
+    // Load attached files (form attachments) for this specific form
     let attachedFiles: string[] = [];
     try {
       const attachmentsResponse = await formAttachmentService.getFormAttachments(existingForm.patient_form_id.toString());
@@ -1082,21 +968,46 @@ export async function loadExistingIntakeFormData(
       console.error("Error loading form attachments:", error);
     }
 
-    // Build complete form data
+    // Build form data using only what was saved for this specific form
     const completeFormData: CompleteIntakeForm = {
       patient_form_id: existingForm.$id,
       appointment_id: appointment.appointment_id,
       patient_id: appointment.patient_id,
-      patient_info: patientInfo,
-      insurance: insuranceInfo,
-      allergies,
-      medications,
-      medical_conditions: medicalConditions,
-      emergency_contacts: emergencyContacts,
+      patient_info: formDataFromThisForm.patient_info || {
+        first_name: "",
+        last_name: "",
+        phone: "",
+        email: "",
+        gender: "",
+        address: "",
+        city: "",
+        state: "",
+        zipcode: "",
+        date_of_birth: "",
+      },
+      insurance: formDataFromThisForm.insurance || {
+        provider: "",
+        policy_number: "",
+        group_number: "",
+        subscriber_name: "",
+        relationship_to_subscriber: "self",
+      },
+      allergies: [], // Start fresh for each appointment
+      medications: [], // Start fresh for each appointment
+      medical_conditions: formDataFromThisForm.medical_conditions || "",
+      emergency_contacts: [{
+        first_name: "",
+        last_name: "",
+        relationship: "",
+        phone_primary: "",
+        phone_secondary: "",
+        email: "",
+        priority_order: 1,
+      }], // Start fresh for each appointment
       attached_files: attachedFiles,
-      hipaa_consent: hipaaConsent,
-      treatment_consent: treatmentConsent,
-      financial_consent: financialConsent,
+      hipaa_consent: formDataFromThisForm.consent?.hipaa || false,
+      treatment_consent: formDataFromThisForm.consent?.treatment || false,
+      financial_consent: formDataFromThisForm.consent?.financial || false,
     };
 
     return {

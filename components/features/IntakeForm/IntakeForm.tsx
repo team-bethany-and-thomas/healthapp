@@ -207,9 +207,23 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
               }));
 
               console.log("✅ Form data updated successfully");
-              setSuccessMessage(
-                "Loaded existing intake form data. You can review and update your information."
-              );
+              
+              // Check if this is actually a new form (empty data) or existing data
+              const hasExistingData = existingDataResult.data.patient_info.first_name || 
+                                    existingDataResult.data.patient_info.last_name ||
+                                    existingDataResult.data.allergies.length > 0 ||
+                                    existingDataResult.data.medications.length > 0 ||
+                                    existingDataResult.data.insurance.provider;
+
+              if (hasExistingData) {
+                setSuccessMessage(
+                  "Loaded existing intake form data. You can review and update your information."
+                );
+              } else {
+                setSuccessMessage(
+                  "New intake form created for your appointment. Please complete all sections below."
+                );
+              }
             } else {
               console.log(
                 "⚠️ No existing data found or failed to load, using fallback"
@@ -222,7 +236,7 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                 patient_id: result.appointment!.patient_id,
               }));
               setSuccessMessage(
-                "Found existing intake form for this appointment. You can continue editing or view the current progress."
+                "New intake form created for your appointment. Please complete all sections below."
               );
             }
           } catch (loadError) {

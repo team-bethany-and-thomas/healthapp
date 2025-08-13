@@ -360,24 +360,13 @@ export async function getIntakeById(form_id: string, patient_id: number): Promis
   return getFormById(form_id, patient_id);
 }
 
-// Get intake form data with parsed JSON and load actual patient data
+// Get intake form data with parsed JSON - returns exactly what's stored in the form
 export async function getIntakeFormData(form_id: string, patient_id: number): Promise<FormData> {
   const form = await getIntakeById(form_id, patient_id);
   const parsedData = parseFormData(form.form_data);
   
-  // If this is compact format (empty data), load actual patient data
-  if (!parsedData.demographics.firstName && !parsedData.address.street) {
-    const existingData = await loadExistingPatientData(patient_id);
-    return {
-      ...parsedData,
-      ...existingData,
-      medicalHistory: {
-        ...parsedData.medicalHistory,
-        ...existingData.medicalHistory
-      }
-    };
-  }
-  
+  // Return the form data as-is without auto-loading existing patient data
+  // Each intake form should start fresh unless explicitly requested by the user
   return parsedData;
 }
 
