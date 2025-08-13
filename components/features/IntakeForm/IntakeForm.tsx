@@ -148,6 +148,18 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
       );
 
       if (result.appointment && result.form) {
+        // Check if appointment is canceled
+        const isAppointmentCanceled = result.appointment.status?.toLowerCase() === "cancelled" || 
+                                     result.appointment.status?.toLowerCase() === "canceled";
+
+        if (isAppointmentCanceled) {
+          setErrors({
+            general: "This appointment has been canceled. You cannot complete the intake form for a canceled appointment."
+          });
+          setIsLoading(false);
+          return;
+        }
+
         setCurrentAppointment(result.appointment);
         setSelectedForm(result.form);
         setIsAppointmentSpecific(true);
