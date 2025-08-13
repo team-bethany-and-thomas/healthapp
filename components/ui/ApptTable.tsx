@@ -596,7 +596,7 @@ export const ApptTable = () => {
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleRescheduleAppointment(appt)}
-                        className={`${styles.tableButton} ${styles.tableButtonOutline} flex-1`}
+                        className={`${styles.tableButton} ${styles.tableButtonOutlinePurple} flex-1`}
                         disabled={actionLoading === appt.appointmentId}
                       >
                         {actionLoading === appt.appointmentId ? (
@@ -867,7 +867,7 @@ export const ApptTable = () => {
                           <div className="flex gap-2">
                             <button
                               onClick={() => handleRescheduleAppointment(appt)}
-                              className={`${styles.tableButton} ${styles.tableButtonOutline} flex-1`}
+                              className={`${styles.tableButton} ${styles.tableButtonOutlinePurple} flex-1`}
                               disabled={actionLoading === appt.appointmentId}
                             >
                               {actionLoading === appt.appointmentId ? (

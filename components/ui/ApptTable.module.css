@@ -437,6 +437,17 @@
   color: white;
 }
 
+.tableButtonOutlinePurple {
+  background-color: transparent;
+  color: #a855f7;
+  border-color: #a855f7;
+}
+
+.tableButtonOutlinePurple:hover {
+  background-color: #a855f7;
+  color: white;
+}
+
 /* Continue large desktop styles */
 @media (min-width: 1200px) {
   /* Set specific column widths */
