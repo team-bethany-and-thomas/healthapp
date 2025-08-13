@@ -54,7 +54,7 @@ export function TopRatedDoctors() {
   }
 
   return (
-    <section className="max-w-7xl mx-auto px-4 py-12">
+    <section className="max-w-7xl mx-auto px-4 py-16">
       {/* Section Header */}
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-primary mb-2">Top Rated</h2>
@@ -68,8 +68,8 @@ export function TopRatedDoctors() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
         {topRatedDoctors.map((doctor, index) => (
 
-          <div key={doctor.$id || index} className="flex flex-col">
-            <div className="card bg-base-100 shadow-lg rounded-2xl hover:shadow-xl transition-all duration-300 border border-base-200 group h-80">
+                      <div key={doctor.$id || index} className="flex flex-col">
+            <div className="card bg-base-100 shadow-xl rounded-2xl hover:shadow-2xl transition-all duration-300 border border-gray-200 group h-80 hover:-translate-y-1">
               <div className="card-body p-6 flex flex-col h-full">
                 {/* Doctor Image */}
                 <div className="flex justify-center">
@@ -146,8 +146,10 @@ export function TopRatedDoctors() {
 
       {/* View All Button */}
 
+
       <div className="text-center mt-24">
         <Link href="/search" className="btn btn-outline btn-secondary hover:btn-secondary rounded-full">
+
 
           View All Doctors
           <svg

@@ -285,10 +285,7 @@ export const ApptTable = () => {
     if (appointments.length === 0) {
       return (
         <div className={styles.emptyState}>
-          <p className="mb-2">No appointments found.</p>
-          <button onClick={handleBookAppointment} className={styles.viewAllButton}>
-            Schedule Your First Appointment
-          </button>
+          <p>No appointments found.</p>
         </div>
       );
     }
@@ -400,12 +397,7 @@ export const ApptTable = () => {
           ) : appointments.length === 0 ? (
             <tr>
               <td colSpan={9} className="text-center p-4">
-                <div>
-                  <p className="mb-2">No appointments found.</p>
-                  <button onClick={handleBookAppointment} className={styles.viewAllButton}>
-                    Schedule Your First Appointment
-                  </button>
-                </div>
+                <p>No appointments found.</p>
               </td>
             </tr>
           ) : (
