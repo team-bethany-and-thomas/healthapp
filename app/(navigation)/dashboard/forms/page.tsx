@@ -345,19 +345,7 @@ function FormsPageContent() {
       return (
         <div className={styles.emptyState}>
           <div className="text-center p-8">
-            <h3 className="text-lg font-semibold mb-4">
-              No Appointments Found
-            </h3>
-            <p className="text-gray-600 mb-6">
-              You need to schedule an appointment before you can complete an
-              intake form.
-            </p>
-            <button
-              onClick={handleBookAppointment}
-              className={styles.viewAllButton}
-            >
-              Schedule Your First Appointment
-            </button>
+            <p>No appointments found.</p>
           </div>
         </div>
       );
@@ -471,21 +459,7 @@ function FormsPageContent() {
           ) : appointments.length === 0 ? (
             <tr>
               <td colSpan={9} className="text-center p-4">
-                <div>
-                  <h3 className="text-lg font-semibold mb-4">
-                    No Appointments Found
-                  </h3>
-                  <p className="text-gray-600 mb-6">
-                    You need to schedule an appointment before you can complete
-                    an intake form.
-                  </p>
-                  <button
-                    onClick={handleBookAppointment}
-                    className={styles.viewAllButton}
-                  >
-                    Schedule Your First Appointment
-                  </button>
-                </div>
+                <p>No appointments found.</p>
               </td>
             </tr>
           ) : (
