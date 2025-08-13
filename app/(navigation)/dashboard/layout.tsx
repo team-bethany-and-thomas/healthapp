@@ -14,8 +14,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </div>
       
       {/* Main content area */}
-      <div className="flex-1 overflow-auto bg-white">
-        <div className="p-6">
+      <div className="flex-1 overflow-auto bg-teal-100">
+        <div className="p-4">
           {children}
         </div>
       </div>
