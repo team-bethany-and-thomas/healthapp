@@ -1047,7 +1047,7 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
 
                   <div className="form-control">
                     <label className="label">
-                      <span className="label-text">Policy Number *</span>
+                      <span className="label-text">Policy Number</span>
                     </label>
                     <input
                       type="text"
@@ -1062,7 +1062,7 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                         )
                       }
                       className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
-                      placeholder="Policy number"
+                      placeholder="Policy number (optional)"
                     />
                     {errors["insurance.policy_number"] && (
                       <span className="text-error text-sm">
@@ -1070,6 +1070,40 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                       </span>
                     )}
                   </div>
+
+                  {/* Custom Insurance Provider Field - appears when "Other" is selected */}
+                  {completeFormData.insurance.provider === "Other" && (
+                    <div className="form-control md:col-span-2">
+                      <label className="label">
+                        <span className="label-text">Insurance Provider *</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={completeFormData.insurance.custom_provider || ""}
+                        onChange={(e) =>
+                          setCompleteFormData((prev) =>
+                            updateInsuranceInfo(
+                              prev,
+                              "custom_provider",
+                              e.target.value
+                            )
+                          )
+                        }
+                        className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
+                        placeholder="Enter your insurance provider name or type 'none'"
+                      />
+                      <div className="label">
+                        <span className="label-text-alt text-gray-500">
+                          Please enter your insurance provider name, or type &quot;none&quot; if you don&apos;t have insurance coverage
+                        </span>
+                      </div>
+                      {errors["insurance.custom_provider"] && (
+                        <span className="text-error text-sm">
+                          {errors["insurance.custom_provider"]}
+                        </span>
+                      )}
+                    </div>
+                  )}
 
                   <div className="form-control">
                     <label className="label">
@@ -1651,7 +1685,7 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                   <div className="flex items-start">
                     <input
                       type="checkbox"
-                      aria-label="Financial responsibility"
+                      aria-label="Financial consent"
                       checked={completeFormData.financial_consent}
                       onChange={(e) =>
                         setCompleteFormData((prev) =>
@@ -1670,8 +1704,7 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                       </label>
                       <p className="text-sm text-gray-600">
                         I understand and accept financial responsibility for all
-                        services provided and agree to pay all charges not
-                        covered by insurance.
+                        charges incurred during my treatment.
                       </p>
                       {errors.financial_consent && (
                         <span className="text-error text-sm">

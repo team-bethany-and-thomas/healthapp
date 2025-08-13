@@ -74,6 +74,7 @@ export interface InsuranceInfo {
   group_number: string;
   subscriber_name: string;
   relationship_to_subscriber: string;
+  custom_provider?: string; // For when "Other" is selected
 }
 
 export interface PatientFormForCompletion {
@@ -190,7 +191,6 @@ export function validateCompleteIntakeForm(formData: CompleteIntakeForm): { isVa
 
   // Insurance validation
   if (!formData.insurance.provider.trim()) errors["insurance.provider"] = "Insurance provider is required";
-  if (!formData.insurance.policy_number.trim()) errors["insurance.policy_number"] = "Policy number is required";
 
   // Emergency contact validation
   if (formData.emergency_contacts.length === 0) {
