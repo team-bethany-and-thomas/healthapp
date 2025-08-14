@@ -353,6 +353,7 @@ const SearchProviders: React.FC = () => {
                         />
                       ))}
                     </div>
+
                   </div>
                 </div>
 
