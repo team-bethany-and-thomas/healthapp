@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../hooks/useAuth";
-import { LogIn, User } from "lucide-react";
+import { LogIn, User, CheckCircle } from "lucide-react";
 import styles from "./login.module.css";
 
 interface ValidationErrors {
@@ -20,6 +20,7 @@ const LoginPage: React.FC = () => {
     loginError: "",
     validationErrors: {} as ValidationErrors,
     isSubmitting: false,
+    showSuccess: false,
   });
   const router = useRouter();
 
@@ -74,7 +75,15 @@ const LoginPage: React.FC = () => {
 
     try {
       await login(formData.email, formData.password);
-      router.push("/dashboard");
+      
+      // Show success confirmation
+      setUiState((prev) => ({ ...prev, showSuccess: true }));
+      
+      // Wait 2 seconds to show success message, then redirect
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 2000);
+      
     } catch (error) {
       console.error("Login failed:", error);
       setUiState((prev) => ({
@@ -129,8 +138,45 @@ const LoginPage: React.FC = () => {
     </div>
   ), [user?.name, handleLogout]);
 
+  // Success confirmation component
+  const successConfirmation = useMemo(() => (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 to-secondary/10 p-4">
+      <div className="bg-base-100 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center border border-primary/20">
+        <div className="flex justify-center mb-6">
+          <div className="bg-success rounded-full p-4">
+            <CheckCircle className="w-12 h-12 text-success-content" />
+          </div>
+        </div>
+        
+        <h2 className="text-2xl font-bold text-base-content mb-4">
+          Welcome Back!
+        </h2>
+        
+        <p className="text-base-content/80 mb-6">
+          You have successfully logged in. Redirecting to your dashboard...
+        </p>
+        
+        <div className="flex justify-center">
+          <div className="loading loading-spinner loading-md text-primary"></div>
+        </div>
+        
+        <div className="mt-6">
+          <div className="bg-primary/10 rounded-lg p-3">
+            <p className="text-sm text-primary font-medium">
+              Logged in as: {user?.email}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  ), [user?.email]);
+
   if (isLoading) {
     return loadingComponent;
+  }
+
+  if (user && uiState.showSuccess) {
+    return successConfirmation;
   }
 
   if (user) {

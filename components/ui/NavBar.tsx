@@ -53,7 +53,7 @@ const NavBar = () => {
       return (
         <div className="flex gap-2 items-center">
           <span className="text-sm hidden sm:inline">Welcome, {user.name}</span>
-          <button className="btn btn-outline btn-error" onClick={handleLogout}>
+          <button className="btn btn-outline btn-error rounded-full" onClick={handleLogout}>
             Logout
           </button>
         </div>
@@ -94,8 +94,48 @@ const NavBar = () => {
 
       <div className="navbar bg-white shadow-sm">
         <div className="navbar-start">
-          <div className="dropdown">
-            <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
+          <Link href="/" className="hover:opacity-80 transition-opacity">
+            <Image
+              src="/logo.png"
+              alt="Pulse Health Logo"
+              width={200}
+              height={50}
+              className="inline-block"
+            />
+          </Link>
+        </div>
+
+        <div className="navbar-center hidden lg:flex">
+          <ul className="menu menu-horizontal px-1">
+            <li>
+                <Link href="/contact" className="text-black">Contact</Link>
+            </li>
+            <li>
+              <a 
+                className="text-black cursor-pointer hover:text-primary transition-colors" 
+                onClick={handleDashboardClick}
+              >
+                Dashboard
+              </a>
+            </li>
+            <li>
+                <Link href="/about" className="text-black">About Us</Link>
+            </li>
+            <li>
+              <Link href={"/search"} className="text-black">
+                Search
+              </Link>
+            </li>
+          </ul>
+        </div>
+
+        <div className="navbar-end">
+          {/* Desktop auth buttons */}
+          <div className="hidden lg:flex">{renderAuthButtons()}</div>
+          
+          {/* Mobile hamburger menu */}
+          <div className="dropdown dropdown-end lg:hidden">
+            <div tabIndex={0} role="button" className="btn btn-ghost">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5"
@@ -135,46 +175,11 @@ const NavBar = () => {
                 </Link>
               </li>
               {/* Mobile auth buttons */}
-              <div className="divider lg:hidden my-2"></div>
-              <div className="px-4 pb-2 lg:hidden">{renderAuthButtons()}</div>
+              <div className="divider my-2"></div>
+              <div className="px-4 pb-2">{renderAuthButtons()}</div>
             </ul>
           </div>
-          <Link href="/" className="btn btn-ghost text-xl">
-            <Image
-              src="/logo.png"
-              alt="Pulse Health Logo"
-              width={200}
-              height={50}
-              className="inline-block"
-            />
-          </Link>
         </div>
-
-        <div className="navbar-center hidden lg:flex">
-          <ul className="menu menu-horizontal px-1">
-            <li>
-                <Link href="/contact" className="text-black">Contact</Link>
-            </li>
-            <li>
-              <a 
-                className="text-black cursor-pointer hover:text-primary transition-colors" 
-                onClick={handleDashboardClick}
-              >
-                Dashboard
-              </a>
-            </li>
-            <li>
-                <Link href="/about" className="text-black">About Us</Link>
-            </li>
-            <li>
-              <Link href={"/search"} className="text-black">
-                Search
-              </Link>
-            </li>
-          </ul>
-        </div>
-
-        <div className="navbar-end hidden lg:flex">{renderAuthButtons()}</div>
       </div>
     </>
   );

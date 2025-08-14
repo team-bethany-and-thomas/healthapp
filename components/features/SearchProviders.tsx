@@ -175,7 +175,7 @@ const SearchProviders: React.FC = () => {
       </div>
 
       {/* Search Section */}
-      <div className="bg-gradient-to-br from-teal-200/80 via-white/95 to-purple-200/80 p-6 rounded-lg mb-8 shadow-xl">
+      <div className="bg-gradient-to-br from-teal-200/80 via-white/95 to-purple-200/80 p-6 rounded-xl mb-8 shadow-2xl border-2 border-primary/20 backdrop-blur-sm">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* Filter by specialty */}
           <div className="form-control">
@@ -263,7 +263,7 @@ const SearchProviders: React.FC = () => {
       </div>
 
       {/* Results count */}
-      <div className="mb-6">
+      <div className="mb-6 bg-base-100 p-4 rounded-lg shadow-lg border border-base-300">
         <p className="text-base-content/70">
           Found {filteredDoctors.length} provider
           {filteredDoctors.length !== 1 ? "s" : ""}
@@ -279,7 +279,7 @@ const SearchProviders: React.FC = () => {
 
       {/* Doctors Grid */}
       {!loading && filteredDoctors.length === 0 ? (
-        <div className="text-center py-12">
+        <div className="text-center py-12 bg-base-100 rounded-xl shadow-xl border border-base-300">
           <div className="text-6xl mb-4">🔍</div>
           <h3 className="text-2xl font-semibold mb-2">No providers found</h3>
           <p className="text-base-content/70">
@@ -291,7 +291,7 @@ const SearchProviders: React.FC = () => {
           {filteredDoctors.map((doctor) => (
             <div
               key={doctor.$id}
-              className="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300"
+              className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 border border-base-300 hover:border-primary/30 rounded-xl overflow-hidden"
             >
               <div className="card-body p-6">
                 {/* Doctor Header */}
