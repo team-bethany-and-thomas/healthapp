@@ -185,12 +185,19 @@ export async function loadPendingIntakeForms(): Promise<PatientFormForCompletion
 export function validateCompleteIntakeForm(formData: CompleteIntakeForm): { isValid: boolean; errors: { [key: string]: string } } {
   const errors: { [key: string]: string } = {};
 
-  // Required fields
-  if (!formData.appointment_id) errors.appointment_id = "Please select an appointment";
-  if (!formData.patient_id) errors.patient_id = "Please select a patient";
+  // Patient info validation
+  if (!formData.patient_info.first_name.trim()) errors["patient_info.first_name"] = "First name is required";
+  if (!formData.patient_info.last_name.trim()) errors["patient_info.last_name"] = "Last name is required";
+  if (!formData.patient_info.phone.trim()) errors["patient_info.phone"] = "Phone number is required";
+  if (!formData.patient_info.email.trim()) errors["patient_info.email"] = "Email is required";
 
   // Insurance validation
   if (!formData.insurance.provider.trim()) errors["insurance.provider"] = "Insurance provider is required";
+  
+  // If "Other" is selected, validate custom provider
+  if (formData.insurance.provider === "Other" && !formData.insurance.custom_provider?.trim()) {
+    errors["insurance.custom_provider"] = "Please specify your insurance provider or type 'none'";
+  }
 
   // Emergency contact validation
   if (formData.emergency_contacts.length === 0) {
@@ -1105,6 +1112,7 @@ export async function loadExistingIntakeFormData(
       patient_info?: PatientInfo;
       insurance?: InsuranceInfo;
       medical_conditions?: string;
+      emergency_contacts?: EmergencyContact[];
       consent?: {
         hipaa?: boolean;
         treatment?: boolean;
@@ -1155,7 +1163,7 @@ export async function loadExistingIntakeFormData(
       allergies: [], // Start fresh for each appointment
       medications: [], // Start fresh for each appointment
       medical_conditions: formDataFromThisForm.medical_conditions || "",
-      emergency_contacts: [{
+      emergency_contacts: formDataFromThisForm.emergency_contacts || [{
         first_name: "",
         last_name: "",
         relationship: "",
@@ -1163,7 +1171,7 @@ export async function loadExistingIntakeFormData(
         phone_secondary: "",
         email: "",
         priority_order: 1,
-      }], // Start fresh for each appointment
+      }],
       attached_files: attachedFiles,
       hipaa_consent: formDataFromThisForm.consent?.hipaa || false,
       treatment_consent: formDataFromThisForm.consent?.treatment || false,
@@ -1309,6 +1317,7 @@ export async function updateCompleteIntakeForm(
             patient_info: formData.patient_info,
             insurance: formData.insurance,
             medical_conditions: formData.medical_conditions,
+            emergency_contacts: formData.emergency_contacts,
             consent: {
               hipaa: formData.hipaa_consent,
               treatment: formData.treatment_consent,

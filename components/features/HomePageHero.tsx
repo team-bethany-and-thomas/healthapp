@@ -42,7 +42,7 @@ export function HomePageHero() {
             ))}
           </div>
           
-          <Link href="/search" className={styles.viewAllButton}>
+          <Link href="/search" className={`${styles.viewAllButton} rounded-full`}>
             View All
           </Link>
         </div>

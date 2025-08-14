@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: "Pulse Clinic - Your Health, Our Priority",
   description: "Pulse Clinic provides comprehensive healthcare services with a focus on community wellness and quality care.",
   icons: {
-    icon: '/logo.png',
+    icon: "/icon.ico",
   },
 };
 

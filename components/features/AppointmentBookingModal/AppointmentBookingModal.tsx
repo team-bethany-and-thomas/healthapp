@@ -29,6 +29,7 @@ interface Doctor {
 	weekend_available: boolean;
 	weekend_start?: string;
 	weekend_end?: string;
+	availability_day?: number[]; // Array of available days (1=Monday, 2=Tuesday, ..., 7=Sunday)
 	bio: string;
 	profile_picture_id: string;
 	provider_id: number; // Make this required to match the actual provider data
@@ -64,6 +65,7 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
     phone: "",
     availability: "",
     weekend_available: false,
+    availability_day: [],
     bio: "",
     profile_picture_id: "",
     provider_id: 0,
@@ -108,6 +110,36 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
     return time; // Return as-is if format is unrecognized
   };
 
+  // Check if a date should be disabled
+  const isDateDisabled = (date: Date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Check if date is in the past
+    if (date < today) {
+      return true;
+    }
+    
+    // Check if the day of week is available for this provider
+    // JavaScript getDay(): 0=Sunday, 1=Monday, ..., 6=Saturday
+    // Database availability_day: 1=Monday, 2=Tuesday, ..., 7=Sunday
+    const jsDay = date.getDay(); // 0-6
+    const dbDay = jsDay === 0 ? 7 : jsDay; // Convert Sunday from 0 to 7, others stay same
+    
+    // Check if this day is in the provider's availability_day array
+    if (selectedDoctor?.availability_day && selectedDoctor.availability_day.length > 0) {
+      return !selectedDoctor.availability_day.includes(dbDay);
+    }
+    
+    // If no availability_day data, fall back to weekend_available logic
+    const isWeekend = jsDay === 0 || jsDay === 6; // Sunday or Saturday
+    if (isWeekend && !selectedDoctor?.weekend_available) {
+      return true;
+    }
+    
+    return false;
+  };
+
   const handleAppointmentType = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setAppointmentType(e.target.value);
   };
@@ -138,6 +170,20 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
     const dateStr = selectedDate.toISOString().split('T')[0];
 
     console.log('dayOfWeek:', dayOfWeek, 'isWeekend:', isWeekend, 'dateStr:', dateStr);
+
+    // Check if this day is available using availability_day field
+    // JavaScript getDay(): 0=Sunday, 1=Monday, ..., 6=Saturday
+    // Database availability_day: 1=Monday, 2=Tuesday, ..., 7=Sunday
+    const jsDay = dayOfWeek; // 0-6
+    const dbDay = jsDay === 0 ? 7 : jsDay; // Convert Sunday from 0 to 7, others stay same
+    
+    // Check if this day is in the provider's availability_day array
+    if (doctor.availability_day && doctor.availability_day.length > 0) {
+      if (!doctor.availability_day.includes(dbDay)) {
+        console.log(`Day ${dbDay} (${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][jsDay]}) not in availability_day:`, doctor.availability_day);
+        return []; // Provider not available on this day
+      }
+    }
 
     // Determine provider availability hours
     let startTime: string | undefined;
@@ -416,10 +462,9 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
         const selectedDoctorArray = fetchSelectedDoctor(providerId);
         
         if (selectedDoctorArray.length > 0) {
-          console.log('Selected doctor data:', selectedDoctorArray[0]); // Debug log
           setSelectedDoctor(selectedDoctorArray[0]);
         } else {
-          console.log('No doctor found with ID:', providerId); // Debug log
+          console.log('No doctor found with ID:', providerId);
         }
 
         modal.showModal();
@@ -580,9 +625,7 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
               mode="single"
               selected={date}
               onSelect={setDate}
-              disabled={{
-                before: new Date(), // Disable past dates
-              }}
+              disabled={isDateDisabled}
               footer={
                 date
                   ? `Selected: ${date.toLocaleDateString()}`

@@ -339,6 +339,7 @@ export function ProviderSearch() {
         weekend_available: provider.weekend_available,
         weekend_start: provider.weekend_start,
         weekend_end: provider.weekend_end,
+        availability_day: provider.availability_day, // Preserve availability_day field
         bio: provider.bio,
         profile_picture_id: provider.profile_picture_id,
         provider_id: provider.provider_id,
