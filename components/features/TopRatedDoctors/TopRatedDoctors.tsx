@@ -100,46 +100,52 @@ export function TopRatedDoctors() {
                     </h3>
                     <p className="doctor-specialty">
                       {doctor.specialty}
-</p>
-</div>
-<div>
-  <div className="flex items-center justify-center gap-1 mb-2">
-    <div className="rating rating-sm">
-      {[...Array(5)].map((_, i) => (
-        <input
-          key={i}
-          id={`rating-${index}-${i}`}
-          type="radio"
-          name={`rating-${index}`}
-          className="mask mask-star-2 bg-orange-400"
-          checked={i < Math.floor(doctor.rating || 4.5)}
-          readOnly
-          title={`Doctor rating star ${i + 1}`}
-          disabled
-        />
-      ))}
-    </div>
-  </div>
-  <div className="flex items-center justify-center gap-1 mb-2">
-    <div className="rating rating-sm">
-      {[...Array(5)].map((_, i) => (
-        <input
-          key={i}
-          id={`rating-${index}-${i}`}
-          type="radio"
-          name={`rating-${index}`}
-          className="mask mask-star-2 bg-orange-400"
-          checked={i < Math.floor(doctor.rating || 4.5)}
-          readOnly
-          title={`Doctor rating star ${i + 1}`}
-          disabled
-        />
-      ))}
-    </div>
+                    </p>
+                  </div>
+                  <div>
+                <div className="flex items-center justify-center gap-1 mb-2">
+  <div className="rating rating-sm">
+    {[...Array(5)].map((_, i) => (
+      <input
+        key={i}
+        id={`rating-${index}-${i}`}
+        type="radio"
+        name={`rating-${index}`}
+        className="mask mask-star-2 bg-orange-400"
+        checked={i < Math.floor(doctor.rating || 4.5)}
+        readOnly
+        title={`Doctor rating star ${i + 1}`}
+        disabled
+      />
+    ))}
   </div>
 </div>
+<div className="flex items-center justify-center gap-1 mb-2">
+  <div className="rating rating-sm">
+    {[...Array(5)].map((_, i) => (
+      <input
+        key={i}
+        id={`rating-${index}-${i}`}
+        type="radio"
+        name={`rating-${index}`}
+        className="mask mask-star-2 bg-orange-400"
+        checked={i < Math.floor(doctor.rating || 4.5)}
+        readOnly
+        title={`Doctor rating star ${i + 1}`}
+        disabled
+      />
+    ))}
+  </div>
 </div>
 
+
+                           title={`Doctor rating star ${i} + 1`}
+                          
+                    
+                      </div>
+                   
+
+                    </div>
                     <p className="doctor-location text-xs text-base-content/60">
                       {doctor.city || 'Local'}, {doctor.state || 'TX'}
                     </p>
@@ -147,9 +153,9 @@ export function TopRatedDoctors() {
                 </div>
               </div>
 
-           
+           </div>
             
-           
+            {/* Action Button - Outside the card */}
             <Link 
               href={`/search?specialty=${encodeURIComponent(doctor.specialty)}&search=${encodeURIComponent(`${doctor.first_name} ${doctor.last_name}`)}`}
               className={`${styles.viewAllButton} mt-4 rounded-full`}
@@ -163,12 +169,10 @@ export function TopRatedDoctors() {
         ))}
       </div>
 
-    
-
+      {/* View All Button */}
 
       <div className="text-center mt-8">
         <Link href="/search" className="btn btn-outline btn-secondary hover:btn-secondary rounded-lg">
-
 
           View All Doctors
           <svg
