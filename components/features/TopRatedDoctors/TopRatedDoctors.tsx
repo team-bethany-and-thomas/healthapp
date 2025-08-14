@@ -16,7 +16,7 @@ export function TopRatedDoctors() {
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-primary mb-2">Top Rated</h2>
           <h2 className="text-3xl font-bold text-secondary mb-4">Doctors Near You</h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-full"></div>
+          <div className="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-2xl"></div>
         </div>
         <div className="flex justify-center items-center py-12">
           <div className="loading loading-spinner loading-lg"></div>
@@ -31,7 +31,7 @@ export function TopRatedDoctors() {
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-primary mb-2">Top Rated</h2>
           <h2 className="text-3xl font-bold text-secondary mb-4">Doctors Near You</h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-full"></div>
+          <div className="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-2xl"></div>
         </div>
         <div className="alert alert-error max-w-md mx-auto">
           <svg
@@ -61,7 +61,7 @@ export function TopRatedDoctors() {
         <h2 className="text-3xl font-bold text-secondary mb-4">
           Doctors Near You
         </h2>
-        <div className="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-full"></div>
+        <div className="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-2xl"></div>
       </div>
 
       {/* Doctors Grid */}
@@ -99,28 +99,45 @@ export function TopRatedDoctors() {
                       {doctor.first_name || 'Doctor'} {doctor.last_name || ''}
                     </h3>
                     <p className="doctor-specialty">
-                      {doctor.specialty}
-                    </p>
-                  </div>
-                  <div>
-                    <div className="flex items-center justify-center gap-1 mb-2">
-                      
-                       <div className="rating rating-sm">
-                        {[...Array(5)].map((_, i) => (
-                          <input
-                            key={i}
-                            id={`rating-${index}-${i}`}
-                            type="radio"
-                            name={`rating-${index}`}
-                            className="mask mask-star-2 bg-orange-400"
-                            checked={i < Math.floor(doctor.rating || 4.5)}
-                            readOnly
-                           title={`Doctor rating star ${i} + 1`}
-                          />
-                        ))}
-                      </div>
-                   
-                    </div>
+{doctor.specialty}
+</p>
+</div>
+<div>
+  <div className="flex items-center justify-center gap-1 mb-2">
+    <div className="rating rating-sm">
+      {[...Array(5)].map((_, i) => (
+        <input
+          key={i}
+          id={`rating-${index}-${i}`}
+          type="radio"
+          name={`rating-${index}`}
+          className="mask mask-star-2 bg-orange-400"
+          checked={i < Math.floor(doctor.rating || 4.5)}
+          readOnly
+          title={`Doctor rating star ${i + 1}`}
+          disabled
+        />
+      ))}
+    </div>
+  </div>
+  <div className="flex items-center justify-center gap-1 mb-2">
+    <div className="rating rating-sm">
+      {[...Array(5)].map((_, i) => (
+        <input
+          key={i}
+          id={`rating-${index}-${i}`}
+          type="radio"
+          name={`rating-${index}`}
+          className="mask mask-star-2 bg-orange-400"
+          checked={i < Math.floor(doctor.rating || 4.5)}
+          readOnly
+          title={`Doctor rating star ${i + 1}`}
+          disabled
+        />
+      ))}
+    </div>
+  </div>
+</div>
                     <p className="doctor-location text-xs text-base-content/60">
                       {doctor.city || 'Local'}, {doctor.state || 'TX'}
                     </p>
@@ -128,9 +145,9 @@ export function TopRatedDoctors() {
                 </div>
               </div>
 
-            </div>
+           
             
-            {/* Action Button - Outside the card */}
+           
             <Link 
               href={`/search?specialty=${encodeURIComponent(doctor.specialty)}&search=${encodeURIComponent(`${doctor.first_name} ${doctor.last_name}`)}`}
               className={`${styles.viewAllButton} mt-4 rounded-full`}
@@ -144,7 +161,7 @@ export function TopRatedDoctors() {
         ))}
       </div>
 
-      {/* View All Button */}
+    
 
       <div className="text-center mt-8">
         <Link href="/search" className="btn btn-outline btn-secondary hover:btn-secondary rounded-lg">
