@@ -543,7 +543,7 @@ export function ProviderSearch() {
                   </div>
                   <div className={styles["provider-rating"]}>
                     <Star size={16} className={styles["star-icon"]} />
-               
+                    <span>{Math.floor(provider.rating || 4.5)}</span>
                   </div>
                 </div>
 
