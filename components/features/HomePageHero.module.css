@@ -49,6 +49,7 @@
   padding: 1rem;
   background: #f8fafc;
   border-radius: 50%;
+  border-radius: 50px;
   min-width: 100px;
   transition: all 0.2s ease;
   cursor: pointer;

@@ -1,9 +1,13 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { useAuth } from "../../app/hooks/useAuth";
-import { providerService, Doctor, SearchFilters, useProviders } from "../../app/services/providerService";
-import { MapPin, Calendar, Clock } from "lucide-react";
+import {
+  providerService,
+  SearchFilters,
+  useProviders,
+} from "../../app/services/providerService";
+import { MapPin, Calendar, Clock, Stethoscope } from "lucide-react";
 import { AppointmentBookingModal } from "./AppointmentBookingModal/AppointmentBookingModal";
 
 const SearchProviders: React.FC = () => {
@@ -12,16 +16,21 @@ const SearchProviders: React.FC = () => {
   const [selectedSpecialty, setSelectedSpecialty] = useState<string>("");
   const [selectedLocation, setSelectedLocation] = useState<string>("");
   const [weekendFilter, setWeekendFilter] = useState<boolean | null>(null);
-  
+
   // Modal state management
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedProviderId, setSelectedProviderId] = useState<string | null>(null);
+  const [selectedProviderId, setSelectedProviderId] = useState<string | null>(
+    null
+  );
 
-  const filters: SearchFilters = useMemo(() => ({
-    searchTerm: searchTerm || undefined,
-    selectedSpecialty: selectedSpecialty || undefined,
-    weekendFilter,
-  }), [searchTerm, selectedSpecialty, weekendFilter]);
+  const filters: SearchFilters = useMemo(
+    () => ({
+      searchTerm: searchTerm || undefined,
+      selectedSpecialty: selectedSpecialty || undefined,
+      weekendFilter,
+    }),
+    [searchTerm, selectedSpecialty, weekendFilter]
+  );
 
   const { doctors, loading, error } = useProviders(filters);
 
@@ -31,7 +40,7 @@ const SearchProviders: React.FC = () => {
   // Get locations from doctors for location filter
   const locations = React.useMemo(() => {
     const uniqueLocations = new Set<string>();
-    doctors.forEach(doctor => {
+    doctors.forEach((doctor) => {
       if (doctor.location) {
         uniqueLocations.add(doctor.location);
       }
@@ -42,20 +51,23 @@ const SearchProviders: React.FC = () => {
   // Filter doctors based on location (client-side filtering for location)
   const filteredDoctors = React.useMemo(() => {
     if (!selectedLocation) return doctors;
-    return doctors.filter(doctor => doctor.location === selectedLocation);
+    return doctors.filter((doctor) => doctor.location === selectedLocation);
   }, [doctors, selectedLocation]);
 
   // Transform doctors for modal compatibility
   const transformedDoctors = React.useMemo(() => {
-    return filteredDoctors.map(doctor => ({
+    return filteredDoctors.map((doctor) => ({
       ...doctor,
       name: doctor.name || `${doctor.first_name} ${doctor.last_name}`,
       location: doctor.location || `${doctor.city}, ${doctor.state}`,
-      availability: doctor.availability || `${doctor.availability_start} - ${doctor.availability_end}`,
+      availability:
+        doctor.availability ||
+        `${doctor.availability_start} - ${doctor.availability_end}`,
       provider_id: doctor.provider_id,
       first_name: doctor.first_name,
       last_name: doctor.last_name,
       practice_name: doctor.practice_name,
+      availability_day: doctor.availability_day, // Preserve availability_day field
     }));
   }, [filteredDoctors]);
 
@@ -154,41 +166,18 @@ const SearchProviders: React.FC = () => {
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold mb-2" style={{ color: '#0d9488' }}>Find Healthcare Providers</h1>
+        <h1 className="text-4xl font-bold mb-2" style={{ color: "#0d9488" }}>
+          Find Healthcare Providers
+        </h1>
         <p className="text-secondary text-lg font-semibold">
           Search and filter through our network of qualified doctors
         </p>
       </div>
 
       {/* Search Section */}
-      <div className="bg-base-200 p-6 mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Search by name/specialty */}
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">Search</span>
-            </label>
-            <div className="join w-full">
-              <input
-                id="search-term"
-                name="searchTerm"
-                type="text"
-                placeholder="Doctor name or specialty..."
-                className="input input-bordered join-item w-full"
-                value={searchTerm}
-                onChange={(e) => handleSearchTermChange(e.target.value)}
-              />
-              <button 
-                className="btn btn-primary join-item"
-                type="button"
-                aria-label="Search providers"
-                title="Search for healthcare providers"
-              >
-                🔍
-              </button>
-            </div>
-          </div>
 
+      <div className="bg-gradient-to-br from-teal-200/80 via-white/95 to-purple-200/80 p-6 rounded-lg mb-8 shadow-xl">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* Filter by specialty */}
           <div className="form-control">
             <label className="label" htmlFor="specialty-select">
@@ -197,7 +186,7 @@ const SearchProviders: React.FC = () => {
             <select
               id="specialty-select"
               name="specialty"
-              className="select select-bordered w-full"
+              className="select select-bordered w-full rounded-lg"
               value={selectedSpecialty}
               onChange={(e) => handleSpecialtyChange(e.target.value)}
               aria-label="Filter by specialty"
@@ -220,7 +209,7 @@ const SearchProviders: React.FC = () => {
             <select
               id="location-select"
               name="location"
-              className="select select-bordered w-full"
+              className="select select-bordered w-full rounded-lg"
               value={selectedLocation}
               onChange={(e) => handleLocationChange(e.target.value)}
               aria-label="Filter by location"
@@ -234,13 +223,40 @@ const SearchProviders: React.FC = () => {
               ))}
             </select>
           </div>
-
-          {/* Clear filters button */}
+          {/* Search by name/specialty */}
           <div className="form-control">
+            <label className="label">
+              <span className="label-text">Search</span>
+            </label>
+            <div className="join w-full">
+              <input
+                id="search-term"
+                name="searchTerm"
+                type="text"
+                placeholder="Doctor name or specialty..."
+                className="input input-bordered join-item w-full rounded-lg"
+                value={searchTerm}
+                onChange={(e) => handleSearchTermChange(e.target.value)}
+              />
+              <button
+                className="btn btn-primary join-item rounded-r-lg"
+                type="button"
+                aria-label="Search providers"
+                title="Search for healthcare providers"
+              >
+                <Stethoscope/>
+              </button>
+            </div>
+          </div>
+          {/* Clear filters button */}
+          <div className="form-control pt-6">
             <label className="label">
               <span className="label-text">&nbsp;</span>
             </label>
-            <button className="btn btn-outline" onClick={clearFilters}>
+            <button
+              className="btn btn-outline rounded-lg"
+              onClick={clearFilters}
+            >
               Clear Filters
             </button>
           </div>
@@ -250,7 +266,8 @@ const SearchProviders: React.FC = () => {
       {/* Results count */}
       <div className="mb-6">
         <p className="text-base-content/70">
-          Found {filteredDoctors.length} provider{filteredDoctors.length !== 1 ? "s" : ""}
+          Found {filteredDoctors.length} provider
+          {filteredDoctors.length !== 1 ? "s" : ""}
         </p>
       </div>
 
@@ -283,9 +300,14 @@ const SearchProviders: React.FC = () => {
                   <div className="flex items-center space-x-3">
                     <div className="avatar">
                       <div className="w-16 h-16 rounded-full ring-2 ring-primary ring-offset-2 ring-offset-base-100">
-                        <img 
-                          src={providerService.getProfileImageUrl(doctor.profile_picture_id)}
-                          alt={doctor.name || `${doctor.first_name} ${doctor.last_name}`}
+                        <img
+                          src={providerService.getProfileImageUrl(
+                            doctor.profile_picture_id
+                          )}
+                          alt={
+                            doctor.name ||
+                            `${doctor.first_name} ${doctor.last_name}`
+                          }
                           width={64}
                           height={64}
                           className="object-cover rounded-full"
@@ -298,13 +320,22 @@ const SearchProviders: React.FC = () => {
                     </div>
                     <div>
                       <h3 className="font-semibold text-lg">
-                        {doctor.name || `${doctor.first_name} ${doctor.last_name}`}
+                        {doctor.name ||
+                          `${doctor.first_name} ${doctor.last_name}`}
                       </h3>
-                      <p className="text-sm text-primary font-medium">{doctor.specialty}</p>
+                      <p className="text-sm text-primary font-medium">
+                        {doctor.specialty}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-1">
-                    <div className="rating rating-sm" role="img" aria-label={`Rating: ${doctor.rating || 4.5} out of 5 stars`}>
+                    <div
+                      className="rating rating-sm"
+                      role="img"
+                      aria-label={`Rating: ${
+                        doctor.rating || 4.5
+                      } out of 5 stars`}
+                    >
                       {[...Array(5)].map((_, i) => (
                         <input
                           key={i}
@@ -314,12 +345,11 @@ const SearchProviders: React.FC = () => {
                           className="mask mask-star-2 bg-orange-400"
                           checked={i < Math.floor(doctor.rating || 4.5)}
                           readOnly
-                          aria-label={`${i + 1} star${i !== 0 ? 's' : ''}`}
-                          title={`${i + 1} star${i !== 0 ? 's' : ''} out of 5`}
+                          aria-label={`${i + 1} star${i !== 0 ? "s" : ""}`}
+                          title={`${i + 1} star${i !== 0 ? "s" : ""} out of 5`}
                         />
                       ))}
                     </div>
-                    <span className="text-sm font-medium">{doctor.rating || 4.5}</span>
                   </div>
                 </div>
 
@@ -331,11 +361,14 @@ const SearchProviders: React.FC = () => {
                   </div>
                   <div className="flex items-center text-sm text-base-content/70">
                     <Calendar className="w-4 h-4 mr-2" />
-                    {doctor.availability || `${doctor.availability_start} - ${doctor.availability_end}`}
+                    {doctor.availability ||
+                      `${doctor.availability_start} - ${doctor.availability_end}`}
                   </div>
                   <div className="flex items-center text-sm text-base-content/70">
                     <Clock className="w-4 h-4 mr-2" />
-                    {doctor.weekend_available ? "Weekend Available" : "Weekdays Only"}
+                    {doctor.weekend_available
+                      ? "Weekend Available"
+                      : "Weekdays Only"}
                   </div>
                   {doctor.practice_name && (
                     <div className="flex items-center text-sm text-base-content/70">
@@ -351,7 +384,7 @@ const SearchProviders: React.FC = () => {
                   <button className="btn btn-outline btn-sm">
                     View Profile
                   </button>
-                  <button 
+                  <button
                     className="btn btn-primary btn-sm"
                     onClick={() => handleBookAppointment(doctor.$id)}
                   >

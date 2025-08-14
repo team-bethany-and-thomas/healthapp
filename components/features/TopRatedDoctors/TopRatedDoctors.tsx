@@ -118,8 +118,9 @@ export function TopRatedDoctors() {
                            title={`Doctor rating star ${i} + 1`}
                           />
                         ))}
+
                       </div> 
-                     
+
                     </div>
                     <p className="doctor-location text-xs text-base-content/60">
                       {doctor.city || 'Local'}, {doctor.state || 'TX'}
@@ -147,8 +148,8 @@ export function TopRatedDoctors() {
       {/* View All Button */}
 
 
-      <div className="text-center mt-24">
-        <Link href="/search" className="btn btn-outline btn-secondary hover:btn-secondary rounded-full">
+      <div className="text-center mt-8">
+        <Link href="/search" className="btn btn-outline btn-secondary hover:btn-secondary rounded-lg">
 
 
           View All Doctors
