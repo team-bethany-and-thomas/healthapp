@@ -500,7 +500,7 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
         className="modal modal-bottom sm:modal-middle"
         onClose={handleClose}
       >
-        <div className="modal-box bg-base-100">
+        <div className="modal-box bg-base-100 max-w-lg rounded-lg">
           <div className="text-center">
             <div className="text-6xl mb-4">✅</div>
             <h1 className="font-bold text-lg mb-2 text-success">Success!</h1>
@@ -535,17 +535,17 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
               </p>
             </div>
 
-            <div className="flex gap-4 justify-center">
+            <div className="flex flex-col gap-3 justify-center mb-4">
               <Link
                 href="/dashboard/forms"
-                className="btn btn-primary flex-1"
+                className="w-full bg-gradient-to-r from-teal-400 to-teal-500 hover:from-teal-500 hover:to-teal-600 text-white border-none rounded-lg px-4 py-3 font-semibold cursor-pointer transition-all duration-200 ease-in-out hover:-translate-y-0.5 text-center"
                 onClick={handleCloseSuccess}
               >
                 Complete Intake Form
               </Link>
               <Link
                 href="/dashboard/appointments"
-                className="btn btn-outline flex-1"
+                className="border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white bg-transparent rounded-lg px-4 py-3 font-semibold cursor-pointer transition-all duration-200 ease-in-out hover:-translate-y-0.5 text-center"
                 onClick={handleCloseSuccess}
               >
                 View Appointments
@@ -555,7 +555,7 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
             <div className="modal-action justify-center">
               <button
                 type="button"
-                className="btn btn-ghost btn-sm"
+                className="bg-gray-200 hover:bg-gray-300 text-gray-700 border-none rounded-lg px-4 py-3 font-semibold cursor-pointer transition-all duration-200 ease-in-out hover:-translate-y-0.5"
                 onClick={handleCloseSuccess}
               >
                 Close
@@ -574,7 +574,7 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
         className="modal modal-bottom sm:modal-middle"
         onClose={handleClose}
       >
-        <div className="modal-box bg-primary">
+        <div className="modal-box bg-primary rounded-lg">
           <h3 className="font-bold text-lg text-base-content text-center">
             Book Appointment With: {selectedDoctor.name}
           </h3>
@@ -601,7 +601,7 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
           <div className="flex justify-center mt-4">
             <select
               value={appointmentType}
-              className="select select-bordered w-3/4 mt-2 bg-base-200 text-base-content"
+              className="select select-bordered w-3/4 mt-2 bg-base-200 text-base-content rounded-lg"
               onChange={handleAppointmentType}
               disabled={appointmentIsSaving}
             >
@@ -637,7 +637,7 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
           <div className="flex justify-center mt-2">
             <select
               value={appointmentTime}
-              className="select bg-base-200 text-base-content select-bordered w-3/4"
+              className="select bg-base-200 text-base-content select-bordered w-3/4 rounded-lg"
               onChange={handleTimeSelection}
               disabled={appointmentIsSaving || loadingTimeSlots}
             >
@@ -702,34 +702,15 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
                 placeholder="Any additional information you'd like to share..."
               ></textarea>
 
-              <div className="form-control">
-                <label className="label cursor-pointer">
-                  <span className="label-text text-sm">
-                    Pre-fill intake form with existing medical information
-                  </span>
-                  <input
-                    type="checkbox"
-                    checked={preFillExistingData}
-                    onChange={(e) => setPreFillExistingData(e.target.checked)}
-                    className="checkbox checkbox-primary"
-                    disabled={appointmentIsSaving}
-                  />
-                </label>
-                <div className="label">
-                  <span className="label-text-alt text-xs text-base-content/70">
-                    If checked, we&apos;ll pre-fill your intake form with previously entered allergies and medications
-                  </span>
-                </div>
-              </div>
             </div>
           </form>
 
-          <div className="bg-info/10 border border-info/20 p-3 rounded-lg mb-4 mx-4">
-            <div className="flex items-center gap-2 mb-2">
+          <div className="bg-primary-content border border-info/20 p-3 rounded-lg mb-4 mx-4">
+            <div className="flex items-center justify-center gap-2 mb-2">
               <span className="text-info">ℹ️</span>
               <span className="font-semibold text-sm">What happens next?</span>
             </div>
-            <p className="text-xs text-base-content/80">
+            <p className="text-xs text-base-content/80 text-center">
               After booking, we&apos;ll automatically create an intake form for you to complete. 
               This helps us prepare for your visit and ensures we have your current medical information.
             </p>
@@ -737,12 +718,12 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
 
           <div className="modal-action flex gap-4 justify-center">
             <button
-              className="btn btn-primary btn-sm"
+              className="w-full bg-gradient-to-r from-teal-400 to-teal-500 hover:from-teal-500 hover:to-teal-600 text-white border-none rounded-lg px-4 py-3 font-semibold cursor-pointer transition-all duration-200 ease-in-out hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               disabled={appointmentIsSaving || !appointmentType || !date || !appointmentTime || !reasonForVisit.trim()}
               onClick={handleSubmit}
             >
               {appointmentIsSaving && (
-                <span className="loading loading-spinner loading-xs"></span>
+                <span className="loading loading-spinner loading-xs mr-2"></span>
               )}
               {appointmentIsSaving
                 ? "Booking Appointment..."
@@ -750,11 +731,11 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
             </button>
             <button
               type="button"
-              className="btn btn-ghost btn-sm"
+              className="bg-gray-200 hover:bg-gray-300 text-gray-700 border-none rounded-lg px-4 py-3 font-semibold cursor-pointer transition-all duration-200 ease-in-out hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               onClick={handleClose}
               disabled={appointmentIsSaving}
             >
-              Close
+              Cancel
             </button>
           </div>
         </div>

@@ -108,21 +108,21 @@ const NavBar = () => {
         <div className="navbar-center hidden lg:flex">
           <ul className="menu menu-horizontal px-1">
             <li>
-                <Link href="/contact" className="text-black">Contact</Link>
+                <Link href="/contact" className="text-black hover:bg-gray-100 hover:rounded-lg transition-all duration-200">Contact</Link>
             </li>
             <li>
               <a 
-                className="text-black cursor-pointer hover:text-primary transition-colors" 
+                className="text-black cursor-pointer hover:text-primary hover:bg-gray-100 hover:rounded-lg transition-all duration-200" 
                 onClick={handleDashboardClick}
               >
                 Dashboard
               </a>
             </li>
             <li>
-                <Link href="/about" className="text-black">About Us</Link>
+                <Link href="/about" className="text-black hover:bg-gray-100 hover:rounded-lg transition-all duration-200">About Us</Link>
             </li>
             <li>
-              <Link href={"/search"} className="text-black">
+              <Link href={"/search"} className="text-black hover:bg-gray-100 hover:rounded-lg transition-all duration-200">
                 Search
               </Link>
             </li>
@@ -156,27 +156,49 @@ const NavBar = () => {
               className="menu menu-sm dropdown-content bg-white rounded-box z-[1] mt-3 w-52 p-2 shadow"
             >
               <li>
-                  <Link href="/contact" className="text-black">Contact</Link>
+                  <Link href="/contact" className="text-black hover:bg-gray-100 hover:rounded-lg transition-all duration-200">Contact</Link>
               </li>
               <li>
                 <a 
-                  className="text-black cursor-pointer hover:text-primary transition-colors" 
+                  className="text-black cursor-pointer hover:text-primary hover:bg-gray-100 hover:rounded-lg transition-all duration-200" 
                   onClick={handleDashboardClick}
                 >
                   Dashboard
                 </a>
               </li>
               <li>
-                  <Link href="/about" className="text-black">About Us</Link>
+                  <Link href="/about" className="text-black hover:bg-gray-100 hover:rounded-lg transition-all duration-200">About Us</Link>
               </li>
               <li>
-                <Link href={"/search"} className="text-black">
+                <Link href={"/search"} className="text-black hover:bg-gray-100 hover:rounded-lg transition-all duration-200">
                   Search
                 </Link>
               </li>
               {/* Mobile auth buttons */}
               <div className="divider my-2"></div>
-              <div className="px-4 pb-2">{renderAuthButtons()}</div>
+              <div className="px-4 pb-2">
+                {isLoading ? (
+                  <div className="btn btn-disabled loading">Loading</div>
+                ) : user ? (
+                  // User is logged in - show name and logout button vertically
+                  <div className="flex flex-col gap-2">
+                    <span className="text-sm text-center">Welcome, {user.name}</span>
+                    <button className="btn btn-outline btn-error rounded-full" onClick={handleLogout}>
+                      Logout
+                    </button>
+                  </div>
+                ) : (
+                  // User is not logged in - show login and register buttons
+                  <div className="flex gap-2">
+                    <Link href="/login" className="btn btn-outline btn-primary">
+                      Login
+                    </Link>
+                    <Link href="/register" className="btn btn-primary">
+                      Register
+                    </Link>
+                  </div>
+                )}
+              </div>
             </ul>
           </div>
         </div>

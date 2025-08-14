@@ -1,9 +1,12 @@
 "use client";
 
-import React from 'react';
-import Link from 'next/link';
-import { useTopRatedDoctors, providerService } from '../../../app/services/providerService';
-import styles from './TopRatedDoctors.module.css';
+import React from "react";
+import Link from "next/link";
+import {
+  useTopRatedDoctors,
+  providerService,
+} from "../../../app/services/providerService";
+import styles from "./TopRatedDoctors.module.css";
 
 export function TopRatedDoctors() {
   const { doctors: topRatedDoctors, loading, error } = useTopRatedDoctors(5);
@@ -13,7 +16,9 @@ export function TopRatedDoctors() {
       <section className="max-w-7xl mx-auto px-4 py-12">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-primary mb-2">Top Rated</h2>
-          <h2 className="text-3xl font-bold text-secondary mb-4">Doctors Near You</h2>
+          <h2 className="text-3xl font-bold text-secondary mb-4">
+            Doctors Near You
+          </h2>
           <div className="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-2xl"></div>
         </div>
         <div className="flex justify-center items-center py-12">
@@ -28,7 +33,9 @@ export function TopRatedDoctors() {
       <section className="max-w-7xl mx-auto px-4 py-12">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-primary mb-2">Top Rated</h2>
-          <h2 className="text-3xl font-bold text-secondary mb-4">Doctors Near You</h2>
+          <h2 className="text-3xl font-bold text-secondary mb-4">
+            Doctors Near You
+          </h2>
           <div className="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-2xl"></div>
         </div>
         <div className="alert alert-error max-w-md mx-auto">
@@ -63,89 +70,100 @@ export function TopRatedDoctors() {
       </div>
 
       {/* Doctors Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
         {topRatedDoctors.map((doctor, index) => (
-          <div key={doctor.$id || index} className="flex flex-col">
-            <div className="card bg-base-100 shadow-xl rounded-2xl hover:shadow-2xl transition-all duration-300 border border-gray-200 group h-80 hover:-translate-y-1">
+          <div key={doctor.$id || index} className="flex flex-col h-full">
+            <div className="card bg-base-100 shadow-xl rounded-2xl hover:shadow-2xl transition-all duration-300 border border-gray-200 group hover:-translate-y-1 flex flex-col h-full">
               <div className="card-body p-6 flex flex-col h-full">
                 {/* Doctor Image */}
-                <div className="flex justify-center">
+                <div className="flex justify-center mb-4">
                   <div className="avatar">
                     <div className="w-16 h-16 rounded-full ring-2 ring-primary ring-offset-2 ring-offset-base-100">
-                      <img 
-                        src={providerService.getProfileImageUrl(doctor.profile_picture_id)} 
-                        alt={`${doctor.first_name || doctor.name} ${doctor.last_name || ''}`}
+                      <img
+                        src={providerService.getProfileImageUrl(
+                          doctor.profile_picture_id
+                        )}
+                        alt={`${doctor.first_name || doctor.name} ${
+                          doctor.last_name || ""
+                        }`}
                         width={64}
                         height={64}
                         className="object-cover rounded-full"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
-                          target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23e5e7eb'/%3E%3Ctext x='32' y='32' font-family='Arial' font-size='8' fill='%236b7280' text-anchor='middle' dy='.3em'%3EDr%3C/text%3E%3C/svg%3E";
+                          target.src =
+                            "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23e5e7eb'/%3E%3Ctext x='32' y='32' font-family='Arial' font-size='8' fill='%236b7280' text-anchor='middle' dy='.3em'%3EDr%3C/text%3E%3C/svg%3E";
                         }}
                       />
                     </div>
                   </div>
                 </div>
 
-                {/* Doctor Info */}
-                <div className="text-center flex-1 flex flex-col justify-between">
-                  <div>
-                    <h3 className="font-semibold text-base-content text-lg leading-tight h-12 flex items-center justify-center">
-                      {doctor.first_name || 'Doctor'} {doctor.last_name || ''}
-                    </h3>
-                    <p className="doctor-specialty">
-                      {doctor.specialty}
+                {/* Doctor Info - Main Content */}
+                <div className="text-center flex-1 flex flex-col">
+                  {/* Doctor Name */}
+                  <h3 className="font-semibold text-base-content text-lg leading-tight mb-2 min-h-[3rem] flex items-center justify-center">
+                    {doctor.first_name || "Doctor"} {doctor.last_name || ""}
+                  </h3>
+                  
+                  {/* Doctor Specialty */}
+                  <p className="text-sm text-base-content/70 mb-3 min-h-[2.5rem] flex items-center justify-center leading-tight">
+                    {doctor.specialty}
+                  </p>
+                  
+                  {/* Rating */}
+                  <div className="flex items-center justify-center gap-1 mb-4">
+                    <div className="rating rating-sm">
+                      {[...Array(5)].map((_, i) => (
+                        <input
+                          key={i}
+                          id={`rating-${index}-${i}`}
+                          type="radio"
+                          name={`rating-${index}`}
+                          className="mask mask-star-2 bg-orange-400"
+                          checked={i < Math.floor(doctor.rating || 4.5)}
+                          readOnly
+                          title={`Doctor rating star ${i + 1}`}
+                          disabled
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Spacer to push location to bottom */}
+                  <div className="flex-1"></div>
+                  
+                  {/* Location at bottom */}
+                  <div className="mt-auto">
+                    <p className="text-sm text-base-content/60 font-medium">
+                      {doctor.city || "Local"}, {doctor.state || "TX"}
                     </p>
                   </div>
-                  <div>
-                    <div className="flex items-center justify-center gap-1 mb-2">
-                      <div className="rating rating-sm">
-                        {[...Array(5)].map((_, i) => (
-                          <input
-                            key={i}
-                            id={`rating-${index}-${i}`}
-                            type="radio"
-                            name={`rating-${index}`}
-                            className="mask mask-star-2 bg-orange-400"
-                            checked={i < Math.floor(doctor.rating || 4.5)}
-                            readOnly
-                            title={`Doctor rating star ${i + 1}`}
-                            disabled
-                          />
-                        ))}
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-center gap-1 mb-2">
-                      <div className="rating rating-sm">
-                        {[...Array(5)].map((_, i) => (
-                          <input
-                            key={i}
-                            id={`rating-${index}-${i}`}
-                            type="radio"
-                            name={`rating-${index}`}
-                            className="mask mask-star-2 bg-orange-400"
-                            checked={i < Math.floor(doctor.rating || 4.5)}
-                            readOnly
-                            title={`Doctor rating star ${i + 1}`}
-                            disabled
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  <p className="doctor-location text-xs text-base-content/60">
-                    {doctor.city || 'Local'}, {doctor.state || 'TX'}
-                  </p>
                 </div>
               </div>
             </div>
-            {/* Action Button - Outside the card */}
+            
+            {/* Consult Button - Outside the card */}
             <Link
-              href={`/search?specialty=${encodeURIComponent(doctor.specialty)}&search=${encodeURIComponent(`${doctor.first_name} ${doctor.last_name}`)}`}
-              className={`${styles.viewAllButton} mt-4 rounded-full`}
+              href={`/search?specialty=${encodeURIComponent(
+                doctor.specialty
+              )}&search=${encodeURIComponent(
+                `${doctor.first_name} ${doctor.last_name}`
+              )}`}
+              className={`${styles.viewAllButton} mt-6 rounded-full`}
             >
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              <svg
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                />
               </svg>
               Consult Now
             </Link>
@@ -155,7 +173,10 @@ export function TopRatedDoctors() {
 
       {/* View All Button */}
       <div className="text-center mt-8">
-        <Link href="/search" className="btn btn-outline btn-secondary hover:btn-secondary rounded-lg">
+        <Link
+          href="/search"
+          className="btn btn-outline btn-secondary mt-6 hover:btn-secondary rounded-lg"
+        >
           View All Doctors
           <svg
             className="w-4 h-4 ml-2"
