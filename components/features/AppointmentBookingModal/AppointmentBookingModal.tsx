@@ -500,7 +500,7 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
         className="modal modal-bottom sm:modal-middle"
         onClose={handleClose}
       >
-        <div className="modal-box bg-base-100">
+        <div className="modal-box bg-base-100 max-w-lg rounded-lg">
           <div className="text-center">
             <div className="text-6xl mb-4">✅</div>
             <h1 className="font-bold text-lg mb-2 text-success">Success!</h1>
@@ -535,17 +535,17 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
               </p>
             </div>
 
-            <div className="flex gap-4 justify-center">
+            <div className="flex flex-col gap-3 justify-center mb-4">
               <Link
                 href="/dashboard/forms"
-                className="btn btn-primary flex-1"
+                className="w-full bg-gradient-to-r from-teal-400 to-teal-500 hover:from-teal-500 hover:to-teal-600 text-white border-none rounded-lg px-4 py-3 font-semibold cursor-pointer transition-all duration-200 ease-in-out hover:-translate-y-0.5 text-center"
                 onClick={handleCloseSuccess}
               >
                 Complete Intake Form
               </Link>
               <Link
                 href="/dashboard/appointments"
-                className="btn btn-outline flex-1"
+                className="border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white bg-transparent rounded-lg px-4 py-3 font-semibold cursor-pointer transition-all duration-200 ease-in-out hover:-translate-y-0.5 text-center"
                 onClick={handleCloseSuccess}
               >
                 View Appointments
@@ -555,7 +555,7 @@ export const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = (
             <div className="modal-action justify-center">
               <button
                 type="button"
-                className="btn btn-ghost btn-sm"
+                className="bg-gray-200 hover:bg-gray-300 text-gray-700 border-none rounded-lg px-4 py-3 font-semibold cursor-pointer transition-all duration-200 ease-in-out hover:-translate-y-0.5"
                 onClick={handleCloseSuccess}
               >
                 Close
