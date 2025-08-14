@@ -11,6 +11,8 @@ interface UploadTableProps {
   showSelectionColumn?: boolean;
   category?: string;
   className?: string;
+  hideCategoryInTitle?: boolean;
+  readOnly?: boolean;
 }
 
 export default function UploadTable({
@@ -18,7 +20,9 @@ export default function UploadTable({
   allowMultipleSelection = false,
   showSelectionColumn = false,
   category,
-  className = ''
+  className = '',
+  hideCategoryInTitle = false,
+  readOnly = false
 }: UploadTableProps) {
   const { user } = useAuth();
   const [files, setFiles] = useState<UploadedFile[]>([]);
@@ -280,7 +284,7 @@ export default function UploadTable({
       {/* Header */}
       <div className={styles.headerSection}>
         <h2 className={styles.headerTitle}>
-          Your Files {category && `(${category})`}
+          Your Files {category && !hideCategoryInTitle && `(${category})`}
         </h2>
         <div className={styles.headerActions}>
           {showSelectionColumn && selectedFiles.size > 0 && (
@@ -290,8 +294,9 @@ export default function UploadTable({
           )}
           <button
             onClick={loadFiles}
-            className={styles.refreshButton}
-            title="Refresh files"
+            disabled={readOnly}
+            className={`${styles.refreshButton} ${readOnly ? 'opacity-50 cursor-not-allowed' : ''}`}
+            title={readOnly ? "Cannot refresh in read-only mode" : "Refresh files"}
           >
             Refresh
           </button>
@@ -337,8 +342,9 @@ export default function UploadTable({
               <div className={styles.fileCardActions}>
                 <button
                   onClick={() => handleDownload(file)}
-                  className={`${styles.actionButton} ${styles.downloadButton}`}
-                  title={`Download ${file.originalName}`}
+                  disabled={readOnly}
+                  className={`${styles.actionButton} ${styles.downloadButton} ${readOnly ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  title={readOnly ? "Cannot download in read-only mode" : `Download ${file.originalName}`}
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -346,9 +352,9 @@ export default function UploadTable({
                 </button>
                 <button
                   onClick={() => handleDelete(file)}
-                  disabled={deletingFiles.has(file.$id)}
-                  className={`${styles.actionButton} ${styles.deleteButton}`}
-                  title={`Delete ${file.originalName}`}
+                  disabled={deletingFiles.has(file.$id) || readOnly}
+                  className={`${styles.actionButton} ${styles.deleteButton} ${readOnly ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  title={readOnly ? "Cannot delete in read-only mode" : `Delete ${file.originalName}`}
                 >
                   {deletingFiles.has(file.$id) ? (
                     <div className="w-4 h-4 animate-spin rounded-full border-2 border-red-600 border-t-transparent"></div>
@@ -471,8 +477,9 @@ export default function UploadTable({
                     <div className={styles.actionButtons}>
                       <button
                         onClick={() => handleDownload(file)}
-                        className={`${styles.actionButton} ${styles.downloadButton}`}
-                        title={`Download ${file.originalName}`}
+                        disabled={readOnly}
+                        className={`${styles.actionButton} ${styles.downloadButton} ${readOnly ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        title={readOnly ? "Cannot download in read-only mode" : `Download ${file.originalName}`}
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -480,9 +487,9 @@ export default function UploadTable({
                       </button>
                       <button
                         onClick={() => handleDelete(file)}
-                        disabled={deletingFiles.has(file.$id)}
-                        className={`${styles.actionButton} ${styles.deleteButton}`}
-                        title={`Delete ${file.originalName}`}
+                        disabled={deletingFiles.has(file.$id) || readOnly}
+                        className={`${styles.actionButton} ${styles.deleteButton} ${readOnly ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        title={readOnly ? "Cannot delete in read-only mode" : `Delete ${file.originalName}`}
                       >
                         {deletingFiles.has(file.$id) ? (
                           <div className="w-5 h-5 animate-spin rounded-full border-2 border-red-600 border-t-transparent"></div>
