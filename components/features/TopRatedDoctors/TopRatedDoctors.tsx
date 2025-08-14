@@ -104,7 +104,8 @@ export function TopRatedDoctors() {
                   </div>
                   <div>
                     <div className="flex items-center justify-center gap-1 mb-2">
-                      <div className="rating rating-sm">
+                      
+                       <div className="rating rating-sm">
                         {[...Array(5)].map((_, i) => (
                           <input
                             key={i}
@@ -114,13 +115,11 @@ export function TopRatedDoctors() {
                             className="mask mask-star-2 bg-orange-400"
                             checked={i < Math.floor(doctor.rating || 4.5)}
                             readOnly
-                            title={`Doctor rating star ${i + 1}`}
+                           title={`Doctor rating star ${i} + 1`}
                           />
                         ))}
                       </div>
-                      <span className="text-sm font-medium text-base-content/80">
-                        {(doctor.rating || 4.5).toFixed(1)}
-                      </span>
+                   
                     </div>
                     <p className="doctor-location text-xs text-base-content/60">
                       {doctor.city || 'Local'}, {doctor.state || 'TX'}
@@ -134,7 +133,7 @@ export function TopRatedDoctors() {
             {/* Action Button - Outside the card */}
             <Link 
               href={`/search?specialty=${encodeURIComponent(doctor.specialty)}&search=${encodeURIComponent(`${doctor.first_name} ${doctor.last_name}`)}`}
-              className={`${styles.viewAllButton} mt-4`}
+              className={`${styles.viewAllButton} mt-4 rounded-full`}
             >
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -148,7 +147,7 @@ export function TopRatedDoctors() {
       {/* View All Button */}
 
       <div className="text-center mt-8">
-        <Link href="/search" className="btn btn-outline btn-secondary hover:btn-secondary">
+        <Link href="/search" className="btn btn-outline btn-secondary hover:btn-secondary rounded-lg">
 
           View All Doctors
           <svg
