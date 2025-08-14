@@ -155,7 +155,7 @@ export function TopRatedDoctors() {
 
            
             
-            {/* Action Button - Outside the card */}
+           
             <Link 
               href={`/search?specialty=${encodeURIComponent(doctor.specialty)}&search=${encodeURIComponent(`${doctor.first_name} ${doctor.last_name}`)}`}
               className={`${styles.viewAllButton} mt-4 rounded-full`}
@@ -169,7 +169,7 @@ export function TopRatedDoctors() {
         ))}
       </div>
 
-      {/* View All Button */}
+    
 
       <div className="text-center mt-8">
         <Link href="/search" className="btn btn-outline btn-secondary hover:btn-secondary rounded-lg">
