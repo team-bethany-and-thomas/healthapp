@@ -712,14 +712,23 @@ export const ApptTable = () => {
 
                 {/* Action Buttons - Only show intake form for past appointments */}
                 <div className={styles.cardActions}>
-                  <button
-                    onClick={() =>
-                      handleIntakeForm(appt.appointmentId, appt.hasIntakeForm)
-                    }
-                    className={`${styles.tableButton} ${styles.tableButtonOutline} w-full`}
-                  >
-                    View Intake Form
-                  </button>
+                  {appt.status === "cancelled" || appt.status === "canceled" ? (
+                    <button
+                      disabled
+                      className={`${styles.tableButton} bg-gray-300 text-gray-500 cursor-not-allowed w-full`}
+                    >
+                      Appointment Cancelled
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() =>
+                        handleIntakeForm(appt.appointmentId, appt.hasIntakeForm, true)
+                      }
+                      className={`${styles.tableButton} ${styles.tableButtonOutline} w-full`}
+                    >
+                      View Intake Form
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -986,17 +995,26 @@ export const ApptTable = () => {
 
                       {/* Actions - Only show intake form for past appointments */}
                       <div className="lg:col-span-1 flex flex-col gap-3">
-                        <button
-                          onClick={() =>
-                            handleIntakeForm(
-                              appt.appointmentId,
-                              appt.hasIntakeForm
-                            )
-                          }
-                          className={`${styles.tableButton} ${styles.tableButtonOutline} w-full justify-center`}
-                        >
-                          View Intake Form
-                        </button>
+                        {appt.status === "cancelled" || appt.status === "canceled" ? (
+                          <button
+                            disabled
+                            className={`${styles.tableButton} bg-gray-300 text-gray-500 cursor-not-allowed w-full justify-center`}
+                          >
+                            Appointment Cancelled
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() =>
+                              handleIntakeForm(
+                                appt.appointmentId,
+                                appt.hasIntakeForm
+                              )
+                            }
+                            className={`${styles.tableButton} ${styles.tableButtonOutline} w-full justify-center`}
+                          >
+                            View Intake Form
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
