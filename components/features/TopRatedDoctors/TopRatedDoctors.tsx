@@ -1,11 +1,9 @@
 "use client";
 
-
 import React from 'react';
 import Link from 'next/link';
 import { useTopRatedDoctors, providerService } from '../../../app/services/providerService';
 import styles from './TopRatedDoctors.module.css';
-
 
 export function TopRatedDoctors() {
   const { doctors: topRatedDoctors, loading, error } = useTopRatedDoctors(5);
@@ -67,8 +65,7 @@ export function TopRatedDoctors() {
       {/* Doctors Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
         {topRatedDoctors.map((doctor, index) => (
-
-                      <div key={doctor.$id || index} className="flex flex-col">
+          <div key={doctor.$id || index} className="flex flex-col">
             <div className="card bg-base-100 shadow-xl rounded-2xl hover:shadow-2xl transition-all duration-300 border border-gray-200 group h-80 hover:-translate-y-1">
               <div className="card-body p-6 flex flex-col h-full">
                 {/* Doctor Image */}
@@ -82,73 +79,68 @@ export function TopRatedDoctors() {
                         height={64}
                         className="object-cover rounded-full"
                         onError={(e) => {
-                          // Fallback to a placeholder if image fails to load
                           const target = e.target as HTMLImageElement;
                           target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23e5e7eb'/%3E%3Ctext x='32' y='32' font-family='Arial' font-size='8' fill='%236b7280' text-anchor='middle' dy='.3em'%3EDr%3C/text%3E%3C/svg%3E";
                         }}
                       />
                     </div>
-
                   </div>
                 </div>
 
                 {/* Doctor Info */}
                 <div className="text-center flex-1 flex flex-col justify-between">
                   <div>
-                    <h3 className="font-semibold text-base-content text-lg leading-tight  h-12 flex items-center justify-center">
+                    <h3 className="font-semibold text-base-content text-lg leading-tight h-12 flex items-center justify-center">
                       {doctor.first_name || 'Doctor'} {doctor.last_name || ''}
                     </h3>
                     <p className="doctor-specialty">
-{doctor.specialty}
-</p>
-</div>
-<div>
-  <div className="flex items-center justify-center gap-1 mb-2">
-    <div className="rating rating-sm">
-      {[...Array(5)].map((_, i) => (
-        <input
-          key={i}
-          id={`rating-${index}-${i}`}
-          type="radio"
-          name={`rating-${index}`}
-          className="mask mask-star-2 bg-orange-400"
-          checked={i < Math.floor(doctor.rating || 4.5)}
-          readOnly
-          title={`Doctor rating star ${i + 1}`}
-          disabled
-        />
-      ))}
-    </div>
-  </div>
-  <div className="flex items-center justify-center gap-1 mb-2">
-    <div className="rating rating-sm">
-      {[...Array(5)].map((_, i) => (
-        <input
-          key={i}
-          id={`rating-${index}-${i}`}
-          type="radio"
-          name={`rating-${index}`}
-          className="mask mask-star-2 bg-orange-400"
-          checked={i < Math.floor(doctor.rating || 4.5)}
-          readOnly
-          title={`Doctor rating star ${i + 1}`}
-          disabled
-        />
-      ))}
-    </div>
-  </div>
-</div>
-                    <p className="doctor-location text-xs text-base-content/60">
-                      {doctor.city || 'Local'}, {doctor.state || 'TX'}
+                      {doctor.specialty}
                     </p>
                   </div>
+                  <div>
+                    <div className="flex items-center justify-center gap-1 mb-2">
+                      <div className="rating rating-sm">
+                        {[...Array(5)].map((_, i) => (
+                          <input
+                            key={i}
+                            id={`rating-${index}-${i}`}
+                            type="radio"
+                            name={`rating-${index}`}
+                            className="mask mask-star-2 bg-orange-400"
+                            checked={i < Math.floor(doctor.rating || 4.5)}
+                            readOnly
+                            title={`Doctor rating star ${i + 1}`}
+                            disabled
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-center gap-1 mb-2">
+                      <div className="rating rating-sm">
+                        {[...Array(5)].map((_, i) => (
+                          <input
+                            key={i}
+                            id={`rating-${index}-${i}`}
+                            type="radio"
+                            name={`rating-${index}`}
+                            className="mask mask-star-2 bg-orange-400"
+                            checked={i < Math.floor(doctor.rating || 4.5)}
+                            readOnly
+                            title={`Doctor rating star ${i + 1}`}
+                            disabled
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <p className="doctor-location text-xs text-base-content/60">
+                    {doctor.city || 'Local'}, {doctor.state || 'TX'}
+                  </p>
                 </div>
               </div>
-
-           
-            
-           
-            <Link 
+            </div>
+            {/* Action Button - Outside the card */}
+            <Link
               href={`/search?specialty=${encodeURIComponent(doctor.specialty)}&search=${encodeURIComponent(`${doctor.first_name} ${doctor.last_name}`)}`}
               className={`${styles.viewAllButton} mt-4 rounded-full`}
             >
@@ -161,11 +153,9 @@ export function TopRatedDoctors() {
         ))}
       </div>
 
-    
-
+      {/* View All Button */}
       <div className="text-center mt-8">
         <Link href="/search" className="btn btn-outline btn-secondary hover:btn-secondary rounded-lg">
-
           View All Doctors
           <svg
             className="w-4 h-4 ml-2"
