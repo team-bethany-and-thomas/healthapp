@@ -118,9 +118,7 @@ export function TopRatedDoctors() {
                           />
                         ))}
                       </div>
-                      <span className="text-sm font-medium text-base-content/80">
-                        {(doctor.rating || 4.5).toFixed(1)}
-                      </span>
+                   
                     </div>
                     <p className="doctor-location text-xs text-base-content/60">
                       {doctor.city || 'Local'}, {doctor.state || 'TX'}
@@ -148,7 +146,7 @@ export function TopRatedDoctors() {
       {/* View All Button */}
 
       <div className="text-center mt-8">
-        <Link href="/search" className="btn btn-outline btn-secondary hover:btn-secondary">
+        <Link href="/search" className="btn btn-outline btn-secondary hover:btn-secondary rounded-lg">
 
           View All Doctors
           <svg
