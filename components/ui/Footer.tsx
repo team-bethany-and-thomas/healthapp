@@ -37,15 +37,15 @@ export const Footer = () => {
         </nav>
         <nav className="flex flex-col  ">
           <h6 className="footer-title text-lg text-primary">Company</h6>
-          <a className="link link-hover text-base text-black hover:text-primary">
+          <Link href="/" className="link link-hover text-base text-black hover:text-primary">
             Home
-          </a>
-          <a className="link link-hover text-base text-black hover:text-primary">
+          </Link>
+          <Link href="/about" className="link link-hover text-base text-black hover:text-primary">
             About us
-          </a>
-          <a className="link link-hover text-base text-black hover:text-primary">
-            Services
-          </a>
+          </Link>
+          <Link href="/contact" className="link link-hover text-base text-black hover:text-primary">
+            Contact
+          </Link>
         </nav>
         <nav className="flex flex-col  ">
           <h6 className="footer-title text-lg text-primary ">Explore</h6>
