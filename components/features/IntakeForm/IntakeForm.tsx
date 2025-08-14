@@ -61,9 +61,10 @@ interface PatientFormData {
 
 interface IntakeFormProps {
   appointmentId?: string | null;
+  readOnly?: boolean;
 }
 
-export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
+export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId, readOnly = false }) => {
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -79,6 +80,7 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
   const [currentAppointment, setCurrentAppointment] =
     useState<Appointment | null>(null);
   const [isAppointmentSpecific, setIsAppointmentSpecific] = useState(false);
+  const [isReadOnly, setIsReadOnly] = useState(readOnly);
 
   // File upload states
   const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
@@ -166,6 +168,19 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
         setSelectedForm(result.form);
         setIsAppointmentSpecific(true);
 
+        // Check if this should be read-only based on appointment status
+        const appointmentDateTime = new Date(`${result.appointment.appointment_date} ${result.appointment.appointment_time}`);
+        const now = new Date();
+        const isAppointmentPast = appointmentDateTime.getTime() < now.getTime();
+        const isAppointmentCompleted = result.appointment.status?.toLowerCase() === "completed";
+        const isAppointmentCancelled = result.appointment.status?.toLowerCase() === "cancelled" || 
+                                      result.appointment.status?.toLowerCase() === "canceled";
+        
+        // Set read-only if appointment is past, completed, or cancelled
+        if (isAppointmentPast || isAppointmentCompleted || isAppointmentCancelled) {
+          setIsReadOnly(true);
+        }
+
         if (result.isExisting) {
           // Load existing intake form data
           try {
@@ -232,11 +247,15 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
 
               if (hasExistingData) {
                 setSuccessMessage(
-                  "Loaded existing intake form data. You can review and update your information."
+                  isReadOnly 
+                    ? "Viewing past intake form data. This form is read-only and cannot be modified."
+                    : "Loaded existing intake form data. You can review and update your information."
                 );
               } else {
                 setSuccessMessage(
-                  "New intake form created for your appointment. Please complete all sections below."
+                  isReadOnly
+                    ? "Viewing past intake form. This form is read-only and cannot be modified."
+                    : "New intake form created for your appointment. Please complete all sections below."
                 );
               }
             } else {
@@ -778,9 +797,10 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
               <PatientInformation
                 onSubmit={handleStepSubmit}
                 defaultValues={formData.patientInformation}
-                onClearFields={handleClearFields}
-                onSaveProgress={handleSaveProgress}
+                onClearFields={!isReadOnly && !errors.general ? handleClearFields : undefined}
+                onSaveProgress={!isReadOnly && !errors.general ? handleSaveProgress : undefined}
                 isLoading={isLoading}
+                isReadOnly={isReadOnly}
               />
             </div>
           )}
@@ -801,7 +821,7 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                         <h3 className="text-md font-medium text-gray-900">
                           Emergency Contact {index + 1}
                         </h3>
-                        {completeFormData.emergency_contacts.length > 1 && (
+                        {completeFormData.emergency_contacts.length > 1 && !isReadOnly && (
                           <button
                             type="button"
                             onClick={() =>
@@ -834,7 +854,12 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                                 )
                               )
                             }
-                            className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
+                            disabled={isReadOnly}
+                            className={`input input-bordered w-full rounded-lg ${
+                              isReadOnly 
+                                ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                                : "bg-base-200 text-base-content"
+                            }`}
                             placeholder="First name"
                           />
                           {errors[`emergency_contact_${index}_first_name`] && (
@@ -861,7 +886,12 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                                 )
                               )
                             }
-                            className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
+                            disabled={isReadOnly}
+                            className={`input input-bordered w-full rounded-lg ${
+                              isReadOnly 
+                                ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                                : "bg-base-200 text-base-content"
+                            }`}
                             placeholder="Last name"
                           />
                           {errors[`emergency_contact_${index}_last_name`] && (
@@ -888,7 +918,12 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                                 )
                               )
                             }
-                            className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
+                            disabled={isReadOnly}
+                            className={`input input-bordered w-full rounded-lg ${
+                              isReadOnly 
+                                ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                                : "bg-base-200 text-base-content"
+                            }`}
                             placeholder="e.g., Spouse, Parent, Sibling"
                           />
                           {errors[
@@ -921,7 +956,12 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                                 )
                               )
                             }
-                            className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
+                            disabled={isReadOnly}
+                            className={`input input-bordered w-full rounded-lg ${
+                              isReadOnly 
+                                ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                                : "bg-base-200 text-base-content"
+                            }`}
                             placeholder="(555) 123-4567"
                           />
                           {errors[
@@ -954,7 +994,12 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                                 )
                               )
                             }
-                            className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
+                            disabled={isReadOnly}
+                            className={`input input-bordered w-full rounded-lg ${
+                              isReadOnly 
+                                ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                                : "bg-base-200 text-base-content"
+                            }`}
                             placeholder="(555) 987-6543 (optional)"
                           />
                         </div>
@@ -976,7 +1021,12 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                                 )
                               )
                             }
-                            className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
+                            disabled={isReadOnly}
+                            className={`input input-bordered w-full rounded-lg ${
+                              isReadOnly 
+                                ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                                : "bg-base-200 text-base-content"
+                            }`}
                             placeholder="contact@example.com (optional)"
                           />
                         </div>
@@ -984,45 +1034,49 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                     </div>
                   ))}
 
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setCompleteFormData((prev) => addEmergencyContact(prev))
-                    }
-                    className="btn btn-outline w-full rounded-lg"
-                  >
-                    Add Another Emergency Contact
-                  </button>
+                  {!isReadOnly && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCompleteFormData((prev) => addEmergencyContact(prev))
+                      }
+                      className="btn btn-outline w-full rounded-lg"
+                    >
+                      Add Another Emergency Contact
+                    </button>
+                  )}
                 </div>
 
                 {/* Action Buttons Row */}
                 <div className="flex flex-col gap-4 mt-6">
-                  {/* Clear Fields and Save Progress Buttons */}
-                  <div className="flex justify-center gap-4">
-                    <button
-                      type="button"
-                      onClick={handleClearFields}
-                      disabled={isLoading}
-                      className="bg-red-500 hover:bg-red-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    >
-                      Clear Fields
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleSaveProgress}
-                      disabled={isLoading}
-                      className="bg-blue-500 hover:bg-blue-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    >
-                      {isLoading ? (
-                        <>
-                          <span className="loading loading-spinner loading-sm"></span>
-                          Saving...
-                        </>
-                      ) : (
-                        "Save Progress"
-                      )}
-                    </button>
-                  </div>
+                  {/* Clear Fields and Save Progress Buttons - Hidden in read-only mode */}
+                  {!isReadOnly && !errors.general && (
+                    <div className="flex justify-center gap-4">
+                      <button
+                        type="button"
+                        onClick={handleClearFields}
+                        disabled={isLoading}
+                        className="bg-red-500 hover:bg-red-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+                      >
+                        Clear Fields
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSaveProgress}
+                        disabled={isLoading}
+                        className="bg-blue-500 hover:bg-blue-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+                      >
+                        {isLoading ? (
+                          <>
+                            <span className="loading loading-spinner loading-sm"></span>
+                            Saving...
+                          </>
+                        ) : (
+                          "Save Progress"
+                        )}
+                      </button>
+                    </div>
+                  )}
                   
                   {/* Navigation Buttons */}
                   <div className="flex justify-between">
@@ -1066,7 +1120,12 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                           updateInsuranceInfo(prev, "provider", e.target.value)
                         )
                       }
-                      className="select select-bordered w-full bg-base-200 text-base-content rounded-lg"
+                      disabled={isReadOnly}
+                      className={`select select-bordered w-full rounded-lg ${
+                        isReadOnly 
+                          ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                          : "bg-base-200 text-base-content"
+                      }`}
                       title="Insurance Provider"
                     >
                       <option value="">Select insurance provider</option>
@@ -1104,7 +1163,12 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                           )
                         )
                       }
-                      className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
+                      disabled={isReadOnly}
+                      className={`input input-bordered w-full rounded-lg ${
+                        isReadOnly 
+                          ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                          : "bg-base-200 text-base-content"
+                      }`}
                       placeholder="Policy number (optional)"
                     />
                     {errors["insurance.policy_number"] && (
@@ -1132,7 +1196,12 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                             )
                           )
                         }
-                        className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
+                        disabled={isReadOnly}
+                        className={`input input-bordered w-full rounded-lg ${
+                          isReadOnly 
+                            ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                            : "bg-base-200 text-base-content"
+                        }`}
                         placeholder="Enter your insurance provider name or type 'none'"
                       />
                       <div className="label">
@@ -1164,7 +1233,12 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                           )
                         )
                       }
-                      className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
+                      disabled={isReadOnly}
+                      className={`input input-bordered w-full rounded-lg ${
+                        isReadOnly 
+                          ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                          : "bg-base-200 text-base-content"
+                      }`}
                       placeholder="Group number (if applicable)"
                     />
                   </div>
@@ -1185,7 +1259,12 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                           )
                         )
                       }
-                      className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
+                      disabled={isReadOnly}
+                      className={`input input-bordered w-full rounded-lg ${
+                        isReadOnly 
+                          ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                          : "bg-base-200 text-base-content"
+                      }`}
                       placeholder="Name on insurance policy"
                     />
                   </div>
@@ -1209,7 +1288,12 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                             )
                           )
                         }
-                        className="select select-bordered w-full bg-base-200 text-base-content rounded-lg"
+                        disabled={isReadOnly}
+                        className={`select select-bordered w-full rounded-lg ${
+                          isReadOnly 
+                            ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                            : "bg-base-200 text-base-content"
+                        }`}
                         title="Relationship to Subscriber"
                       >
                       <option value="self">Self</option>
@@ -1223,32 +1307,34 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
 
                 {/* Action Buttons Row */}
                 <div className="flex flex-col gap-4 mt-6">
-                  {/* Clear Fields and Save Progress Buttons */}
-                  <div className="flex justify-center gap-4">
-                    <button
-                      type="button"
-                      onClick={handleClearFields}
-                      disabled={isLoading}
-                      className="bg-red-500 hover:bg-red-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    >
-                      Clear Fields
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleSaveProgress}
-                      disabled={isLoading}
-                      className="bg-blue-500 hover:bg-blue-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    >
-                      {isLoading ? (
-                        <>
-                          <span className="loading loading-spinner loading-sm"></span>
-                          Saving...
-                        </>
-                      ) : (
-                        "Save Progress"
-                      )}
-                    </button>
-                  </div>
+                  {/* Clear Fields and Save Progress Buttons - Hidden in read-only mode */}
+                  {!isReadOnly && !errors.general && (
+                    <div className="flex justify-center gap-4">
+                      <button
+                        type="button"
+                        onClick={handleClearFields}
+                        disabled={isLoading}
+                        className="bg-red-500 hover:bg-red-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+                      >
+                        Clear Fields
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSaveProgress}
+                        disabled={isLoading}
+                        className="bg-blue-500 hover:bg-blue-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+                      >
+                        {isLoading ? (
+                          <>
+                            <span className="loading loading-spinner loading-sm"></span>
+                            Saving...
+                          </>
+                        ) : (
+                          "Save Progress"
+                        )}
+                      </button>
+                    </div>
+                  )}
                   
                   {/* Navigation Buttons */}
                   <div className="flex justify-between">
@@ -1298,7 +1384,12 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                             )
                           )
                         }
-                        className="input input-bordered bg-base-200 text-base-content rounded-lg lg:col-span-3"
+                        disabled={isReadOnly}
+                        className={`input input-bordered rounded-lg lg:col-span-3 ${
+                          isReadOnly 
+                            ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                            : "bg-base-200 text-base-content"
+                        }`}
                         aria-label="Allergen name"
                       />
                       <select
@@ -1313,7 +1404,12 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                             )
                           )
                         }
-                        className="select select-bordered bg-base-200 text-base-content rounded-lg lg:col-span-3"
+                        disabled={isReadOnly}
+                        className={`select select-bordered rounded-lg lg:col-span-3 ${
+                          isReadOnly 
+                            ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                            : "bg-base-200 text-base-content"
+                        }`}
                         title="Allergy Severity"
                       >
                         <option value="mild">Mild</option>
@@ -1334,20 +1430,27 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                             )
                           )
                         }
-                        className="input input-bordered bg-base-200 text-base-content rounded-lg lg:col-span-4"
+                        disabled={isReadOnly}
+                        className={`input input-bordered rounded-lg lg:col-span-4 ${
+                          isReadOnly 
+                            ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                            : "bg-base-200 text-base-content"
+                        }`}
                         aria-label="Reaction description"
                       />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setCompleteFormData((prev) =>
-                            removeAllergy(prev, index)
-                          )
-                        }
-                        className="btn btn-error rounded-lg h-12 lg:col-span-2"
-                      >
-                        Remove
-                      </button>
+                      {!isReadOnly && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setCompleteFormData((prev) =>
+                              removeAllergy(prev, index)
+                            )
+                          }
+                          className="btn btn-error rounded-lg h-12 lg:col-span-2"
+                        >
+                          Remove
+                        </button>
+                      )}
                     </div>
                   ))}
 
@@ -1357,45 +1460,49 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                     </p>
                   )}
 
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setCompleteFormData((prev) => addAllergy(prev))
-                    }
-                    className="btn btn-outline w-full rounded-lg"
-                  >
-                    Add Allergy
-                  </button>
+                  {!isReadOnly && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCompleteFormData((prev) => addAllergy(prev))
+                      }
+                      className="btn btn-outline w-full rounded-lg"
+                    >
+                      Add Allergy
+                    </button>
+                  )}
                 </div>
 
                 {/* Action Buttons Row */}
                 <div className="flex flex-col gap-4 mt-6">
-                  {/* Clear Fields and Save Progress Buttons */}
-                  <div className="flex justify-center gap-4">
-                    <button
-                      type="button"
-                      onClick={handleClearFields}
-                      disabled={isLoading}
-                      className="bg-red-500 hover:bg-red-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    >
-                      Clear Fields
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleSaveProgress}
-                      disabled={isLoading}
-                      className="bg-blue-500 hover:bg-blue-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    >
-                      {isLoading ? (
-                        <>
-                          <span className="loading loading-spinner loading-sm"></span>
-                          Saving...
-                        </>
-                      ) : (
-                        "Save Progress"
-                      )}
-                    </button>
-                  </div>
+                  {/* Clear Fields and Save Progress Buttons - Hidden in read-only mode */}
+                  {!isReadOnly && !errors.general && (
+                    <div className="flex justify-center gap-4">
+                      <button
+                        type="button"
+                        onClick={handleClearFields}
+                        disabled={isLoading}
+                        className="bg-red-500 hover:bg-red-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+                      >
+                        Clear Fields
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSaveProgress}
+                        disabled={isLoading}
+                        className="bg-blue-500 hover:bg-blue-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+                      >
+                        {isLoading ? (
+                          <>
+                            <span className="loading loading-spinner loading-sm"></span>
+                            Saving...
+                          </>
+                        ) : (
+                          "Save Progress"
+                        )}
+                      </button>
+                    </div>
+                  )}
                   
                   {/* Navigation Buttons */}
                   <div className="flex justify-between">
@@ -1445,7 +1552,12 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                             )
                           )
                         }
-                        className="input input-bordered bg-base-200 text-base-content rounded-lg"
+                        disabled={isReadOnly}
+                        className={`input input-bordered rounded-lg ${
+                          isReadOnly 
+                            ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                            : "bg-base-200 text-base-content"
+                        }`}
                         aria-label="Medication name"
                       />
                       <input
@@ -1462,7 +1574,12 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                             )
                           )
                         }
-                        className="input input-bordered bg-base-200 text-base-content rounded-lg"
+                        disabled={isReadOnly}
+                        className={`input input-bordered rounded-lg ${
+                          isReadOnly 
+                            ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                            : "bg-base-200 text-base-content"
+                        }`}
                         aria-label="Dosage"
                       />
                       <input
@@ -1479,7 +1596,12 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                             )
                           )
                         }
-                        className="input input-bordered bg-base-200 text-base-content rounded-lg"
+                        disabled={isReadOnly}
+                        className={`input input-bordered rounded-lg ${
+                          isReadOnly 
+                            ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                            : "bg-base-200 text-base-content"
+                        }`}
                         aria-label="Frequency"
                       />
                       <select
@@ -1494,7 +1616,12 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                             )
                           )
                         }
-                        className="select select-bordered bg-base-200 text-base-content rounded-lg"
+                        disabled={isReadOnly}
+                        className={`select select-bordered rounded-lg ${
+                          isReadOnly 
+                            ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                            : "bg-base-200 text-base-content"
+                        }`}
                         title="Medication Status"
                       >
                         <option value="prescribed">Prescribed</option>
@@ -1502,17 +1629,19 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                         <option value="completed">Completed</option>
                         <option value="discontinued">Discontinued</option>
                       </select>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setCompleteFormData((prev) =>
-                            removeMedication(prev, index)
-                          )
-                        }
-                        className="btn btn-error rounded-lg h-12"
-                      >
-                        Remove
-                      </button>
+                      {!isReadOnly && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setCompleteFormData((prev) =>
+                              removeMedication(prev, index)
+                            )
+                          }
+                          className="btn btn-error rounded-lg h-12"
+                        >
+                          Remove
+                        </button>
+                      )}
                     </div>
                   ))}
 
@@ -1522,15 +1651,17 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                     </p>
                   )}
 
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setCompleteFormData((prev) => addMedication(prev))
-                    }
-                    className="btn btn-outline w-full rounded-lg"
-                  >
-                    Add Medication
-                  </button>
+                  {!isReadOnly && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCompleteFormData((prev) => addMedication(prev))
+                      }
+                      className="btn btn-outline w-full rounded-lg"
+                    >
+                      Add Medication
+                    </button>
+                  )}
                 </div>
 
                 {/* Medical Conditions */}
@@ -1545,40 +1676,47 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                         updateMedicalConditions(prev, e.target.value)
                       )
                     }
+                    disabled={isReadOnly}
                     rows={4}
-                    className="textarea textarea-bordered bg-base-200 text-base-content rounded-lg w-full"
+                    className={`textarea textarea-bordered rounded-lg w-full ${
+                      isReadOnly 
+                        ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                        : "bg-base-200 text-base-content"
+                    }`}
                     placeholder="Please describe any current medical conditions, past surgeries, or relevant medical history..."
                   />
                 </div>
 
                 {/* Action Buttons Row */}
                 <div className="flex flex-col gap-4 mt-6">
-                  {/* Clear Fields and Save Progress Buttons */}
-                  <div className="flex justify-center gap-4">
-                    <button
-                      type="button"
-                      onClick={handleClearFields}
-                      disabled={isLoading}
-                      className="bg-red-500 hover:bg-red-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    >
-                      Clear Fields
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleSaveProgress}
-                      disabled={isLoading}
-                      className="bg-blue-500 hover:bg-blue-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    >
-                      {isLoading ? (
-                        <>
-                          <span className="loading loading-spinner loading-sm"></span>
-                          Saving...
-                        </>
-                      ) : (
-                        "Save Progress"
-                      )}
-                    </button>
-                  </div>
+                  {/* Clear Fields and Save Progress Buttons - Hidden in read-only mode */}
+                  {!isReadOnly && !errors.general && (
+                    <div className="flex justify-center gap-4">
+                      <button
+                        type="button"
+                        onClick={handleClearFields}
+                        disabled={isLoading}
+                        className="bg-red-500 hover:bg-red-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+                      >
+                        Clear Fields
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSaveProgress}
+                        disabled={isLoading}
+                        className="bg-blue-500 hover:bg-blue-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+                      >
+                        {isLoading ? (
+                          <>
+                            <span className="loading loading-spinner loading-sm"></span>
+                            Saving...
+                          </>
+                        ) : (
+                          "Save Progress"
+                        )}
+                      </button>
+                    </div>
+                  )}
                   
                   {/* Navigation Buttons */}
                   <div className="flex justify-between">
@@ -1611,28 +1749,32 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                 </h2>
 
                 {/* File Attachments */}
-                <div className="mb-8">
-                  <h3 className="text-md font-medium text-gray-900 mb-4">
-                    Upload New Files
-                  </h3>
-                  <UploadFile
-                    onUploadSuccess={handleFileUploadSuccess}
-                    onUploadError={handleFileUploadError}
-                    allowMultiple={true}
-                    category="medical-documents"
-                    className="w-full"
-                  />
-                </div>
+                {!isReadOnly && (
+                  <div className="mb-8">
+                    <h3 className="text-md font-medium text-gray-900 mb-4">
+                      Upload New Files
+                    </h3>
+                    <UploadFile
+                      onUploadSuccess={handleFileUploadSuccess}
+                      onUploadError={handleFileUploadError}
+                      allowMultiple={true}
+                      category="medical-documents"
+                      className="w-full"
+                    />
+                  </div>
+                )}
 
                 {/* File Selection Section */}
                 <div className="mb-8">
                   <h3 className="text-md font-medium text-gray-900 mb-4">
-                    Select Files to Attach
+                    {isReadOnly ? "Attached Files" : "Select Files to Attach"}
                   </h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Choose from your previously uploaded files to attach to this
-                    intake form.
-                  </p>
+                  {!isReadOnly && (
+                    <p className="text-sm text-gray-600 mb-4">
+                      Choose from your previously uploaded files to attach to this
+                      intake form.
+                    </p>
+                  )}
 
                   {completeFormData.attached_files.length > 0 && (
                     <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
@@ -1642,18 +1784,20 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                         </strong>{" "}
                         file
                         {completeFormData.attached_files.length > 1 ? "s" : ""}{" "}
-                        selected for attachment
+                        {isReadOnly ? "attached to this form" : "selected for attachment"}
                       </p>
                     </div>
                   )}
 
                   <UploadTable
                     key={refreshFileTable}
-                    onFileSelect={handleFileSelection}
-                    allowMultipleSelection={true}
-                    showSelectionColumn={true}
+                    onFileSelect={isReadOnly ? undefined : handleFileSelection}
+                    allowMultipleSelection={!isReadOnly}
+                    showSelectionColumn={!isReadOnly}
                     category="medical-documents"
                     className="w-full"
+                    hideCategoryInTitle={isReadOnly}
+                    readOnly={isReadOnly}
                   />
                 </div>
 
@@ -1673,7 +1817,10 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                           updateConsent(prev, "hipaa_consent", e.target.checked)
                         )
                       }
-                      className="checkbox checkbox-primary mt-1"
+                      disabled={isReadOnly}
+                      className={`checkbox checkbox-primary mt-1 ${
+                        isReadOnly ? "cursor-not-allowed opacity-50" : ""
+                      }`}
                     />
                     <div className="ml-3">
                       <label className="text-sm font-medium text-gray-900">
@@ -1707,7 +1854,10 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                           )
                         )
                       }
-                      className="checkbox checkbox-primary mt-1"
+                      disabled={isReadOnly}
+                      className={`checkbox checkbox-primary mt-1 ${
+                        isReadOnly ? "cursor-not-allowed opacity-50" : ""
+                      }`}
                     />
                     <div className="ml-3">
                       <label className="text-sm font-medium text-gray-900">
@@ -1739,7 +1889,10 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                           )
                         )
                       }
-                      className="checkbox checkbox-primary mt-1"
+                      disabled={isReadOnly}
+                      className={`checkbox checkbox-primary mt-1 ${
+                        isReadOnly ? "cursor-not-allowed opacity-50" : ""
+                      }`}
                     />
                     <div className="ml-3">
                       <label className="text-sm font-medium text-gray-900">
@@ -1760,32 +1913,34 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
 
                 {/* Action Buttons Row */}
                 <div className="flex flex-col gap-4 mt-6">
-                  {/* Clear Fields and Save Progress Buttons */}
-                  <div className="flex justify-center gap-4">
-                    <button
-                      type="button"
-                      onClick={handleClearFields}
-                      disabled={isLoading}
-                      className="bg-red-500 hover:bg-red-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    >
-                      Clear Fields
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleSaveProgress}
-                      disabled={isLoading}
-                      className="bg-blue-500 hover:bg-blue-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    >
-                      {isLoading ? (
-                        <>
-                          <span className="loading loading-spinner loading-sm"></span>
-                          Saving...
-                        </>
-                      ) : (
-                        "Save Progress"
-                      )}
-                    </button>
-                  </div>
+                  {/* Clear Fields and Save Progress Buttons - Hidden in read-only mode */}
+                  {!isReadOnly && !errors.general && (
+                    <div className="flex justify-center gap-4">
+                      <button
+                        type="button"
+                        onClick={handleClearFields}
+                        disabled={isLoading}
+                        className="bg-red-500 hover:bg-red-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+                      >
+                        Clear Fields
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSaveProgress}
+                        disabled={isLoading}
+                        className="bg-blue-500 hover:bg-blue-600 text-white border-none rounded-lg px-4 py-2 flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 font-semibold min-w-[120px] hover:transform hover:-translate-y-0.5 hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+                      >
+                        {isLoading ? (
+                          <>
+                            <span className="loading loading-spinner loading-sm"></span>
+                            Saving...
+                          </>
+                        ) : (
+                          "Save Progress"
+                        )}
+                      </button>
+                    </div>
+                  )}
                   
                   {/* Navigation and Submit Buttons */}
                   <div className="flex justify-between">
@@ -1799,9 +1954,9 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                     <button
                       type="button"
                       onClick={handleCompleteFormSubmit}
-                      disabled={isLoading}
+                      disabled={isLoading || isReadOnly || !!errors.general}
                       className={`${
-                        isLoading
+                        isLoading || isReadOnly || errors.general
                           ? "bg-gray-400 cursor-not-allowed"
                           : "bg-[rgba(102,232,219,0.9)] hover:bg-[rgba(72,212,199,0.9)] hover:transform hover:-translate-y-0.5 hover:shadow-lg"
                       } text-white border-none rounded-lg px-6 py-3 flex items-center justify-center gap-2 transition-all duration-200 font-semibold min-w-[180px]`}
@@ -1811,6 +1966,10 @@ export const IntakeForm: React.FC<IntakeFormProps> = ({ appointmentId }) => {
                           <span className="loading loading-spinner loading-sm"></span>
                           Submitting...
                         </>
+                      ) : isReadOnly ? (
+                        "Form is Read-Only"
+                      ) : errors.general ? (
+                        "Cannot Submit"
                       ) : (
                         "Submit Complete Intake Form"
                       )}

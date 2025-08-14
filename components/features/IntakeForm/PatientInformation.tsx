@@ -48,6 +48,7 @@ interface PatientFormProps {
   onClearFields?: () => void;
   onSaveProgress?: () => void;
   isLoading?: boolean;
+  isReadOnly?: boolean;
 }
 
 export const PatientInformation: React.FC<PatientFormProps> = ({
@@ -56,6 +57,7 @@ export const PatientInformation: React.FC<PatientFormProps> = ({
   onClearFields,
   onSaveProgress,
   isLoading = false,
+  isReadOnly = false,
 }) => {
   const {
     register,
@@ -142,9 +144,12 @@ export const PatientInformation: React.FC<PatientFormProps> = ({
             <input
               type="text"
               {...register("first_name")}
-              className={`input input-bordered w-full bg-base-200 text-base-content rounded-lg ${
-                errors.first_name ? "input-error" : ""
-              }`}
+              disabled={isReadOnly}
+              className={`input input-bordered w-full rounded-lg ${
+                isReadOnly 
+                  ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                  : "bg-base-200 text-base-content"
+              } ${errors.first_name ? "input-error" : ""}`}
               placeholder="Enter first name"
             />
             {errors.first_name && (
@@ -158,7 +163,12 @@ export const PatientInformation: React.FC<PatientFormProps> = ({
             <input
               type="text"
               {...register("last_name")}
-              className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
+              disabled={isReadOnly}
+              className={`input input-bordered w-full rounded-lg ${
+                isReadOnly 
+                  ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                  : "bg-base-200 text-base-content"
+              }`}
               placeholder="Enter last name"
             />
             {errors.last_name && (
@@ -175,7 +185,12 @@ export const PatientInformation: React.FC<PatientFormProps> = ({
             <input
               type="text"
               {...register("email")}
-              className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
+              disabled={isReadOnly}
+              className={`input input-bordered w-full rounded-lg ${
+                isReadOnly 
+                  ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                  : "bg-base-200 text-base-content"
+              }`}
               placeholder="Enter email"
             />
             {errors.email && (
@@ -189,7 +204,12 @@ export const PatientInformation: React.FC<PatientFormProps> = ({
             <input
               type="text"
               {...register("phone")}
-              className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
+              disabled={isReadOnly}
+              className={`input input-bordered w-full rounded-lg ${
+                isReadOnly 
+                  ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                  : "bg-base-200 text-base-content"
+              }`}
               placeholder="Enter phone number"
             />
             {errors.phone && (
@@ -205,7 +225,12 @@ export const PatientInformation: React.FC<PatientFormProps> = ({
           <input
             type="text"
             {...register("address")}
-            className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
+            disabled={isReadOnly}
+            className={`input input-bordered w-full rounded-lg ${
+              isReadOnly 
+                ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                : "bg-base-200 text-base-content"
+            }`}
             placeholder="Enter address"
           />
           {errors.address && (
@@ -221,7 +246,12 @@ export const PatientInformation: React.FC<PatientFormProps> = ({
             <input
               type="text"
               {...register("city")}
-              className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
+              disabled={isReadOnly}
+              className={`input input-bordered w-full rounded-lg ${
+                isReadOnly 
+                  ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                  : "bg-base-200 text-base-content"
+              }`}
               placeholder="Enter city"
             />
             {errors.city && (
@@ -234,7 +264,12 @@ export const PatientInformation: React.FC<PatientFormProps> = ({
             </label>
             <select
               {...register("state")}
-              className="select select-bordered w-full bg-base-200 text-base-content rounded-lg"
+              disabled={isReadOnly}
+              className={`select select-bordered w-full rounded-lg ${
+                isReadOnly 
+                  ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                  : "bg-base-200 text-base-content"
+              }`}
               defaultValue={""}
             >
               <option value={""} disabled>
@@ -258,7 +293,12 @@ export const PatientInformation: React.FC<PatientFormProps> = ({
           <input
             type="text"
             {...register("zip_code")}
-            className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
+            disabled={isReadOnly}
+            className={`input input-bordered w-full rounded-lg ${
+              isReadOnly 
+                ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                : "bg-base-200 text-base-content"
+            }`}
             placeholder="Enter Zip code"
           />
           {errors.zip_code && (
@@ -270,7 +310,12 @@ export const PatientInformation: React.FC<PatientFormProps> = ({
             <input
               type="text"
               {...register("gender")}
-              className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
+              disabled={isReadOnly}
+              className={`input input-bordered w-full rounded-lg ${
+                isReadOnly 
+                  ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                  : "bg-base-200 text-base-content"
+              }`}
               placeholder="Type or select your gender"
               list="Genders"
             />
@@ -289,7 +334,12 @@ export const PatientInformation: React.FC<PatientFormProps> = ({
             <input
               type="date"
               {...register("date_of_birth")}
-              className="input input-bordered w-full bg-base-200 text-base-content rounded-lg"
+              disabled={isReadOnly}
+              className={`input input-bordered w-full rounded-lg ${
+                isReadOnly 
+                  ? "bg-gray-100 text-gray-600 cursor-not-allowed" 
+                  : "bg-base-200 text-base-content"
+              }`}
               placeholder="Date of Birth"
             />
             {errors.date_of_birth && (

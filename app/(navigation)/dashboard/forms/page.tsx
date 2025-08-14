@@ -326,6 +326,8 @@ function FormsPageContent() {
   const handleBackToList = () => {
     setShowIntakeForm(false);
     setSelectedAppointmentId(null);
+    // Clear URL parameters and navigate back to forms page
+    router.push('/dashboard/forms');
     // Refresh the list to show updated status
     fetchAppointmentsWithIntakeStatus();
   };
@@ -336,6 +338,10 @@ function FormsPageContent() {
 
   // If showing intake form, render it
   if (showIntakeForm && selectedAppointmentId) {
+    // Find the appointment to determine if it should be read-only
+    const selectedAppointment = appointments.find(appt => appt.appointmentId === selectedAppointmentId);
+    const shouldBeReadOnly = selectedAppointment ? isAppointmentPast(selectedAppointment) : false;
+
     return (
       <div className="h-full">
         <div className="mb-4">
@@ -346,7 +352,10 @@ function FormsPageContent() {
             ← Back to Intake Forms List
           </button>
         </div>
-        <IntakeForm appointmentId={selectedAppointmentId} />
+        <IntakeForm 
+          appointmentId={selectedAppointmentId} 
+          readOnly={shouldBeReadOnly}
+        />
       </div>
     );
   }
