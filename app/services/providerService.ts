@@ -143,8 +143,8 @@ class ProviderService {
       
       // Sort by rating if available, otherwise return random selection
       const sortedDoctors = allDoctors.sort((a, b) => {
-        const ratingA = a.rating || 4.5;
-        const ratingB = b.rating || 4.5;
+        const ratingA = a.rating || 4.5; 
+        const ratingB = b.rating || 4.5; 
         return ratingB - ratingA;
       });
 
@@ -215,7 +215,7 @@ class ProviderService {
       last_name: doctor.last_name || '',
       city: doctor.city || '',
       state: doctor.state || '',
-      rating: doctor.rating || 4.5,
+      rating: doctor.rating || 4.5, 
       appointments: doctor.appointments || [],
     };
   }
