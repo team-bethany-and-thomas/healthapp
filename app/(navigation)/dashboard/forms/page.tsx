@@ -387,7 +387,7 @@ function FormsPageContent() {
         return <span className={`${baseClasses} bg-red-100 text-red-800`}>Not Started</span>;
       case 'canceled':
       case 'cancelled':
-        return <span className={`${baseClasses} bg-gray-100 text-gray-600`}>Canceled</span>;
+        return <span className={`${baseClasses} bg-red-100 text-red-800`}>Canceled</span>;
       default:
         return <span className={`${baseClasses} bg-gray-100 text-gray-800`}>{status}</span>;
     }
