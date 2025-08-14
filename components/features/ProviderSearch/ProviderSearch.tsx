@@ -32,6 +32,19 @@ export function ProviderSearch() {
   const [isSearching, setIsSearching] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProviderId, setSelectedProviderId] = useState<string>("");
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if screen is mobile size
+  React.useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
 
   const generateNextAvailableSlots = useCallback((doctor: Doctor) => {
     const slots: AppointmentSlot[] = [];
@@ -358,14 +371,20 @@ export function ProviderSearch() {
       </div>
 
       <form onSubmit={handleSubmit} className={styles["search-bar"]}>
-        <Search className={styles["search-icon"]} />
-        <input
-          type="text"
-          placeholder="Search by name, specialty, location, or language..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyPress={handleKeyPress}
-        />
+        <div className={styles["search-input-container"]}>
+          <Search className={styles["search-icon"]} />
+          <input
+            type="text"
+            placeholder={
+              isMobile 
+                ? "Name, specialty, location, or language..." 
+                : "Search by name, specialty, location, or language..."
+            }
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyPress={handleKeyPress}
+          />
+        </div>
         <button
           type="submit"
           className={styles["search-button"]}
