@@ -138,7 +138,7 @@ export const ApptTable = () => {
     window.location.href = "/search";
   };
 
-  const handleIntakeForm = (appointmentId: string, hasIntakeForm: boolean) => {
+  const handleIntakeForm = (appointmentId: string, hasIntakeForm: boolean, isPast: boolean = false) => {
     if (hasIntakeForm) {
       // Navigate to existing intake form
       window.location.href = `/dashboard/forms?appointment_id=${appointmentId}`;
