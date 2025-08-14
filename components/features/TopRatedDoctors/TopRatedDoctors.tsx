@@ -135,7 +135,7 @@ export function TopRatedDoctors() {
                 </div>
               </div>
 
-            </div>
+            
             
             {/* Action Button - Outside the card */}
             <Link 
