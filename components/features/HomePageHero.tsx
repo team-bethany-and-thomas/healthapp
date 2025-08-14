@@ -24,12 +24,10 @@ const insuranceProviders = [
 export function HomePageHero() {
   return (
     <div className={styles.heroContainer}>
-      <div className={styles.backgroundOverlay}>
-      </div>
-      
       <div className={styles.content}>
         <div className={styles.quickConsultSection}>
           <h2 className={styles.sectionTitle}>Quick Consult For</h2>
+          <div className="w-16 h-1 bg-gradient-to-r from-teal-500 to-purple-600 mx-auto mb-6 rounded-full"></div>
           
           <div className={styles.medicalCategories}>
             {medicalCategories.map((category) => (
@@ -51,6 +49,7 @@ export function HomePageHero() {
 
         <div className={styles.doctorSection}>
           <h2 className={styles.doctorTitle}>Find an in-network doctor</h2>
+          <div className="w-16 h-1 bg-gradient-to-r from-purple-500 to-orange-500 mx-auto mb-6 rounded-full"></div>
           <p className={styles.doctorSubtitle}>from over 1,000 insurance plans</p>
           <p className={styles.doctorNote}>
             Always confirm doctor participation before booking. Not all specialties may be available in every plan.

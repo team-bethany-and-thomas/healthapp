@@ -42,4 +42,64 @@
   --color-error-content: oklch(98% 0.01 27.136);
 }
 
+/* Custom styles for IntakeForm step icons */
+.step-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background-color: rgba(156, 163, 175, 0.2);
+  border: 2px solid rgba(156, 163, 175, 0.3);
+  transition: all 0.3s ease;
+}
 
+.step-icon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  stroke-width: 2;
+}
+
+/* Active step icon styles */
+.step-primary .step-icon {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-primary-content);
+}
+
+.step-success .step-icon {
+  background-color: var(--color-success);
+  border-color: var(--color-success);
+  color: var(--color-success-content);
+}
+
+.step-warning .step-icon {
+  background-color: var(--color-warning);
+  border-color: var(--color-warning);
+  color: var(--color-warning-content);
+}
+
+.step-error .step-icon {
+  background-color: var(--color-error);
+  border-color: var(--color-error);
+  color: var(--color-error-content);
+}
+
+.step-secondary .step-icon {
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
+  color: var(--color-secondary-content);
+}
+
+.step-accent .step-icon {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-accent-content);
+}
+
+/* Hover effects for step icons */
+.step:hover .step-icon {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}

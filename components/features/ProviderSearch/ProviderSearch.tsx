@@ -19,6 +19,13 @@ import {
 } from "../../../app/services/providerService";
 import { AppointmentBookingModal } from "@/components/features/AppointmentBookingModal/AppointmentBookingModal";
 
+interface AppointmentSlot {
+  $id: string;
+  date: string;
+  start_time: string;
+  length_minutes: number;
+}
+
 export function ProviderSearch() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredProviders, setFilteredProviders] = useState<Doctor[]>([]);
@@ -26,17 +33,38 @@ export function ProviderSearch() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProviderId, setSelectedProviderId] = useState<string>("");
 
-  // Memoize the appointment slot generation
   const generateNextAvailableSlots = useCallback((doctor: Doctor) => {
-    const slots = [];
+    const slots: AppointmentSlot[] = [];
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-    // Helper function to parse time string (e.g., "09:00" to hours and minutes)
+    // Helper function to parse time string (e.g., "09:00" or "8am" to hours and minutes)
     const parseTime = (timeStr: string) => {
       if (!timeStr) return null;
-      const [hours, minutes] = timeStr.split(":").map(Number);
-      return { hours, minutes };
+
+      // Handle format like "8am", "5pm", "12pm", "12am"
+      const amPmMatch = timeStr.match(/(\d{1,2})(am|pm)/i);
+      if (amPmMatch) {
+        let hours = parseInt(amPmMatch[1]);
+        const period = amPmMatch[2].toLowerCase();
+
+        // Convert to 24-hour format
+        if (period === "pm" && hours !== 12) {
+          hours += 12;
+        } else if (period === "am" && hours === 12) {
+          hours = 0;
+        }
+
+        return { hours, minutes: 0 };
+      }
+
+      // Handle format like "09:00", "17:30"
+      if (timeStr.includes(":")) {
+        const [hours, minutes] = timeStr.split(":").map(Number);
+        return { hours, minutes };
+      }
+
+      return null;
     };
 
     // Helper function to create date with specific time
@@ -48,7 +76,46 @@ export function ProviderSearch() {
       return dateTime;
     };
 
-    // Generate slots for the next 7 days
+    // If no availability data, generate dynamic future-only slots
+    if (!doctor.availability_start && !doctor.weekend_start) {
+      const fallbackSlots = [];
+      let slotsGenerated = 0;
+
+      // Generate slots for the next few days until we have 3 slots
+      for (
+        let dayOffset = 0;
+        dayOffset < 7 && slotsGenerated < 3;
+        dayOffset++
+      ) {
+        const checkDate = new Date(today);
+        checkDate.setDate(today.getDate() + dayOffset);
+
+        // Define typical business hours for fallback
+        const businessHours = [9, 10, 11, 14, 15, 16, 17]; // 9am-5pm with lunch break
+
+        for (const hour of businessHours) {
+          if (slotsGenerated >= 3) break;
+
+          const slotDateTime = new Date(checkDate);
+          slotDateTime.setHours(hour, 0, 0, 0);
+
+          // Only add if this slot is in the future
+          if (slotDateTime > now) {
+            fallbackSlots.push({
+              $id: `fallback-${slotsGenerated}`,
+              date: checkDate.toISOString().split("T")[0],
+              start_time: `${hour.toString().padStart(2, "0")}:00`,
+              length_minutes: 30,
+            });
+            slotsGenerated++;
+          }
+        }
+      }
+
+      return fallbackSlots;
+    }
+
+    // Generate slots for the next 7 days, but only future times
     for (let dayOffset = 0; dayOffset < 7 && slots.length < 3; dayOffset++) {
       const currentDate = new Date(today);
       currentDate.setDate(today.getDate() + dayOffset);
@@ -84,63 +151,88 @@ export function ProviderSearch() {
         const endTime = createDateTime(currentDate, availableEnd);
 
         if (startTime && endTime) {
-          // If it's today, make sure the appointment is in the future
-          if (dayOffset === 0) {
-            const currentTime = new Date();
-            if (startTime <= currentTime) {
-              // Round up to next hour
-              const nextHour = new Date(currentTime);
-              nextHour.setHours(currentTime.getHours() + 1, 0, 0, 0);
-              if (nextHour < endTime) {
-                startTime.setTime(nextHour.getTime());
-              } else {
-                continue; // Skip today if no time available
-              }
+          // If it's today and the start time is in the past, adjust to next available hour
+          if (dayOffset === 0 && startTime <= now) {
+            // Round up to next hour after current time
+            const nextHour = new Date(now);
+            nextHour.setHours(now.getHours() + 1, 0, 0, 0);
+
+            // If the next hour is still within business hours, use it
+            if (nextHour < endTime) {
+              startTime.setTime(nextHour.getTime());
+            } else {
+              // No more time available today, skip to next day
+              continue;
             }
+          } else if (dayOffset > 0 && startTime <= now) {
+            // For future days, if somehow the start time is still in the past, skip
+            continue;
           }
 
-          // Generate 2-3 time slots for this day
-          const slotDuration = 60; // 1 hour slots
+          // Generate time slots for this day in 30-minute intervals
+          const slotDuration = 30; // 30 minute slots
           const currentSlot = new Date(startTime);
           let slotsForDay = 0;
 
-          while (currentSlot < endTime && slotsForDay < 2 && slots.length < 3) {
-            slots.push({
-              $id: `${doctor.$id}-${slots.length}`,
-              date: currentSlot.toISOString().split("T")[0],
-              start_time: currentSlot.toTimeString().slice(0, 5),
-              length_minutes: 30,
-            });
+          while (currentSlot < endTime && slotsForDay < 3 && slots.length < 3) {
+            // Double-check that this specific slot is in the future
+            if (currentSlot > now) {
+              const newSlot: AppointmentSlot = {
+                $id: `${doctor.$id}-${slots.length}`,
+                date: currentSlot.toISOString().split("T")[0],
+                start_time: currentSlot.toTimeString().slice(0, 5),
+                length_minutes: 30,
+              };
+              slots.push(newSlot);
+              slotsForDay++;
+            }
 
             currentSlot.setMinutes(currentSlot.getMinutes() + slotDuration);
-            slotsForDay++;
           }
         }
       }
     }
 
-    return slots.length > 0
-      ? slots
-      : [
-          {
-            $id: "1",
-            date: "2025-08-07",
-            start_time: "09:00",
-            length_minutes: 30,
-          },
-          {
-            $id: "2",
-            date: "2025-08-07",
-            start_time: "14:00",
-            length_minutes: 30,
-          },
-          {
-            $id: "3",
-            date: "2025-08-08",
-            start_time: "10:00",
-            length_minutes: 30,
-          },
-        ];
+    // If no slots were generated, use the same dynamic logic as the primary fallback
+    if (slots.length === 0) {
+      const fallbackSlots = [];
+      let slotsGenerated = 0;
+
+      // Generate slots for the next few days until we have 3 slots
+      for (
+        let dayOffset = 0;
+        dayOffset < 7 && slotsGenerated < 3;
+        dayOffset++
+      ) {
+        const checkDate = new Date(today);
+        checkDate.setDate(today.getDate() + dayOffset);
+
+        // Define typical business hours for fallback
+        const businessHours = [9, 10, 11, 14, 15, 16, 17]; // 9am-5pm with lunch break
+
+        for (const hour of businessHours) {
+          if (slotsGenerated >= 3) break;
+
+          const slotDateTime = new Date(checkDate);
+          slotDateTime.setHours(hour, 0, 0, 0);
+
+          // Only add if this slot is in the future
+          if (slotDateTime > now) {
+            fallbackSlots.push({
+              $id: `secondary-fallback-${slotsGenerated}`,
+              date: checkDate.toISOString().split("T")[0],
+              start_time: `${hour.toString().padStart(2, "0")}:00`,
+              length_minutes: 30,
+            });
+            slotsGenerated++;
+          }
+        }
+      }
+
+      return fallbackSlots;
+    }
+
+    return slots;
   }, []);
 
   // Memoize the search function to prevent unnecessary re-renders
@@ -155,35 +247,41 @@ export function ProviderSearch() {
     try {
       // Get all doctors to search through
       const allResults = await providerService.fetchDoctors({});
-      
+
       const searchTerm = searchQuery.trim().toLowerCase();
-      
+
       // Optimize search by using more efficient string operations
       const matchingResults = allResults.filter((doctor) => {
-        const fullName = `${doctor.first_name || ''} ${doctor.last_name || ''}`.toLowerCase();
-        const specialty = (doctor.specialty || '').toLowerCase();
-        const city = (doctor.city || '').toLowerCase();
-        const state = (doctor.state || '').toLowerCase();
-        const practice = (doctor.practice_name || '').toLowerCase();
-        const language = (doctor.language_spoken || '').toLowerCase();
-        
-        return fullName.includes(searchTerm) ||
-               specialty.includes(searchTerm) ||
-               city.includes(searchTerm) ||
-               state.includes(searchTerm) ||
-               practice.includes(searchTerm) ||
-               language.includes(searchTerm);
+        const fullName = `${doctor.first_name || ""} ${
+          doctor.last_name || ""
+        }`.toLowerCase();
+        const specialty = (doctor.specialty || "").toLowerCase();
+        const city = (doctor.city || "").toLowerCase();
+        const state = (doctor.state || "").toLowerCase();
+        const practice = (doctor.practice_name || "").toLowerCase();
+        const language = (doctor.language_spoken || "").toLowerCase();
+
+        return (
+          fullName.includes(searchTerm) ||
+          specialty.includes(searchTerm) ||
+          city.includes(searchTerm) ||
+          state.includes(searchTerm) ||
+          practice.includes(searchTerm) ||
+          language.includes(searchTerm)
+        );
       });
 
       // Transform the results to match the expected format
       const transformedResults = matchingResults.map((doctor) => {
         const transformed = providerService.transformDoctorData(doctor);
+        // Always override appointments with dynamically generated slots
+        const dynamicAppointments = generateNextAvailableSlots(doctor);
         return {
           ...transformed,
           imageUrl: providerService.getProfileImageUrl(
             doctor.profile_picture_id
           ),
-          appointments: generateNextAvailableSlots(doctor),
+          appointments: dynamicAppointments, // Always use our generated slots
         };
       });
 
@@ -196,20 +294,28 @@ export function ProviderSearch() {
     }
   }, [searchQuery, generateNextAvailableSlots]);
 
-  const handleSubmit = useCallback((e: React.FormEvent) => {
-    e.preventDefault();
-    handleSearch();
-  }, [handleSearch]);
-
-  const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
       handleSearch();
-    }
-  }, [handleSearch]);
+    },
+    [handleSearch]
+  );
+
+  const handleKeyPress = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Enter") {
+        handleSearch();
+      }
+    },
+    [handleSearch]
+  );
 
   // Memoize the date formatting function
   const formatDate = useCallback((dateString: string) => {
-    const date = new Date(dateString);
+    // Parse the date as local time to avoid timezone issues
+    const [year, month, day] = dateString.split("-").map(Number);
+    const date = new Date(year, month - 1, day); // month is 0-indexed
     return date.toLocaleDateString("en-US", {
       weekday: "short",
       month: "short",
@@ -218,19 +324,30 @@ export function ProviderSearch() {
   }, []);
 
   // Memoize the provider list for the modal
-  const providerListForModal = useMemo(() => 
-    filteredProviders.map(provider => ({
-      $id: provider.$id,
-      name: `${provider.first_name} ${provider.last_name}`.trim(),
-      gender: provider.gender,
-      specialty: provider.specialty,
-      location: `${provider.city}, ${provider.state}`,
-      phone: provider.phone,
-      availability: provider.availability,
-      weekend_available: provider.weekend_available,
-      bio: provider.bio,
-      profile_picture_id: provider.profile_picture_id,
-    })), [filteredProviders]
+  const providerListForModal = useMemo(
+    () =>
+      filteredProviders.map((provider) => ({
+        $id: provider.$id,
+        name: `${provider.first_name} ${provider.last_name}`.trim(),
+        gender: provider.gender,
+        specialty: provider.specialty,
+        location: `${provider.city}, ${provider.state}`,
+        phone: provider.phone,
+        availability: provider.availability,
+        availability_start: provider.availability_start,
+        availability_end: provider.availability_end,
+        weekend_available: provider.weekend_available,
+        weekend_start: provider.weekend_start,
+        weekend_end: provider.weekend_end,
+        availability_day: provider.availability_day, // Preserve availability_day field
+        bio: provider.bio,
+        profile_picture_id: provider.profile_picture_id,
+        provider_id: provider.provider_id,
+        first_name: provider.first_name,
+        last_name: provider.last_name,
+        practice_name: provider.practice_name,
+      })),
+    [filteredProviders]
   );
 
   return (
@@ -270,12 +387,14 @@ export function ProviderSearch() {
               });
               const transformedResults = results.map((doctor) => {
                 const transformed = providerService.transformDoctorData(doctor);
+                // Always override appointments with dynamically generated slots
+                const dynamicAppointments = generateNextAvailableSlots(doctor);
                 return {
                   ...transformed,
                   imageUrl: providerService.getProfileImageUrl(
                     doctor.profile_picture_id
                   ),
-                  appointments: generateNextAvailableSlots(doctor),
+                  appointments: dynamicAppointments, // Always use our generated slots
                 };
               });
               setFilteredProviders(transformedResults);
@@ -304,12 +423,14 @@ export function ProviderSearch() {
               );
               const transformedResults = specialistResults.map((doctor) => {
                 const transformed = providerService.transformDoctorData(doctor);
+                // Always override appointments with dynamically generated slots
+                const dynamicAppointments = generateNextAvailableSlots(doctor);
                 return {
                   ...transformed,
                   imageUrl: providerService.getProfileImageUrl(
                     doctor.profile_picture_id
                   ),
-                  appointments: generateNextAvailableSlots(doctor),
+                  appointments: dynamicAppointments, // Always use our generated slots
                 };
               });
               setFilteredProviders(transformedResults);
@@ -334,12 +455,14 @@ export function ProviderSearch() {
               });
               const transformedResults = results.map((doctor) => {
                 const transformed = providerService.transformDoctorData(doctor);
+                // Always override appointments with dynamically generated slots
+                const dynamicAppointments = generateNextAvailableSlots(doctor);
                 return {
                   ...transformed,
                   imageUrl: providerService.getProfileImageUrl(
                     doctor.profile_picture_id
                   ),
-                  appointments: generateNextAvailableSlots(doctor),
+                  appointments: dynamicAppointments, // Always use our generated slots
                 };
               });
               setFilteredProviders(transformedResults);
@@ -363,18 +486,20 @@ export function ProviderSearch() {
               const allResults = await providerService.fetchDoctors({});
               const multilingualResults = allResults.filter(
                 (doctor) =>
-                  doctor.language_spoken && 
-                  doctor.language_spoken.toLowerCase() !== 'english' &&
-                  doctor.language_spoken.toLowerCase() !== ''
+                  doctor.language_spoken &&
+                  doctor.language_spoken.toLowerCase() !== "english" &&
+                  doctor.language_spoken.toLowerCase() !== ""
               );
               const transformedResults = multilingualResults.map((doctor) => {
                 const transformed = providerService.transformDoctorData(doctor);
+                // Always override appointments with dynamically generated slots
+                const dynamicAppointments = generateNextAvailableSlots(doctor);
                 return {
                   ...transformed,
                   imageUrl: providerService.getProfileImageUrl(
                     doctor.profile_picture_id
                   ),
-                  appointments: generateNextAvailableSlots(doctor),
+                  appointments: dynamicAppointments, // Always use our generated slots
                 };
               });
               setFilteredProviders(transformedResults);
@@ -436,14 +561,19 @@ export function ProviderSearch() {
                       available
                     </span>
                   </div>
-                  <div className={styles['languages']}>
-                    <span className={styles['language-label']}>Languages:</span>
-                    <div className={styles['language-tags']}>
+                  <div className={styles["languages"]}>
+                    <span className={styles["language-label"]}>Languages:</span>
+                    <div className={styles["language-tags"]}>
                       {provider.languages_spoken?.map((language, langIndex) => (
-                        <span key={langIndex} className={styles['language-tag']}>
+                        <span
+                          key={langIndex}
+                          className={styles["language-tag"]}
+                        >
                           {language}
                         </span>
-                      )) || <span className={styles['language-tag']}>English</span>}
+                      )) || (
+                        <span className={styles["language-tag"]}>English</span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -470,7 +600,7 @@ export function ProviderSearch() {
                   </div>
                 </div>
 
-                <button 
+                <button
                   className={styles["book-button"]}
                   onClick={() => {
                     setSelectedProviderId(provider.$id);
