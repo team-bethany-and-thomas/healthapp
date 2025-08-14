@@ -476,12 +476,6 @@ export const ApptTable = () => {
       return (
         <div className={styles.emptyState}>
           <p className="mb-2">No appointments found.</p>
-          <button
-            onClick={handleBookAppointment}
-            className={styles.viewAllButton}
-          >
-            Schedule Your First Appointment
-          </button>
         </div>
       );
     }
@@ -752,12 +746,6 @@ export const ApptTable = () => {
       return (
         <div className="text-center p-8">
           <p className="mb-4">No appointments found.</p>
-          <button
-            onClick={handleBookAppointment}
-            className={styles.viewAllButton}
-          >
-            Schedule Your First Appointment
-          </button>
         </div>
       );
     }
