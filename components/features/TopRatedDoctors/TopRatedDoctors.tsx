@@ -141,7 +141,7 @@ export function TopRatedDoctors() {
 
                            title={`Doctor rating star ${i} + 1`}
                           
-                        ))}
+                    
                       </div>
                    
 
@@ -153,7 +153,7 @@ export function TopRatedDoctors() {
                 </div>
               </div>
 
-            </div>
+           </div>
             
             {/* Action Button - Outside the card */}
             <Link 
