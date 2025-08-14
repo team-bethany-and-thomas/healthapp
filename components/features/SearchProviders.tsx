@@ -293,7 +293,7 @@ const SearchProviders: React.FC = () => {
               key={doctor.$id}
               className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 border border-base-300 hover:border-primary/30 rounded-xl overflow-hidden"
             >
-              <div className="card-body p-6">
+              <div className="card-body p-6 flex flex-col h-full">
                 {/* Doctor Header */}
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center space-x-3">
@@ -354,7 +354,7 @@ const SearchProviders: React.FC = () => {
                 </div>
 
                 {/* Doctor Details */}
-                <div className="space-y-2 mb-4">
+                <div className="space-y-2 mb-4 flex-grow">
                   <div className="flex items-center text-sm text-base-content/70">
                     <MapPin className="w-4 h-4 mr-2" />
                     {doctor.location || `${doctor.city}, ${doctor.state}`}
@@ -380,12 +380,20 @@ const SearchProviders: React.FC = () => {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="card-actions justify-between">
-                  <button className="btn btn-outline btn-sm">
-                    View Profile
-                  </button>
+                <div className="card-actions justify-end mt-auto">
                   <button
-                    className="btn btn-primary btn-sm"
+                    className="border-none text-white font-semibold cursor-pointer transition-all duration-200 ease-in-out rounded-full px-4 py-3"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(102, 232, 219, 0.9), rgba(72, 212, 199, 0.9))',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'linear-gradient(135deg, rgba(72, 212, 199, 0.9), rgba(52, 192, 179, 0.9))';
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'linear-gradient(135deg, rgba(102, 232, 219, 0.9), rgba(72, 212, 199, 0.9))';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }}
                     onClick={() => handleBookAppointment(doctor.$id)}
                   >
                     Book Appointment
