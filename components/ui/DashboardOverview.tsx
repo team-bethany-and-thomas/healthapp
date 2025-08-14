@@ -525,7 +525,7 @@ const DashboardOverview: React.FC = () => {
                 value={nextAppointment ? formatDate(nextAppointment.date) : 'None scheduled'}
                 description={nextAppointment ? `${formatTime(nextAppointment.time)} - ${nextAppointment.type}\n${nextAppointment.providerName}` : 'Schedule your next appointment'}
                 actionText={nextAppointment ? 'View Details' : 'Book Now'}
-                onAction={() => router.push('/dashboard/appointments')}
+                onAction={() => nextAppointment ? router.push('/dashboard/appointments') : router.push('/search')}
                 status={nextAppointment ? 'primary' : 'warning'}
                 icon={
                   <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
