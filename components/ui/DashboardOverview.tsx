@@ -336,9 +336,15 @@ const DashboardOverview: React.FC = () => {
   const formatUploadDate = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
+    // Set both dates to start of day for accurate comparison
+    const uploadDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    const diffTime = today.getTime() - uploadDate.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'Today';
     if (diffDays === 1) return 'Yesterday';
     if (diffDays < 7) return `${diffDays} days ago`;
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -525,7 +531,7 @@ const DashboardOverview: React.FC = () => {
                 value={nextAppointment ? formatDate(nextAppointment.date) : 'None scheduled'}
                 description={nextAppointment ? `${formatTime(nextAppointment.time)} - ${nextAppointment.type}\n${nextAppointment.providerName}` : 'Schedule your next appointment'}
                 actionText={nextAppointment ? 'View Details' : 'Book Now'}
-                onAction={() => router.push('/dashboard/appointments')}
+                onAction={() => nextAppointment ? router.push('/dashboard/appointments') : router.push('/search')}
                 status={nextAppointment ? 'primary' : 'warning'}
                 icon={
                   <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

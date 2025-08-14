@@ -556,12 +556,6 @@ function FormsPageContent() {
             You need to schedule an appointment before you can complete an
             intake form.
           </p>
-          <button
-            onClick={handleBookAppointment}
-            className={styles.viewAllButton}
-          >
-            Schedule Your First Appointment
-          </button>
         </div>
       );
     }

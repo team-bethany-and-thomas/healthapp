@@ -345,9 +345,10 @@ const SearchProviders: React.FC = () => {
                           id={`rating-${doctor.$id}-${i}`}
                           type="radio"
                           name={`rating-${doctor.$id}`}
-                          className="mask mask-star-2 bg-orange-400"
+                          className="mask mask-star-2 bg-orange-400 pointer-events-none"
                           checked={i < Math.floor(doctor.rating || 4.5)}
                           readOnly
+                          disabled
                           aria-label={`${i + 1} star${i !== 0 ? "s" : ""}`}
                           title={`${i + 1} star${i !== 0 ? "s" : ""} out of 5`}
                         />

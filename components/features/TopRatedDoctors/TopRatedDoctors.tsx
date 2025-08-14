@@ -120,7 +120,7 @@ export function TopRatedDoctors() {
                           id={`rating-${index}-${i}`}
                           type="radio"
                           name={`rating-${index}`}
-                          className="mask mask-star-2 bg-orange-400"
+                          className="mask mask-star-2 bg-orange-400 pointer-events-none"
                           checked={i < Math.floor(doctor.rating || 4.5)}
                           readOnly
                           title={`Doctor rating star ${i + 1}`}
