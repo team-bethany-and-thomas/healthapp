@@ -90,7 +90,6 @@ export function TopRatedDoctors() {
                         height={64}
                         className="object-cover rounded-full"
                         onError={(e) => {
-                          // Fallback to a placeholder if image fails to load
                           const target = e.target as HTMLImageElement;
                           target.src =
                             "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23e5e7eb'/%3E%3Ctext x='32' y='32' font-family='Arial' font-size='8' fill='%236b7280' text-anchor='middle' dy='.3em'%3EDr%3C/text%3E%3C/svg%3E";
@@ -172,6 +171,7 @@ export function TopRatedDoctors() {
         ))}
       </div>
 
+      {/* View All Button */}
       <div className="text-center mt-8">
         <Link
           href="/search"

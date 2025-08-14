@@ -175,7 +175,11 @@ const SearchProviders: React.FC = () => {
       </div>
 
       {/* Search Section */}
+
+  
+
       <div className="bg-gradient-to-br from-teal-200/80 via-white/95 to-purple-200/80 p-6 rounded-xl mb-8 shadow-2xl border-2 border-primary/20 backdrop-blur-sm">
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* Filter by specialty */}
           <div className="form-control">
